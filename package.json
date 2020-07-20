@@ -1,0 +1,112 @@
+{
+  "name": "set.js",
+  "version": "0.0.1",
+  "description": "A javascript library for interacting with the Set Protocol v2",
+  "keywords": [
+    "set.js",
+    "SetProtocol",
+    "ethereum",
+    "tokens",
+    "basket",
+    "ERC20"
+  ],
+  "main": "dist/src/index.js",
+  "typings": "dist/types/src/index.d.ts",
+  "bin": {},
+  "scripts": {
+    "prod": "yarn run build",
+    "chain": "bash scripts/init_chain_internal.sh",
+    "build": "yarn run build-ts && yarn run tslint",
+    "build-ts": "tsc",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch --runInBand",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "precommit": "lint-staged",
+    "docs": "bash scripts/docs/generate_docs.sh",
+    "prepublishOnly": "yarn build"
+  },
+  "config": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SetProtocol/setProtocol.js"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=10.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.23",
+    "chai": "^4.2.0",
+    "ganache-cli": "^6.9.1",
+    "husky": "^4.2.5",
+    "jest": "^26.1.0",
+    "lint-staged": "^10.2.11",
+    "ts-jest": "^26.1.3",
+    "tslint": "^6.1.2",
+    "tslint-eslint-rules": "^5.4.0",
+    "typedoc": "^0.17.8",
+    "typedoc-plugin-markdown": "^2.3.1",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@0xproject/types": "^1.1.4",
+    "@0xproject/typescript-typings": "^3.0.2",
+    "@0xproject/utils": "^2.0.2",
+    "@truffle/contract": "^4.2.13",
+    "@types/jest": "^26.0.5",
+    "@types/web3": "^1.2.2",
+    "abi-decoder": "^2.3.0",
+    "bignumber.js": "^9.0.0",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^3.0.0",
+    "ethereum-types": "^3.2.0",
+    "ethereumjs-util": "^7.0.3",
+    "truffle": "^5.1.35",
+    "truffle-hdwallet-provider": "^1.0.17",
+    "web3": "^1.2.11",
+    "web3-utils": "^1.2.11"
+  },
+  "files": [
+    "src",
+    "dist",
+    "scripts"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "yarn tslint --fix",
+      "git add"
+    ],
+    "test/**/*.ts": [
+      "yarn tslint --fix",
+      "git add"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testPathIgnorePatterns": [
+      "/dist/",
+      "/_versions/"
+    ],
+    "testURL": "http://localhost/",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "moduleNameMapper": {
+      "^@src/(.*)": "<rootDir>/src/$1",
+      "^@test/(.*)": "<rootDir>/test/$1"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+dist/
+node_modules/
+.DS_Store
+documentation/*
+
+logs/
+
+/src/artifacts/ts/*.ts
+/src/artifacts/json/*.json
+
+yarn-error.log
+
+# Snapshot
+blockchain/
