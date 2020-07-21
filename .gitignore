@@ -12,3 +12,5 @@ yarn-error.log
 
 # Snapshot
 blockchain/
+
+.env
