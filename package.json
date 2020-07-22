@@ -23,9 +23,7 @@
         "tslint": "tslint -c tslint.json -p tsconfig.json",
         "precommit": "lint-staged",
         "docs": "bash scripts/docs/generate_docs.sh",
-        "prepublishOnly": "yarn build",
-        "postinstall": "node scripts/postinstall.js",
-        "preinstall": "eval $(egrep -v '^#' .env | xargs) node scripts/preinstall.js"
+        "prepublishOnly": "yarn build"
     },
     "config": {},
     "repository": {
@@ -64,7 +62,7 @@
         "dotenv": "^8.2.0",
         "ethereum-types": "^3.2.0",
         "ethereumjs-util": "^7.0.3",
-        "set-protocol-v2": "git+https://${$PERSONAL_ACCESS_TOKEN}:x-oauth-basic@github.com/SetProtocol/set-protocol-v2.git",
+        "set-protocol-v2": "git+ssh://git@github.com/SetProtocol/set-protocol-v2.git",
         "truffle": "^5.1.35",
         "truffle-hdwallet-provider": "^1.0.17",
         "web3": "^1.2.11",
