@@ -31,4 +31,18 @@ export class SetTokenWrapper {
   public constructor(web3: Web3) {
     this.web3 = web3;
   }
+
+  /**
+   * Issues a Set to the transaction signer. Must have component tokens in the correct quantites in either
+   * the vault or in the signer's wallet. Component tokens must be approved to the Transfer
+   * Proxy contract via setTransferProxyAllowanceAsync
+   *
+   * @param  setAddress    Address Set to issue
+   * @param  quantity      Amount of Set to issue. Must be multiple of the natural unit of the Set
+   * @param  txOpts        Transaction options object conforming to `Tx` with signer, gas, and gasPrice data
+   * @return               Transaction hash
+   */
+  public async popPosition(setAddress: string): Promise<string> {
+    return await 'hello';
+  }
 }

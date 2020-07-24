@@ -17,10 +17,9 @@
 'use strict';
 
 import Web3 from 'web3';
-import {
-  BaseContract as CoreBaseContract,
-  SetTokenContract,
-} from 'set-protocol-v2';
+import { Contract } from 'ethers';
+import { SetToken } from 'set-protocol-v2/utils/contracts';
+import { Address } from 'set-protocol-v2/utils/types';
 
 /**
  * @title ContractWrapper
@@ -31,7 +30,7 @@ import {
  */
 export class ProtocolContractWrapper {
   private web3: Web3;
-  private cache: { [contractName: string]: CoreBaseContract };
+  private cache: { [contractName: string]: Contract };
 
   public constructor(web3: Web3) {
     this.web3 = web3;
@@ -48,17 +47,14 @@ export class ProtocolContractWrapper {
   public async loadSetTokenAsync(
     setTokenAddress: Address,
     transactionOptions: object = {},
-  ): Promise<SetTokenContract> {
+  ): Promise<SetToken> {
     const cacheKey = `SetToken_${setTokenAddress}`;
 
     if (cacheKey in this.cache) {
-      return this.cache[cacheKey] as SetTokenContract;
+      return this.cache[cacheKey] as SetToken;
     } else {
-      const setTokenContract = await SetTokenContract.at(
-        setTokenAddress,
-        this.web3,
-        transactionOptions,
-      );
+      const setTokenContract = await SetToken.new(setTokenAddress);
+
       this.cache[cacheKey] = setTokenContract;
       return setTokenContract;
     }
