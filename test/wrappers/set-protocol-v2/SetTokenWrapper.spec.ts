@@ -1,23 +1,20 @@
-import Web3 from 'web3';
+import { ethers } from 'ethers';
+import chai from 'chai';
 
-import { BigNumber } from 'ethers/utils';
-import { Account, Address } from 'set-protocol-v2/utils/types';
-import {
-  addSnapshotBeforeRestoreAfterEach,
-  getAccounts,
-  getWaffleExpect
-} from 'set-protocol-v2/utils/masterUtils';
+import { Address } from 'set-protocol-v2/utils/types';
+const { Blockchain } = require('set-protocol-v2/dist/utils/masterUtils/blockchainUtils');
 
 import { SetTokenWrapper } from '../../../src/wrappers/set-protocol-v2/SetTokenWrapper';
 
-const web3 = new Web3('http://localhost:8545');
-const expect = getWaffleExpect();
+const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+const expect = chai.expect;
 
+const blockchain = new Blockchain(provider);
 
 describe('SetTokenWrapper', () => {
-  let owner: Account;
-  let manager: Account;
-  let mockSetAddress: Account;
+  let owner: string;
+  let manager: string;
+  let mockSetAddress: string;
 
   let setTokenWrapper: SetTokenWrapper;
 
@@ -26,18 +23,24 @@ describe('SetTokenWrapper', () => {
       owner,
       manager,
       mockSetAddress,
-    ] = await getAccounts();
+    ] = await provider.listAccounts();
 
-    setTokenWrapper = new SetTokenWrapper(web3);
+    setTokenWrapper = new SetTokenWrapper(provider);
   });
 
-  addSnapshotBeforeRestoreAfterEach();
+  beforeEach(async () => {
+    await blockchain.saveSnapshotAsync();
+  });
 
-  describe('#popPosition', async () => {
+  afterEach(async () => {
+    await blockchain.revertAsync();
+  });
+
+  describe('#popPosition', () => {
     let subjectSetAddress: Address;
 
     beforeEach(async () => {
-      subjectSetAddress = mockSetAddress.address;
+      subjectSetAddress = mockSetAddress;
     });
 
     async function subject(): Promise<any> {

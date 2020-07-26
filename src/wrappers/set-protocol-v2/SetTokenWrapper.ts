@@ -16,7 +16,7 @@
 
 'use strict';
 
-import Web3 from 'web3';
+import { Provider } from 'ethers/providers';
 
 /**
  * @title  SetTokenWrapper
@@ -26,10 +26,10 @@ import Web3 from 'web3';
  *
  */
 export class SetTokenWrapper {
-  private web3: Web3;
+  private provider: Provider;
 
-  public constructor(web3: Web3) {
-    this.web3 = web3;
+  public constructor(provider: Provider) {
+    this.provider = provider;
   }
 
   /**

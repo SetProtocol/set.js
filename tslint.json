@@ -16,7 +16,6 @@
             "check-whitespace"
         ],
         "no-var-keyword": true,
-        "no-unused-variable": true,
         "quotemark": [
             true,
             "single",

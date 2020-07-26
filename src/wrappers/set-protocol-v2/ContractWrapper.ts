@@ -16,10 +16,11 @@
 
 'use strict';
 
-import Web3 from 'web3';
+import { Provider } from 'ethers/providers';
 import { Contract } from 'ethers';
-import { SetToken } from 'set-protocol-v2/utils/contracts';
 import { Address } from 'set-protocol-v2/utils/types';
+
+const SetToken = require('set-protocol-v2/dist/utils/contracts').SetToken;
 
 /**
  * @title ContractWrapper
@@ -28,12 +29,12 @@ import { Address } from 'set-protocol-v2/utils/types';
  * The Contracts API handles all functions that load contracts
  *
  */
-export class ProtocolContractWrapper {
-  private web3: Web3;
+export class ContractWrapper {
+  private provider: Provider;
   private cache: { [contractName: string]: Contract };
 
-  public constructor(web3: Web3) {
-    this.web3 = web3;
+  public constructor(provider: Provider) {
+    this.provider = provider;
     this.cache = {};
   }
 
@@ -47,11 +48,11 @@ export class ProtocolContractWrapper {
   public async loadSetTokenAsync(
     setTokenAddress: Address,
     transactionOptions: object = {},
-  ): Promise<SetToken> {
+  ): Promise<typeof SetToken> {
     const cacheKey = `SetToken_${setTokenAddress}`;
 
     if (cacheKey in this.cache) {
-      return this.cache[cacheKey] as SetToken;
+      return this.cache[cacheKey] as typeof SetToken;
     } else {
       const setTokenContract = await SetToken.new(setTokenAddress);
 

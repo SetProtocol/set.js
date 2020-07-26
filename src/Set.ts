@@ -16,7 +16,7 @@
 
 'use strict';
 
-import Web3 from 'web3';
+import { Provider } from 'ethers/providers';
 
 /**
  * @title Set
@@ -27,13 +27,13 @@ import Web3 from 'web3';
  * of Set with the web3 provider argument
  */
 class Set {
-  private web3: Web3;
+  private provider: Provider;
 
   /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
-  constructor() {
-    this.web3 = new Web3();
+  constructor(provider: Provider) {
+    this.provider = provider;
   }
 }
 

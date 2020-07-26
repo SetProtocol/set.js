@@ -17,7 +17,7 @@
         "prod": "yarn run build",
         "chain": "bash scripts/init_chain_internal.sh",
         "build": "yarn run build-ts && yarn run tslint",
-        "build-ts": "tsc",
+        "build-ts": "tsc -p tsconfig.json",
         "test": "jest --runInBand",
         "test:watch": "jest --watch --runInBand",
         "tslint": "tslint -c tslint.json -p tsconfig.json",

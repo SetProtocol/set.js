@@ -6,6 +6,12 @@ jobs:
       - image: circleci/node:10.16
     working_directory: ~/set.js
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "30:e2:54:41:44:91:bb:f8:0c:93:89:5b:69:0b:0f:71"
+      - run:
+          name: Check SSH Keys
+          command: ssh-add -L # This shows that the key was successfully added
       - checkout
       - restore_cache:
           key: module-cache-{{ checksum "yarn.lock" }}
