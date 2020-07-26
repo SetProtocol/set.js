@@ -80,12 +80,10 @@
     },
     "lint-staged": {
         "src/**/*.ts": [
-            "yarn tslint --fix",
-            "git add"
+            "yarn tslint --fix"
         ],
         "test/**/*.ts": [
-            "yarn tslint --fix",
-            "git add"
+            "yarn tslint --fix"
         ]
     },
     "jest": {
