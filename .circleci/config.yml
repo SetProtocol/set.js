@@ -7,6 +7,12 @@ jobs:
     working_directory: ~/set.js
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "4c:c0:3a:d9:06:58:2b:4c:13:dc:00:48:e8:55:20:8a"
+      - run:
+          name: Check SSH Keys
+          command: ssh-add -L # This shows that the key was successfully added
       - restore_cache:
           key: module-cache-{{ checksum "yarn.lock" }}
       - run:
@@ -14,7 +20,7 @@ jobs:
           command: yarn global add truffle
       - run:
           name: Fetch Dependencies
-          command: yarn
+          command: yarn install --network-concurrency 1
       - save_cache:
           key: module-cache-{{ checksum "yarn.lock" }}
           paths:
@@ -35,15 +41,23 @@ jobs:
       - restore_cache:
           key: compiled-env-{{ .Environment.CIRCLE_SHA1 }}
       - run:
-            name: Test RPC
-            command: yarn chain
-            background: true
+          name: Test RPC
+          command: yarn chain
+          background: true
       - run:
-            name: Jest
-            command: |
-              mkdir /tmp/test-results
-              TEST_FILES="$(circleci tests glob "./test/integration/**/*.spec.ts" | circleci tests split --split-by=timings)"
-              yarn test --findRelatedTests ${TEST_FILES}
+          name: Wait for chain to start
+          shell: /bin/sh
+          command: |
+            wget --retry-connrefused --waitretry=30 --read-timeout=30 --timeout=20 -t 100 http://localhost:8545
+            :
+      - run:
+          name: Jest
+          command: |
+            mkdir -p /tmp/test-results
+            TEST_FILES="$(circleci tests glob "./test/**/*.spec.ts")"
+            echo $TEST_FILES
+            yarn test --findRelatedTests ${TEST_FILES}
+          when: always
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
