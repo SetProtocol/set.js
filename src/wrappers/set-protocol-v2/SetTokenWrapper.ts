@@ -16,7 +16,13 @@
 
 'use strict';
 
+import { Contract } from 'ethers';
 import { Provider } from 'ethers/providers';
+import { Address } from 'set-protocol-v2/utils/types';
+
+const SetToken = require('set-protocol-v2/dist/utils/contracts').SetToken;
+
+import { setTokenABI } from "./setTokenABI";
 
 /**
  * @title  SetTokenWrapper
@@ -43,6 +49,22 @@ export class SetTokenWrapper {
    * @return               Transaction hash
    */
   public async popPosition(setAddress: string): Promise<string> {
-    return await 'hello';
+    const setToken = this.loadSetTokenAsync(setAddress);
+
+    return await setToken.getPositions();
+  }
+
+  /**
+   * Load Set Token contract
+   *
+   * @param  setTokenAddress    Address of the Set Token contract
+   * @return                    The Set Token Contract
+   */
+  private loadSetTokenAsync(setTokenAddress: Address): Contract {
+    return new Contract(
+      setTokenAddress,
+      setTokenABI,
+      this.provider
+    );
   }
 }
