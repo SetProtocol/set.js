@@ -16,12 +16,12 @@
 
 'use strict';
 
-import { Contract } from 'ethers';
+import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
 import { Address } from 'set-protocol-v2/utils/types';
 import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
 
-const SetToken = require('set-protocol-v2/dist/utils/contracts').SetToken;
+import { SetToken } from 'set-protocol-v2/dist/types/typechain/SetToken';
 
 /**
  * @title  SetTokenWrapper
@@ -47,7 +47,20 @@ export class SetTokenWrapper {
    * @param  txOpts        Transaction options object conforming to `Tx` with signer, gas, and gasPrice data
    * @return               Transaction hash
    */
-  public async popPosition(setAddress: string): Promise<string> {
+  public async popPosition(setAddress: string): Promise<
+    {
+      component: string;
+      module: string;
+      unit: BigNumber;
+      positionState: number;
+      data: string;
+      0: string;
+      1: string;
+      2: BigNumber;
+      3: number;
+      4: string;
+    }[]
+  > {
     const setToken = this.loadSetTokenAsync(setAddress);
 
     return await setToken.getPositions();
@@ -59,10 +72,10 @@ export class SetTokenWrapper {
    * @param  setTokenAddress    Address of the Set Token contract
    * @return                    The Set Token Contract
    */
-  private loadSetTokenAsync(setTokenAddress: Address): Contract {
-    return new Contract(
+  private loadSetTokenAsync(setTokenAddress: Address): SetToken {
+    return new SetToken(
       setTokenAddress,
-      setTokenABI,
+      setTokenABI.abi,
       this.provider
     );
   }

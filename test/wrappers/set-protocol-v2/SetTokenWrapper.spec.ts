@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import chai from 'chai';
 
 import { Address } from 'set-protocol-v2/utils/types';
-const { Blockchain } = require('set-protocol-v2/dist/utils/masterUtils/blockchainUtils');
+const { Blockchain } = require('set-protocol-v2/dist/utils/common');
 
 import { SetTokenWrapper } from '../../../src/wrappers/set-protocol-v2/SetTokenWrapper';
 
