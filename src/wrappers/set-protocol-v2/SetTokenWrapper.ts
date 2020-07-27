@@ -16,12 +16,13 @@
 
 'use strict';
 
+import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
 import { Address } from 'set-protocol-v2/utils/types';
 import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
 
-import { SetToken } from 'set-protocol-v2/dist/types/typechain/SetToken';
+import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
 
 /**
  * @title  SetTokenWrapper
@@ -61,7 +62,7 @@ export class SetTokenWrapper {
       4: string;
     }[]
   > {
-    const setToken = this.loadSetTokenAsync(setAddress);
+    const setToken = this.loadSetToken(setAddress);
 
     return await setToken.getPositions();
   }
@@ -72,8 +73,8 @@ export class SetTokenWrapper {
    * @param  setTokenAddress    Address of the Set Token contract
    * @return                    The Set Token Contract
    */
-  private loadSetTokenAsync(setTokenAddress: Address): SetToken {
-    return new SetToken(
+  private loadSetToken(setTokenAddress: Address): SetToken {
+    return new ethers.Contract(
       setTokenAddress,
       setTokenABI.abi,
       this.provider

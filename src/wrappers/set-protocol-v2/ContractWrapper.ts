@@ -19,8 +19,10 @@
 import { Provider } from 'ethers/providers';
 import { Contract } from 'ethers';
 import { Address } from 'set-protocol-v2/utils/types';
+import { SetToken } from 'set-protocol-v2/dist/types/typechain/SetToken';
 
-const SetToken = require('set-protocol-v2/dist/utils/contracts').SetToken;
+import { SetTokenWrapper } from './SetTokenWrapper';
+import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
 
 /**
  * @title ContractWrapper
@@ -45,16 +47,20 @@ export class ContractWrapper {
    * @param  transactionOptions Options sent into the contract deployed method
    * @return                    The Set Token Contract
    */
-  public async loadSetTokenAsync(
+  public loadSetToken(
     setTokenAddress: Address,
     transactionOptions: object = {},
-  ): Promise<typeof SetToken> {
+  ): SetToken {
     const cacheKey = `SetToken_${setTokenAddress}`;
 
     if (cacheKey in this.cache) {
-      return this.cache[cacheKey] as typeof SetToken;
+      return this.cache[cacheKey] as SetToken;
     } else {
-      const setTokenContract = await SetToken.new(setTokenAddress);
+      const setTokenContract = new SetToken(
+        setTokenAddress,
+        setTokenABI.abi,
+        this.provider
+      );
 
       this.cache[cacheKey] = setTokenContract;
       return setTokenContract;
