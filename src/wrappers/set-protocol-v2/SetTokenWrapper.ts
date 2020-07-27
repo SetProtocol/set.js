@@ -19,10 +19,9 @@
 import { Contract } from 'ethers';
 import { Provider } from 'ethers/providers';
 import { Address } from 'set-protocol-v2/utils/types';
+import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
 
 const SetToken = require('set-protocol-v2/dist/utils/contracts').SetToken;
-
-import { setTokenABI } from "./setTokenABI";
 
 /**
  * @title  SetTokenWrapper
