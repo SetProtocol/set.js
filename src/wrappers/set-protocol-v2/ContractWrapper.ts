@@ -17,10 +17,11 @@
 'use strict';
 
 import { Provider } from 'ethers/providers';
-import { Contract } from 'ethers';
+import { Contract, Signer } from 'ethers';
 import { Address } from 'set-protocol-v2/utils/types';
 
-import { SetToken } from 'set-protocol-v2/dist/types/typechain/SetToken';
+import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
+import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
 import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
 
 /**
@@ -43,21 +44,21 @@ export class ContractWrapper {
    * Load Set Token contract
    *
    * @param  setTokenAddress    Address of the Set Token contract
-   * @param  transactionOptions Options sent into the contract deployed method
+   * @param  signer             Caller of the methods
    * @return                    The Set Token Contract
    */
-  public loadSetToken(
+  public async loadSetTokenAsync(
     setTokenAddress: Address,
+    signer: Signer,
   ): SetToken {
-    const cacheKey = `SetToken_${setTokenAddress}`;
+    const cacheKey = `SetToken_${setTokenAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as SetToken;
     } else {
-      const setTokenContract = new SetToken(
+      const setTokenContract = SetTokenFactory.connect(
         setTokenAddress,
-        setTokenABI.abi,
-        this.provider
+        signer
       );
 
       this.cache[cacheKey] = setTokenContract;

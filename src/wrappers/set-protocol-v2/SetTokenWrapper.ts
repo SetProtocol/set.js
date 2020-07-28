@@ -17,7 +17,7 @@
 'use strict';
 
 import { ContractTransaction } from 'ethers';
-import { Provider } from 'ethers/providers';
+import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
 
 import { ContractWrapper } from './ContractWrapper';
@@ -44,8 +44,11 @@ export class SetTokenWrapper {
    * @param setAddress  Address Set to get list of positions for
    * @return            Array of Positions
    */
-  public async getPositions(setAddress: Address): Promise<Position[]> {
-    const setToken = this.contracts.loadSetToken(setAddress);
+  public async getPositions(setAddress: Address, callerAddress: Address): Promise<Position[]> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+    );
 
     return setToken.getPositions();
   }
@@ -56,8 +59,11 @@ export class SetTokenWrapper {
    * @param  setAddress Address Set to get last position for
    * @return            ContractTransaction
    */
-  public async popPosition(setAddress: Address): Promise<ContractTransaction> {
-    const setToken = this.contracts.loadSetToken(setAddress);
+  public async popPosition(setAddress: Address, callerAddress: Address): Promise<ContractTransaction> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+    );
 
     return setToken.popPosition();
   }
