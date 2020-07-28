@@ -19,9 +19,8 @@
 import { Provider } from 'ethers/providers';
 import { Contract } from 'ethers';
 import { Address } from 'set-protocol-v2/utils/types';
-import { SetToken } from 'set-protocol-v2/dist/types/typechain/SetToken';
 
-import { SetTokenWrapper } from './SetTokenWrapper';
+import { SetToken } from 'set-protocol-v2/dist/types/typechain/SetToken';
 import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
 
 /**
@@ -49,7 +48,6 @@ export class ContractWrapper {
    */
   public loadSetToken(
     setTokenAddress: Address,
-    transactionOptions: object = {},
   ): SetToken {
     const cacheKey = `SetToken_${setTokenAddress}`;
 

@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils';
 import chai from 'chai';
 
 import { Address } from 'set-protocol-v2/utils/types';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
+import { Blockchain } from 'set-protocol-v2/dist/utils/common';
 
 import { SetTokenWrapper } from '../../../src/wrappers/set-protocol-v2/SetTokenWrapper';
 
