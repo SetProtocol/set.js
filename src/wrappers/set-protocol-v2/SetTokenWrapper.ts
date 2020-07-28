@@ -16,13 +16,11 @@
 
 'use strict';
 
-import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
-import { Provider } from 'ethers/providers';
+import { ContractTransaction } from 'ethers';
+import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
-import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
 
-import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
+import { ContractWrapper } from './ContractWrapper';
 
 /**
  * @title  SetTokenWrapper
@@ -33,38 +31,40 @@ import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
  */
 export class SetTokenWrapper {
   private provider: Provider;
+  private contracts: ContractWrapper;
 
   public constructor(provider: Provider) {
     this.provider = provider;
+    this.contracts = new ContractWrapper(provider);
   }
 
   /**
-   * Issues a Set to the transaction signer. Must have component tokens in the correct quantites in either
-   * the vault or in the signer's wallet. Component tokens must be approved to the Transfer
-   * Proxy contract via setTransferProxyAllowanceAsync
+   * Returns the list of positions on the SetToken
    *
-   * @param  setAddress    Address Set to issue
-   * @param  quantity      Amount of Set to issue. Must be multiple of the natural unit of the Set
-   * @param  txOpts        Transaction options object conforming to `Tx` with signer, gas, and gasPrice data
-   * @return               Transaction hash
+   * @param setAddress  Address Set to get list of positions for
+   * @return            Array of Positions
    */
-  public async popPosition(setAddress: string): Promise<Position[]> {
-    const setToken = this.loadSetToken(setAddress);
-
-    return await setToken.getPositions();
-  }
-
-  /**
-   * Load Set Token contract
-   *
-   * @param  setTokenAddress    Address of the Set Token contract
-   * @return                    The Set Token Contract
-   */
-  private loadSetToken(setTokenAddress: Address): SetToken {
-    return new ethers.Contract(
-      setTokenAddress,
-      setTokenABI.abi,
-      this.provider
+  public async getPositions(setAddress: Address, callerAddress: Address): Promise<Position[]> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
+
+    return setToken.getPositions();
+  }
+
+  /**
+   * Removes the last element to the Positions array. Decreases length of position array by 1.
+   *
+   * @param  setAddress Address Set to get last position for
+   * @return            ContractTransaction
+   */
+  public async popPosition(setAddress: Address, callerAddress: Address): Promise<ContractTransaction> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+    );
+
+    return setToken.popPosition();
   }
 }
