@@ -2,13 +2,18 @@ import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 import chai from 'chai';
 
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address, Position } from 'set-protocol-v2/utils/types';
 import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 import { SetTokenWrapper } from '../../../src/wrappers/set-protocol-v2/SetTokenWrapper';
 import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
 import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
 import { StandardTokenMock } from 'set-protocol-v2/dist/typechain/StandardTokenMock';
+import {
+  ADDRESS_ZERO,
+  EMPTY_BYTES,
+  POSITION_STATE
+} from 'set-protocol-v2/dist/utils/constants';
 import { ContractTransaction } from 'ethers';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
@@ -49,6 +54,7 @@ describe('SetTokenWrapper', () => {
   describe('when there is a deployed SetToken', () => {
     let setToken: SetToken;
 
+    let subjectCaller: Address;
     let controller: Controller;
     let firstComponent: StandardTokenMock;
     let firstComponentUnits: BigNumber;
@@ -99,9 +105,35 @@ describe('SetTokenWrapper', () => {
       await setToken.initializeModule();
     });
 
-    describe('#popPosition', () => {
-      let subjectCaller: Address;
+    describe ('#getPositions', () => {
+      beforeEach(async () => {
+        subjectCaller = testAccount;
+      });
 
+      async function subject(): Promise<Position[]> {
+        return await setTokenWrapper.getPositions(setToken.address, subjectCaller);
+      }
+
+      it('should return the correct Positions', async () => {
+        const positions = await subject();
+
+        const firstPosition = positions[0];
+        expect(firstPosition.component).to.eq(firstComponent.address);
+        expect(firstPosition.unit.toString()).to.eq(units[0].toString());
+        expect(firstPosition.module).to.eq(ADDRESS_ZERO);
+        expect(firstPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
+        expect(firstPosition.data).to.eq(EMPTY_BYTES);
+
+        const secondPosition = positions[1];
+        expect(secondPosition.component).to.eq(secondComponent.address);
+        expect(secondPosition.unit.toString()).to.eq(units[1].toString());
+        expect(secondPosition.module).to.eq(ADDRESS_ZERO);
+        expect(secondPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
+        expect(secondPosition.data).to.eq(EMPTY_BYTES);
+      });
+    });
+
+    describe('#popPosition', () => {
       beforeEach(async () => {
         subjectCaller = mockIssuanceModule;
       });

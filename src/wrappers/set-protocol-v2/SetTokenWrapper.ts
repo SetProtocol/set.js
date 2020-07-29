@@ -54,6 +54,21 @@ export class SetTokenWrapper {
   }
 
   /**
+   * Returns the list of modules on the SetToken
+   *
+   * @param setAddress  Address Set to get list of modules for
+   * @return            Array of module addresses
+   */
+  public async getModules(setAddress: Address, callerAddress: Address): Promise<Address[]> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+    );
+
+    return setToken.getModules();
+  }
+
+  /**
    * Removes the last element to the Positions array. Decreases length of position array by 1.
    *
    * @param  setAddress Address Set to get last position for
