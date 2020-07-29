@@ -1,6 +1,5 @@
 import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
-import chai from 'chai';
 
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
@@ -12,12 +11,13 @@ import { StandardTokenMock } from 'set-protocol-v2/dist/typechain/StandardTokenM
 import {
   ADDRESS_ZERO,
   EMPTY_BYTES,
-  POSITION_STATE
+  POSITION_STATE,
+  MODULE_STATE,
 } from 'set-protocol-v2/dist/utils/constants';
 import { ContractTransaction } from 'ethers';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-const expect = chai.expect;
+import { expect } from './utils/chai';
 
 const blockchain = new Blockchain(provider);
 
@@ -27,6 +27,7 @@ describe('SetTokenWrapper', () => {
   let mockIssuanceModule: Address;
   let mockLockedModule: Address;
   let testAccount: Address;
+  let randomAccount: Address;
   let setTokenWrapper: SetTokenWrapper;
 
   let deployer: DeployHelper;
@@ -74,6 +75,7 @@ describe('SetTokenWrapper', () => {
         mockIssuanceModule,
         mockLockedModule,
         testAccount,
+        randomAccount,
       ] = await provider.listAccounts();
 
       firstComponent = await deployer.mocks.deployTokenMock(manager);
@@ -103,6 +105,179 @@ describe('SetTokenWrapper', () => {
 
       setToken = setToken.connect(provider.getSigner(mockLockedModule));
       await setToken.initializeModule();
+    });
+
+    describe('#addModule', () => {
+      let subjectModule: Address;
+
+      beforeEach(async () => {
+        await controller.addModule(testAccount);
+
+        subjectModule = testAccount;
+        subjectCaller = manager;
+      });
+
+      async function subject(): Promise<ContractTransaction> {
+        return setTokenWrapper.addModule(setToken.address, subjectModule, subjectCaller);
+      }
+
+      it('should change the state to pending', async () => {
+        await subject();
+
+        const moduleState = await setTokenWrapper.moduleStates(setToken.address, subjectModule);
+        expect(moduleState).to.eq(MODULE_STATE['PENDING']);
+      });
+
+      describe('when the caller is not the manager', () => {
+        beforeEach(async () => {
+          subjectCaller = randomAccount;
+        });
+
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Only manager can call');
+          }
+        });
+      });
+
+      describe('when the module is already added', () => {
+        beforeEach(async () => {
+          subjectModule = mockIssuanceModule;
+          const moduleState = await setTokenWrapper.moduleStates(setToken.address, mockIssuanceModule);
+        });
+
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Module must not be added');
+          }
+        });
+      });
+
+      describe('when the module is not enabled', () => {
+        beforeEach(async () => {
+          await controller.removeModule(subjectModule);
+        });
+
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Must be enabled on Controller');
+          }
+        });
+      });
+    });
+
+    describe('#setManager', () => {
+      let subjectManager: Address;
+
+      beforeEach(async () => {
+        subjectManager = testAccount;
+        subjectCaller = manager;
+      });
+
+      async function subject(): Promise<ContractTransaction> {
+        return setTokenWrapper.setManager(setToken.address, subjectManager, subjectCaller);
+      }
+
+      it('should change the manager', async () => {
+        await subject();
+
+        const managerAddress = await setToken.manager();
+        expect(managerAddress).to.eq(subjectManager);
+      });
+
+      describe('when the caller is not the manager', () => {
+        beforeEach(async () => {
+          subjectCaller = randomAccount;
+        });
+
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Only manager can call');
+          }
+        });
+      });
+    });
+
+    describe('#initializeModule', () => {
+      let subjectModule: Address;
+
+      beforeEach(async () => {
+        subjectModule = testAccount;
+        subjectCaller = testAccount;
+
+        setToken = setToken.connect(provider.getSigner(manager));
+        await controller.addModule(subjectModule);
+        await setToken.addModule(subjectModule);
+      });
+
+      async function subject(): Promise<ContractTransaction> {
+        return setTokenWrapper.initializeModule(setToken.address, subjectCaller);
+      }
+
+      it('should add the module to the modules list', async () => {
+        await subject();
+
+        const moduleList = await setToken.getModules();
+        expect(moduleList).to.include(subjectModule);
+      });
+
+      it('should update the module state to initialized', async () => {
+        await subject();
+
+        const moduleState = await setTokenWrapper.moduleStates(setToken.address, subjectModule);
+        expect(moduleState).to.eq(MODULE_STATE['INITIALIZED']);
+      });
+
+      describe('when the module is not added', () => {
+        beforeEach(async () => {
+          subjectCaller = owner;
+        });
+
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Module must be pending');
+          }
+        });
+      });
+
+      describe('when the module already added', () => {
+        beforeEach(async () => {
+          subjectCaller = mockIssuanceModule;
+        });
+
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Module must be pending');
+          }
+        });
+      });
+
+      describe('when the module is locked', () => {
+        beforeEach(async () => {
+          setToken = setToken.connect(provider.getSigner(mockIssuanceModule));
+          await setToken.lock();
+        });
+
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Only when unlocked');
+          }
+        });
+      });
     });
 
     describe ('#getPositions', () => {
@@ -146,25 +321,6 @@ describe('SetTokenWrapper', () => {
         const moduleAddresses = await subject();
 
         expect(JSON.stringify(moduleAddresses)).to.eq(JSON.stringify(modules));
-      });
-    });
-
-    describe('#popPosition', () => {
-      beforeEach(async () => {
-        subjectCaller = mockIssuanceModule;
-      });
-
-      async function subject(): Promise<ContractTransaction> {
-        return setTokenWrapper.popPosition(setToken.address, subjectCaller);
-      }
-
-      it('should remove the last position', async () => {
-        const prevPositions = await setTokenWrapper.getPositions(setToken.address, subjectCaller);
-
-        await subject();
-
-        const positions = await setTokenWrapper.getPositions(setToken.address, subjectCaller);
-        expect(positions.length).to.eq(prevPositions.length - 1);
       });
     });
   });

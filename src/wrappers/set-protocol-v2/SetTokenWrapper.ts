@@ -17,8 +17,9 @@
 'use strict';
 
 import { ContractTransaction } from 'ethers';
-import { Provider, JsonRpcProvider } from 'ethers/providers';
+import { Provider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
+import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
 import { ContractWrapper } from './ContractWrapper';
 
@@ -39,47 +40,170 @@ export class SetTokenWrapper {
   }
 
   /**
-   * Returns the list of positions on the SetToken
+   * addModule
    *
-   * @param setAddress  Address Set to get list of positions for
-   * @return            Array of Positions
+   * @param  setAddress    Address Set to issue
+   * @param  moduleAddress Address of potential module
+   * @param  callerAddress Address of caller (optional)
+   * @return               Transaction hash
    */
-  public async getPositions(setAddress: Address, callerAddress: Address): Promise<Position[]> {
+  public async moduleStates(
+    setAddress: Address,
+    moduleAddress: Address,
+    callerAddress?: Address,
+  ): Promise<number> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
-      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+      callerAddress,
+    );
+
+    return await setToken.moduleStates(moduleAddress);
+  }
+
+  /**
+   * addModule
+   * Add a module via address to the Set token
+   *
+   * @param  setAddress    Address Set to issue
+   * @param  moduleAddress Address of potential module
+   * @param  callerAddress Address of caller (optional)
+   * @param  overrides     Overrides for transaction (optional)
+   * @return               Transaction hash
+   */
+  public async addModule(
+    setAddress: Address,
+    moduleAddress: Address,
+    callerAddress: Address = undefined,
+    overrides: TransactionOverrides = {},
+  ): Promise<ContractTransaction> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      callerAddress,
+    );
+
+    return await setToken.addModule(moduleAddress, overrides);
+  }
+
+  /**
+   * setManager
+   * Sets the manager of the current Set token
+   *
+   * @param  setAddress    Address Set to issue
+   * @param  callerAddress Address of caller (optional)
+   * @param  overrides     Overrides for transaction (optional)
+   * @return               Transaction hash
+   */
+  public async setManager(
+    setAddress: Address,
+    managerAddress: Address,
+    callerAddress: Address = undefined,
+    overrides: TransactionOverrides = {},
+  ): Promise<ContractTransaction> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      callerAddress,
+    );
+
+    return await setToken.setManager(managerAddress, overrides);
+  }
+
+  /**
+   * initializeModule
+   * Initializes the module on the Set
+   *
+   * @param  setAddress    Address Set to issue
+   * @param  callerAddress Address of caller (optional)
+   * @param  overrides     Overrides for transaction (optional)
+   * @return               Contract transaction
+   */
+  public async initializeModule(
+    setAddress: Address,
+    callerAddress: Address = undefined,
+    overrides: TransactionOverrides = {},
+  ): Promise<ContractTransaction> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      callerAddress,
+    );
+
+    return await setToken.initializeModule(overrides);
+  }
+
+  /**
+   * isModule
+   * Determines if given address is a module
+   *
+   * @param  setAddress    Address of Set to check
+   * @param  moduleAddress Address of potential module
+   * @param  callerAddress Address of caller (optional)
+   * @return               boolean
+   */
+  public async isModule(
+    setAddress: Address,
+    moduleAddress: Address,
+    callerAddress?: Address,
+  ): Promise<boolean> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      callerAddress,
+    );
+
+    return await setToken.isModule(moduleAddress);
+  }
+
+  /**
+   * isPendingModule
+   * Determines if a given module address is pending on the Set
+   *
+   * @param  setAddress    Address of Set to check
+   * @param  moduleAddress Address of module
+   * @param  callerAddress Address of caller (optional)
+   * @return               boolean
+   */
+  public async isPendingModule(
+    setAddress: Address,
+    moduleAddress: Address,
+    callerAddress?: Address,
+  ): Promise<boolean> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      callerAddress,
+    );
+
+    return await setToken.isPendingModule(moduleAddress);
+  }
+
+  /**
+   * getPositions
+   * Returns the list of positions on the SetToken
+   *
+   * @param  setAddress    Address of Set to get list of positions for
+   * @param  callerAddress Address of caller (optional)
+   * @return               Array of Positions
+   */
+  public async getPositions(setAddress: Address, callerAddress?: Address): Promise<Position[]> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+      callerAddress
     );
 
     return setToken.getPositions();
   }
 
   /**
+   * getModules
    * Returns the list of modules on the SetToken
    *
-   * @param setAddress  Address Set to get list of modules for
-   * @return            Array of module addresses
+   * @param  setAddress     Address of Set to get list of modules for
+   * @param  callerAddress  Address of caller (optional)
+   * @return                Array of module addresses
    */
-  public async getModules(setAddress: Address, callerAddress: Address): Promise<Address[]> {
+  public async getModules(setAddress: Address, callerAddress?: Address): Promise<Address[]> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
-      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+      callerAddress
     );
 
     return setToken.getModules();
-  }
-
-  /**
-   * Removes the last element to the Positions array. Decreases length of position array by 1.
-   *
-   * @param  setAddress Address Set to get last position for
-   * @return            ContractTransaction
-   */
-  public async popPosition(setAddress: Address, callerAddress: Address): Promise<ContractTransaction> {
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      (this.provider as JsonRpcProvider).getSigner(callerAddress)
-    );
-
-    return setToken.popPosition();
   }
 }

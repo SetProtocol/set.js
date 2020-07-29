@@ -11,9 +11,6 @@
     "declaration": true,
     "declarationDir": "./dist/types",
     "paths": {
-      "*": [
-        "src/types"
-      ],
       "@src/*": [ "src/*" ],
       "@test/*": [ "test/*" ]
     }
