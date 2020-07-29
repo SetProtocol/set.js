@@ -133,6 +133,22 @@ describe('SetTokenWrapper', () => {
       });
     });
 
+    describe('#getModules', () => {
+      beforeEach(async () => {
+        subjectCaller = testAccount;
+      });
+
+      async function subject(): Promise<Address[]> {
+        return await setTokenWrapper.getModules(setToken.address, subjectCaller);
+      }
+
+      it('should return the correct modules', async () => {
+        const moduleAddresses = await subject();
+
+        expect(JSON.stringify(moduleAddresses)).to.eq(JSON.stringify(modules));
+      });
+    });
+
     describe('#popPosition', () => {
       beforeEach(async () => {
         subjectCaller = mockIssuanceModule;
