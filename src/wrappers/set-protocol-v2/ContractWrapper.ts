@@ -16,11 +16,11 @@
 
 'use strict';
 
-import { Provider } from 'ethers/providers';
+import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Contract, Signer } from 'ethers';
 import { Address } from 'set-protocol-v2/utils/types';
 
-import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
+import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
 import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
 
@@ -44,13 +44,16 @@ export class ContractWrapper {
    * Load Set Token contract
    *
    * @param  setTokenAddress    Address of the Set Token contract
-   * @param  signer             Caller of the methods
+   * @param  callerAddress      Address of caller, uses first one on node if none provided.
    * @return                    The Set Token Contract
    */
   public async loadSetTokenAsync(
     setTokenAddress: Address,
-    signer: Signer,
+    callerAddress?: Address,
   ): SetToken {
+    const signer = callerAddress ?
+      (this.provider as JsonRpcProvider).getSigner(callerAddress) :
+      (this.provider as JsonRpcProvider).getSigner();
     const cacheKey = `SetToken_${setTokenAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
