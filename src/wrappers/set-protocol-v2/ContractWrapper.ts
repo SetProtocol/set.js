@@ -28,7 +28,6 @@ import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFact
 
 import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
 import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
-import * as erc20ABI from 'set-protocol-v2/artifacts/ERC20.json';
 
 /**
  * @title ContractWrapper
@@ -57,13 +56,11 @@ export class ContractWrapper {
     tokenAddress: Address,
     callerAddress?: Address,
   ): SetToken {
-    const signer = callerAddress ?
-      (this.provider as JsonRpcProvider).getSigner(callerAddress) :
-      (this.provider as JsonRpcProvider).getSigner();
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `ERC20_${tokenAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
-      return this.cache[cacheKey] as SetToken;
+      return this.cache[cacheKey] as ERC20;
     } else {
       const tokenContract = Erc20Factory.connect(
         tokenAddress,
@@ -86,9 +83,7 @@ export class ContractWrapper {
     setTokenAddress: Address,
     callerAddress?: Address,
   ): SetToken {
-    const signer = callerAddress ?
-      (this.provider as JsonRpcProvider).getSigner(callerAddress) :
-      (this.provider as JsonRpcProvider).getSigner();
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `SetToken_${setTokenAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
