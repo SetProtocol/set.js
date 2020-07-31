@@ -18,6 +18,7 @@ import { ContractTransaction } from 'ethers';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 import { expect } from './utils/chai';
+import { ERC20Wrapper } from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 
 const blockchain = new Blockchain(provider);
 
@@ -29,6 +30,7 @@ describe('SetTokenWrapper', () => {
   let testAccount: Address;
   let randomAccount: Address;
   let setTokenWrapper: SetTokenWrapper;
+  let erc20Wrapper: ERC20Wrapper;
 
   let deployer: DeployHelper;
 
@@ -37,10 +39,13 @@ describe('SetTokenWrapper', () => {
       owner,
       manager,
       mockIssuanceModule,
+      mockLockedModule,
       testAccount,
     ] = await provider.listAccounts();
 
     setTokenWrapper = new SetTokenWrapper(provider);
+    erc20Wrapper = new ERC20Wrapper(provider);
+
     deployer = new DeployHelper(provider.getSigner(owner));
   });
 
@@ -50,6 +55,97 @@ describe('SetTokenWrapper', () => {
 
   afterEach(async () => {
     await blockchain.revertAsync();
+  });
+
+  describe('Checking basic functionality', () => {
+    let firstComponent: StandardTokenMock;
+    let firstComponentUnits: BigNumber;
+    let secondComponent: StandardTokenMock;
+    let secondComponentUnits: BigNumber;
+    let controller: Controller;
+
+    let subjectComponentAddresses: Address[];
+    let subjectUnits: BigNumber[];
+    let subjectModuleAddresses: Address[];
+    let subjectControllerAddress: Address;
+    let subjectManagerAddress: Address;
+    let subjectName: string;
+    let subjectSymbol: string;
+
+    beforeEach(async () => {
+      firstComponent = await deployer.mocks.deployTokenMock(manager);
+      firstComponentUnits = ether(1);
+      secondComponent = await deployer.mocks.deployTokenMock(manager);
+      secondComponentUnits = ether(2);
+      controller = await deployer.core.deployController(owner);
+
+      subjectComponentAddresses = [firstComponent.address, secondComponent.address];
+      subjectUnits = [firstComponentUnits, secondComponentUnits];
+      subjectModuleAddresses = [mockIssuanceModule, mockLockedModule];
+      subjectControllerAddress = controller.address;
+      subjectManagerAddress = manager;
+      subjectName = 'TestSetToken';
+      subjectSymbol = 'SET';
+    });
+
+    async function subject(): Promise<SetToken> {
+      return await deployer.core.deploySetToken(
+        subjectComponentAddresses,
+        subjectUnits,
+        subjectModuleAddresses,
+        subjectControllerAddress,
+        subjectManagerAddress,
+        subjectName,
+        subjectSymbol
+      );
+    }
+
+    it('should have the correct name, symbol, controller, and manager', async () => {
+      const setToken = await subject();
+
+      const name = await erc20Wrapper.name(setToken.address);
+      const symbol = await erc20Wrapper.symbol(setToken.address);
+      const controllerAddress = await setTokenWrapper.controller(setToken.address);
+      const managerAddress = await setTokenWrapper.manager(setToken.address);
+      expect(name).to.eq(subjectName);
+      expect(symbol).to.eq(subjectSymbol);
+      expect(controllerAddress).to.eq(subjectControllerAddress);
+      expect(managerAddress).to.eq(subjectManagerAddress);
+    });
+
+    it('should have the correct positions', async () => {
+      const setToken = await subject();
+
+      const positions = await setTokenWrapper.getPositions(setToken.address, testAccount);
+      const firstComponentPosition = positions[0];
+      const secondComponentPosition = positions[1];
+      expect(firstComponentPosition.component).to.eq(firstComponent.address);
+      expect(firstComponentPosition.unit.toString()).to.eq(firstComponentUnits.toString());
+      expect(firstComponentPosition.module).to.eq(ADDRESS_ZERO);
+      expect(firstComponentPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
+      expect(firstComponentPosition.data).to.eq(EMPTY_BYTES);
+      expect(secondComponentPosition.component).to.eq(secondComponent.address);
+      expect(secondComponentPosition.unit.toString()).to.eq(secondComponentUnits.toString());
+      expect(secondComponentPosition.module).to.eq(ADDRESS_ZERO);
+      expect(secondComponentPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
+      expect(secondComponentPosition.data).to.eq(EMPTY_BYTES);
+    });
+
+    it('should have the 0 modules initialized', async () => {
+      const setToken = await subject();
+
+      const modules = await setTokenWrapper.getModules(setToken.address);
+      expect(modules.length).to.eq(0);
+    });
+
+    it('should have the correct modules in pending state', async () => {
+      const setToken = await subject();
+
+      const mockIssuanceModuleState = await setTokenWrapper.moduleStates(setToken.address, mockIssuanceModule);
+      const mockLockedModuleState = await setTokenWrapper.moduleStates(setToken.address, mockLockedModule);
+      expect(mockIssuanceModuleState).to.eq(MODULE_STATE['PENDING']);
+      expect(mockLockedModuleState).to.eq(MODULE_STATE['PENDING']);
+    });
   });
 
   describe('when there is a deployed SetToken', () => {
