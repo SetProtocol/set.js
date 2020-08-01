@@ -22,7 +22,9 @@ import { Address } from 'set-protocol-v2/utils/types';
 
 import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
-import * as setTokenABI from 'set-protocol-v2/artifacts/SetToken.json';
+import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
+import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
+
 
 /**
  * @title ContractWrapper
@@ -66,6 +68,32 @@ export class ContractWrapper {
 
       this.cache[cacheKey] = setTokenContract;
       return setTokenContract;
+    }
+  }
+
+  /**
+   * Load Controller contract
+   *
+   * @param  controllerAddress  Address of the Controller contract
+   * @param  signer             Caller of the methods
+   * @return                    The Controller Contract
+   */
+  public async loadControllerContractAsync(
+    controllerAddress: Address,
+    signer: Signer,
+  ): Controller {
+    const cacheKey = `Controller_${controllerAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as Controller;
+    } else {
+      const controllerContract = ControllerFactory.connect(
+        controllerAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = controllerContract;
+      return controllerContract;
     }
   }
 }
