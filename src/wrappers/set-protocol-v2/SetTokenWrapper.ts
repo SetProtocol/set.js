@@ -22,6 +22,7 @@ import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
 import { ContractWrapper } from './ContractWrapper';
+import { generateTxOpts } from '@src/utils/transactions';
 
 /**
  * @title  SetTokenWrapper
@@ -37,6 +38,38 @@ export class SetTokenWrapper {
   public constructor(provider: Provider) {
     this.provider = provider;
     this.contracts = new ContractWrapper(provider);
+  }
+
+  /**
+   * controller
+   *
+   * @param  setAddress    Address of Set
+   * @return               Controller address of the Set
+   */
+  public async controller(
+    setAddress: Address,
+  ): Promise<string> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+    );
+
+    return await setToken.controller();
+  }
+
+  /**
+   * manager
+   *
+   * @param  setAddress    Address of Set
+   * @return               Manager of the Set
+   */
+  public async manager(
+    setAddress: Address,
+  ): Promise<string> {
+    const setToken = await this.contracts.loadSetTokenAsync(
+      setAddress,
+    );
+
+    return await setToken.manager();
   }
 
   /**
@@ -67,21 +100,22 @@ export class SetTokenWrapper {
    * @param  setAddress    Address Set to issue
    * @param  moduleAddress Address of potential module
    * @param  callerAddress Address of caller (optional)
-   * @param  overrides     Overrides for transaction (optional)
+   * @param  txOpts        Overrides for transaction (optional)
    * @return               Transaction hash
    */
   public async addModule(
     setAddress: Address,
     moduleAddress: Address,
     callerAddress: Address = undefined,
-    overrides: TransactionOverrides = {},
+    txOpts: TransactionOverrides = {},
   ): Promise<ContractTransaction> {
+    const txOptions = await generateTxOpts(txOpts);
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
       callerAddress,
     );
 
-    return await setToken.addModule(moduleAddress, overrides);
+    return await setToken.addModule(moduleAddress, txOptions);
   }
 
   /**
@@ -90,21 +124,22 @@ export class SetTokenWrapper {
    *
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
-   * @param  overrides     Overrides for transaction (optional)
+   * @param  txOpts     Overrides for transaction (optional)
    * @return               Transaction hash
    */
   public async setManager(
     setAddress: Address,
     managerAddress: Address,
     callerAddress: Address = undefined,
-    overrides: TransactionOverrides = {},
+    txOpts: TransactionOverrides = {},
   ): Promise<ContractTransaction> {
+    const txOptions = await generateTxOpts(txOpts);
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
       callerAddress,
     );
 
-    return await setToken.setManager(managerAddress, overrides);
+    return await setToken.setManager(managerAddress, txOptions);
   }
 
   /**
@@ -113,20 +148,21 @@ export class SetTokenWrapper {
    *
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
-   * @param  overrides     Overrides for transaction (optional)
+   * @param  txOpts     Overrides for transaction (optional)
    * @return               Contract transaction
    */
   public async initializeModule(
     setAddress: Address,
     callerAddress: Address = undefined,
-    overrides: TransactionOverrides = {},
+    txOpts: TransactionOverrides = {},
   ): Promise<ContractTransaction> {
+    const txOptions = await generateTxOpts(txOpts);
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
       callerAddress,
     );
 
-    return await setToken.initializeModule(overrides);
+    return await setToken.initializeModule(txOptions);
   }
 
   /**

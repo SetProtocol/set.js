@@ -37,6 +37,7 @@
     "devDependencies": {
         "@types/node": "^14.0.23",
         "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
         "ganache-cli": "^6.9.1",
         "husky": "^4.2.5",
         "jest": "^26.1.0",
@@ -58,8 +59,6 @@
         "@types/web3": "^1.2.2",
         "abi-decoder": "^2.3.0",
         "bignumber.js": "^9.0.0",
-        "chai-as-promised": "^7.1.1",
-        "chai-bignumber": "^3.0.0",
         "dotenv": "^8.2.0",
         "ethereum-types": "^3.2.0",
         "ethereumjs-util": "^7.0.3",

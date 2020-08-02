@@ -24,7 +24,8 @@ import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
 import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
-
+import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
+import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
 
 /**
  * @title ContractWrapper
@@ -43,6 +44,33 @@ export class ContractWrapper {
   }
 
   /**
+   * Load ERC20 token contract
+   *
+   * @param  tokenAddress       Address of the token contract
+   * @param  callerAddress      Address of caller, uses first one on node if none provided.
+   * @return                    The token contract
+   */
+  public async loadERC20Async(
+    tokenAddress: Address,
+    callerAddress?: Address,
+  ): SetToken {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `ERC20_${tokenAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as ERC20;
+    } else {
+      const tokenContract = Erc20Factory.connect(
+        tokenAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = tokenContract;
+      return tokenContract;
+    }
+  }
+
+  /**
    * Load Set Token contract
    *
    * @param  setTokenAddress    Address of the Set Token contract
@@ -53,9 +81,7 @@ export class ContractWrapper {
     setTokenAddress: Address,
     callerAddress?: Address,
   ): SetToken {
-    const signer = callerAddress ?
-      (this.provider as JsonRpcProvider).getSigner(callerAddress) :
-      (this.provider as JsonRpcProvider).getSigner();
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `SetToken_${setTokenAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
