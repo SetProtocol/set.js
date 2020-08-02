@@ -24,8 +24,6 @@ import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
 import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
-
-
 import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
 import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
 
