@@ -22,10 +22,12 @@ import { Address } from 'set-protocol-v2/utils/types';
 
 import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
-import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
+import { Controller } from 'set-protocol-v2/dist/utils/contracts';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
 import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
 import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
+import { SetTokenCreator } from 'set-protocol-v2/dist/utils/contracts';
+import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
 
 /**
  * @title ContractWrapper
@@ -52,7 +54,7 @@ export class ContractWrapper {
    */
   public async loadERC20Async(
     tokenAddress: Address,
-    callerAddress?: Address,
+    callerAddress?: Address
   ): SetToken {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `ERC20_${tokenAddress}_${await signer.getAddress()}`;
@@ -60,10 +62,7 @@ export class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as ERC20;
     } else {
-      const tokenContract = Erc20Factory.connect(
-        tokenAddress,
-        signer
-      );
+      const tokenContract = Erc20Factory.connect(tokenAddress, signer);
 
       this.cache[cacheKey] = tokenContract;
       return tokenContract;
@@ -79,7 +78,7 @@ export class ContractWrapper {
    */
   public async loadSetTokenAsync(
     setTokenAddress: Address,
-    callerAddress?: Address,
+    callerAddress?: Address
   ): SetToken {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `SetToken_${setTokenAddress}_${await signer.getAddress()}`;
@@ -87,10 +86,7 @@ export class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as SetToken;
     } else {
-      const setTokenContract = SetTokenFactory.connect(
-        setTokenAddress,
-        signer
-      );
+      const setTokenContract = SetTokenFactory.connect(setTokenAddress, signer);
 
       this.cache[cacheKey] = setTokenContract;
       return setTokenContract;
@@ -106,7 +102,7 @@ export class ContractWrapper {
    */
   public async loadControllerContractAsync(
     controllerAddress: Address,
-    signer: Signer,
+    signer: Signer
   ): Controller {
     const cacheKey = `Controller_${controllerAddress}_${await signer.getAddress()}`;
 
@@ -115,6 +111,32 @@ export class ContractWrapper {
     } else {
       const controllerContract = ControllerFactory.connect(
         controllerAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = controllerContract;
+      return controllerContract;
+    }
+  }
+
+  /**
+   * Load Set Token Creator contract
+   *
+   * @param  setTokenCreatorAddress  Address of the Set Token Creator contract
+   * @param  signer                  Caller of the methods
+   * @return                         The Set Token Creator Contract
+   */
+  public async loadSetTokenCreatorAsync(
+    setTokenCreatorAddress: Address,
+    signer: Signer
+  ): Controller {
+    const cacheKey = `Controller_${setTokenCreatorAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as SetTokenCreator;
+    } else {
+      const controllerContract = ControllerFactory.connect(
+        setTokenCreatorAddress,
         signer
       );
 
