@@ -135,7 +135,7 @@ export class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as SetTokenCreator;
     } else {
-      const controllerContract = ControllerFactory.connect(
+      const controllerContract = SetTokenCreatorFactory.connect(
         setTokenCreatorAddress,
         signer
       );
