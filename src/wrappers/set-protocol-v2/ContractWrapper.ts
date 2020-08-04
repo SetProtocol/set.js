@@ -136,7 +136,7 @@ export class ContractWrapper {
     setTokenCreatorAddress: Address,
     signer: Signer,
   ): SetTokenCreator {
-    const cacheKey = `Controller_${setTokenCreatorAddress}_${await signer.getAddress()}`;
+    const cacheKey = `SetTokenCreator_${setTokenCreatorAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as SetTokenCreator;

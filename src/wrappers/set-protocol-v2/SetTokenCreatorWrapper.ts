@@ -17,6 +17,7 @@
 'use strict';
 
 import { Provider, JsonRpcProvider } from 'ethers/providers';
+import { BigNumber } from 'ethers/utils';
 import { Address } from 'set-protocol-v2/utils/types';
 
 import { ContractWrapper } from './ContractWrapper';
@@ -53,7 +54,7 @@ export class SetTokenCreatorWrapper {
    */
   public async create(
     components: Address[],
-    units: string[],
+    units: BigNumber[],
     modules: Address[],
     manager: Address,
     name: string,
