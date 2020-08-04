@@ -22,10 +22,12 @@ import { Address } from 'set-protocol-v2/utils/types';
 
 import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
-import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
+import { Controller } from 'set-protocol-v2/dist/utils/contracts';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
 import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
 import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
+import { SetTokenCreator } from 'set-protocol-v2/dist/utils/contracts';
+import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
 
 /**
  * @title ContractWrapper
@@ -120,6 +122,32 @@ export class ContractWrapper {
 
       this.cache[cacheKey] = controllerContract;
       return controllerContract;
+    }
+  }
+
+  /**
+   * Load Set Token Creator contract
+   *
+   * @param  setTokenCreatorAddress  Address of the Set Token Creator contract
+   * @param  signer                  Caller of the method
+   * @return                         The Set Token Creator Contract
+   */
+  public async loadSetTokenCreatorAsync(
+    setTokenCreatorAddress: Address,
+    signer: Signer,
+  ): SetTokenCreator {
+    const cacheKey = `SetTokenCreator_${setTokenCreatorAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as SetTokenCreator;
+    } else {
+      const setTokenCreator = SetTokenCreatorFactory.connect(
+        setTokenCreatorAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = setTokenCreator;
+      return setTokenCreator;
     }
   }
 }
