@@ -123,25 +123,25 @@ export class ContractWrapper {
    * Load Set Token Creator contract
    *
    * @param  setTokenCreatorAddress  Address of the Set Token Creator contract
-   * @param  signer                  Caller of the methods
+   * @param  signer                  Caller of the method
    * @return                         The Set Token Creator Contract
    */
   public async loadSetTokenCreatorAsync(
     setTokenCreatorAddress: Address,
     signer: Signer
-  ): Controller {
+  ): SetTokenCreator {
     const cacheKey = `Controller_${setTokenCreatorAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as SetTokenCreator;
     } else {
-      const controllerContract = SetTokenCreatorFactory.connect(
+      const setTokenCreator = SetTokenCreatorFactory.connect(
         setTokenCreatorAddress,
         signer
       );
 
-      this.cache[cacheKey] = controllerContract;
-      return controllerContract;
+      this.cache[cacheKey] = setTokenCreator;
+      return setTokenCreator;
     }
   }
 }
