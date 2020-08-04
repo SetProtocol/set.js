@@ -16,19 +16,27 @@ const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 const blockchain = new Blockchain(provider);
 
 describe('SetTokenCreatorWrapper', () => {
-  let owner: Account;
-  let manager: Account;
-  let controllerAddress: Account;
+  let owner: Address;
+  let manager: Address;
+  let controllerAddress: Address;
+  let firstModuleAddress: Address;
+  let secondModuleAddress: Address;
+  let invalidModuleAddress: Address;
 
   let deployer: DeployHelper;
 
   beforeEach(async () => {
-    [owner, manager, controllerAddress] = await provider.listAccounts();
+    [
+      owner,
+      manager,
+      controllerAddress,
+      firstModuleAddress,
+      secondModuleAddress,
+      invalidModuleAddress,
+    ] = await provider.listAccounts();
 
     deployer = new DeployHelper(provider.getSigner(owner));
-  });
 
-  beforeEach(async () => {
     await blockchain.saveSnapshotAsync();
   });
 
@@ -57,184 +65,182 @@ describe('SetTokenCreatorWrapper', () => {
     });
   });
 
-  // describe("when there is a SetTokenCreator", async () => {
-  //   let controller: Controller;
-  //   let setTokenCreator: SetTokenCreator;
+  describe('when there is a SetTokenCreator', () => {
+    let controller: Controller;
+    let setTokenCreator: SetTokenCreator;
 
-  //   beforeEach(async () => {
-  //     controller = await deployer.core.deployController(owner.address);
-  //     setTokenCreator = await deployer.core.deploySetTokenCreator(
-  //       controller.address
-  //     );
+    beforeEach(async () => {
+      controller = await deployer.core.deployController(owner);
+      setTokenCreator = await deployer.core.deploySetTokenCreator(
+        controller.address
+      );
 
-  //     await controller.initialize([setTokenCreator.address], [], [], []);
-  //   });
+      await controller.initialize([setTokenCreator.address], [], [], []);
+    });
 
-  //   describe("#create", async () => {
-  //     let firstComponent: StandardTokenMock;
-  //     let secondComponent: StandardTokenMock;
-  //     let firstModule: Address;
-  //     let secondModule: Address;
+    describe('#create', () => {
+      let firstComponent: StandardTokenMock;
+      let secondComponent: StandardTokenMock;
+      let firstModule: Address;
+      let secondModule: Address;
 
-  //     let subjectComponents: Address[];
-  //     let subjectUnits: BigNumber[];
-  //     let subjectModules: Address[];
-  //     let subjectManager: Address;
-  //     let subjectName: string;
-  //     let subjectSymbol: string;
+      let subjectComponents: Address[];
+      let subjectUnits: BigNumber[];
+      let subjectModules: Address[];
+      let subjectManager: Address;
+      let subjectName: string;
+      let subjectSymbol: string;
 
-  //     beforeEach(async () => {
-  //       firstComponent = await deployer.mocks.deployTokenMock(manager.address);
-  //       secondComponent = await deployer.mocks.deployTokenMock(manager.address);
-  //       firstModule = await deployer.mocks.deployModuleBaseMock();
-  //       secondModule = await deployer.mocks.deployModuleBaseMock();
+      beforeEach(async () => {
+        firstComponent = await deployer.mocks.deployTokenMock(manager);
+        secondComponent = await deployer.mocks.deployTokenMock(manager);
+        firstModule = firstModuleAddress;
+        secondModule = secondModuleAddress;
 
-  //       await controller.addModule(firstModule);
-  //       await controller.addModule(secondModule);
+        await controller.addModule(firstModule);
+        await controller.addModule(secondModule);
 
-  //       subjectComponents = [firstComponent.address, secondComponent.address];
-  //       subjectUnits = [ether(1), ether(2)];
-  //       subjectModules = [firstModule, secondModule];
-  //       subjectManager = manager;
-  //       subjectName = "TestSetTokenCreator";
-  //       subjectSymbol = "SET";
-  //     });
+        subjectComponents = [firstComponent.address, secondComponent.address];
+        subjectUnits = [ether(1), ether(2)];
+        subjectModules = [firstModule, secondModule];
+        subjectManager = manager;
+        subjectName = 'TestSetTokenCreator';
+        subjectSymbol = 'SET';
+      });
 
-  //     async function subject(): Promise<any> {
-  //       return setTokenCreator.create(
-  //         subjectComponents,
-  //         subjectUnits,
-  //         subjectModules,
-  //         subjectManager,
-  //         subjectName,
-  //         subjectSymbol
-  //       );
-  //     }
+      async function subject(): Promise<any> {
+        return setTokenCreator.create(
+          subjectComponents,
+          subjectUnits,
+          subjectModules,
+          subjectManager,
+          subjectName,
+          subjectSymbol
+        );
+      }
 
-  //     it("should properly create the Set", async () => {
-  //       const receipt = await subject();
+      // it("should properly create the Set", async () => {
+      //   const receipt = await subject();
 
-  //       // const address = await protocolUtils.getCreatedSetTokenAddress(
-  //       //   receipt.hash
-  //       // );
-  //       expect(receipt.hash).to.be.a("string");
-  //     });
+      //   const address = await protocolUtils.getCreatedSetTokenAddress(
+      //     receipt.hash
+      //   );
+      //   expect(receipt.hash).to.be.a("string");
+      // });
 
-  //     it("should enable the Set on the controller", async () => {
-  //       const receipt = await subject();
+      // it("should enable the Set on the controller", async () => {
+      //   const receipt = await subject();
 
-  //       // const retrievedSetAddress = await protocolUtils.getCreatedSetTokenAddress(
-  //       //   receipt.hash
-  //       // );
-  //       const isSetEnabled = await controller.isSet(receipt.hash);
-  //       expect(isSetEnabled).to.eq(true);
-  //     });
+      //   // const retrievedSetAddress = await protocolUtils.getCreatedSetTokenAddress(
+      //   //   receipt.hash
+      //   // );
+      //   const isSetEnabled = await controller.isSet(receipt.hash);
+      //   expect(isSetEnabled).to.eq(true);
+      // });
 
-  //     describe("when no components are passed in", async () => {
-  //       beforeEach(async () => {
-  //         subjectComponents = [];
-  //       });
+      describe('when no components are passed in', () => {
+        beforeEach(() => {
+          subjectComponents = [];
+        });
 
-  //       it("should revert", async () => {
-  //         try {
-  //           await subject();
-  //         } catch (err) {
-  //           expect(err.responseText).to.include(
-  //             "Must have at least 1 component"
-  //           );
-  //         }
-  //       });
-  //     });
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include(
+              'Must have at least 1 component'
+            );
+          }
+        });
+      });
 
-  //     describe("when the component and units arrays are not the same length", async () => {
-  //       beforeEach(async () => {
-  //         subjectUnits = [ether(1)];
-  //       });
+      describe('when the component and units arrays are not the same length', () => {
+        beforeEach(() => {
+          subjectUnits = [ether(1)];
+        });
 
-  //       it("should revert", async () => {
-  //         try {
-  //           await subject();
-  //         } catch (err) {
-  //           expect(err.responseText).to.include(
-  //             "Component and unit lengths must be the same"
-  //           );
-  //         }
-  //       });
-  //     });
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include(
+              'Component and unit lengths must be the same'
+            );
+          }
+        });
+      });
 
-  //     describe("when a module is not approved by the Controller", async () => {
-  //       beforeEach(async () => {
-  //         const invalidModuleAddress = await manager.address;
+      describe('when a module is not approved by the Controller', () => {
+        beforeEach(() => {
+          subjectModules = [firstModule, invalidModuleAddress];
+        });
 
-  //         subjectModules = [firstModule, invalidModuleAddress];
-  //       });
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Must be enabled module');
+          }
+        });
+      });
 
-  //       it("should revert", async () => {
-  //         try {
-  //           await subject();
-  //         } catch (err) {
-  //           expect(err.responseText).to.include("Must be enabled module");
-  //         }
-  //       });
-  //     });
+      describe('when no modules are passed in', () => {
+        beforeEach(() => {
+          subjectModules = [];
+        });
 
-  //     describe("when no modules are passed in", async () => {
-  //       beforeEach(async () => {
-  //         subjectModules = [];
-  //       });
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Must have at least 1 module');
+          }
+        });
+      });
 
-  //       it("should revert", async () => {
-  //         try {
-  //           await subject();
-  //         } catch (err) {
-  //           expect(err.responseText).to.include("Must have at least 1 module");
-  //         }
-  //       });
-  //     });
+      describe('when the manager is a null address', () => {
+        beforeEach(() => {
+          subjectManager = ADDRESS_ZERO;
+        });
 
-  //     describe("when the manager is a null address", async () => {
-  //       beforeEach(async () => {
-  //         subjectManager = ADDRESS_ZERO;
-  //       });
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Manager must not be empty');
+          }
+        });
+      });
 
-  //       it("should revert", async () => {
-  //         try {
-  //           await subject();
-  //         } catch (err) {
-  //           expect(err.responseText).to.include("Manager must not be empty");
-  //         }
-  //       });
-  //     });
+      describe('when a component is a null address', () => {
+        beforeEach(() => {
+          subjectComponents = [firstComponent.address, ADDRESS_ZERO];
+        });
 
-  //     describe("when a component is a null address", async () => {
-  //       beforeEach(async () => {
-  //         subjectComponents = [firstComponent.address, ADDRESS_ZERO];
-  //       });
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include(
+              'Component must not be null address'
+            );
+          }
+        });
+      });
 
-  //       it("should revert", async () => {
-  //         try {
-  //           await subject();
-  //         } catch (err) {
-  //           expect(err.responseText).to.include(
-  //             "Component must not be null address"
-  //           );
-  //         }
-  //       });
-  //     });
+      describe('when a unit is 0', () => {
+        beforeEach(() => {
+          subjectUnits = [ONE, ZERO];
+        });
 
-  //     describe("when a unit is 0", async () => {
-  //       beforeEach(async () => {
-  //         subjectUnits = [ONE, ZERO];
-  //       });
-
-  //       it("should revert", async () => {
-  //         try {
-  //           await subject();
-  //         } catch (err) {
-  //           expect(err.responseText).to.include("Units must be greater than 0");
-  //         }
-  //       });
-  //     });
-  //   });
-  // });
+        it('should revert', async () => {
+          try {
+            await subject();
+          } catch (err) {
+            expect(err.responseText).to.include('Units must be greater than 0');
+          }
+        });
+      });
+    });
+  });
 });
