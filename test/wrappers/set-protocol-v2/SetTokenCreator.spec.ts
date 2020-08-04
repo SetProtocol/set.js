@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
 import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import { Account, Address } from 'set-protocol-v2/dist/utils/types';
+import { Address } from 'set-protocol-v2/dist/utils/types';
 import { ADDRESS_ZERO, ZERO, ONE } from 'set-protocol-v2/dist/utils/constants';
 import {
   Controller,
@@ -11,9 +11,11 @@ import {
 } from 'set-protocol-v2/dist/utils/contracts';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 import { expect } from './utils/chai';
+import { ProtocolUtils as CreateProtocolUtils } from 'set-protocol-v2/dist/utils/common/protocolUtils';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 const blockchain = new Blockchain(provider);
+const protocolUtils = new CreateProtocolUtils(provider);
 
 describe('SetTokenCreatorWrapper', () => {
   let owner: Address;
@@ -119,24 +121,24 @@ describe('SetTokenCreatorWrapper', () => {
         );
       }
 
-      // it("should properly create the Set", async () => {
-      //   const receipt = await subject();
+      it('should properly create the Set', async () => {
+        const receipt = await subject();
 
-      //   const address = await protocolUtils.getCreatedSetTokenAddress(
-      //     receipt.hash
-      //   );
-      //   expect(receipt.hash).to.be.a("string");
-      // });
+        const address = await protocolUtils.getCreatedSetTokenAddress(
+          receipt.hash
+        );
+        expect(address).to.be.a('string');
+      });
 
-      // it("should enable the Set on the controller", async () => {
-      //   const receipt = await subject();
+      it('should enable the Set on the controller', async () => {
+        const receipt = await subject();
 
-      //   // const retrievedSetAddress = await protocolUtils.getCreatedSetTokenAddress(
-      //   //   receipt.hash
-      //   // );
-      //   const isSetEnabled = await controller.isSet(receipt.hash);
-      //   expect(isSetEnabled).to.eq(true);
-      // });
+        const retrievedSetAddress = await protocolUtils.getCreatedSetTokenAddress(
+          receipt.hash
+        );
+        const isSetEnabled = await controller.isSet(retrievedSetAddress);
+        expect(isSetEnabled).to.eq(true);
+      });
 
       describe('when no components are passed in', () => {
         beforeEach(() => {
