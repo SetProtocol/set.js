@@ -16,9 +16,8 @@
 
 'use strict';
 
-import { ContractTransaction } from 'ethers';
 import { Provider, JsonRpcProvider } from 'ethers/providers';
-import { Address, Position } from 'set-protocol-v2/utils/types';
+import { Address } from 'set-protocol-v2/utils/types';
 
 import { ContractWrapper } from './ContractWrapper';
 
@@ -42,12 +41,12 @@ export class SetTokenCreatorWrapper {
   }
 
   /**
-   * Returns the array of Factory contracts
+   * Instantiates and registers a new Set Token.
    *
-   * @param components  List of component addresses that will comprise initial positions
-   * @param units       List of units. Each unit is the # of components per 10^18 of a Set Token.
+   * @param components  List of component addresses that will comprise a Set's initial positions.
+   * @param units       List of units. Each unit is the # of components per 10^18 of this Set Token.
    * @param modules     List of modules to enable. All modules must be approved by the Controller.
-   * @param manager     Address of the manager
+   * @param manager     Address of the manager.
    * @param name        The Set Token's name.
    * @param symbol      The Set Token's symbol identifier.
    * @return            Address of newly instantiated Set Token.
@@ -61,11 +60,11 @@ export class SetTokenCreatorWrapper {
     symbol: string,
     callerAddress?: Address,
   ): Promise<Address[]> {
-    const controller = await this.contracts.loadSetTokenCreatorAsync(
+    const setTokenCreator = await this.contracts.loadSetTokenCreatorAsync(
       this.setTokenCreatorAddress,
       (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
 
-    return controller.create(components, units, modules, manager, name, symbol);
+    return setTokenCreator.create(components, units, modules, manager, name, symbol);
   }
 }
