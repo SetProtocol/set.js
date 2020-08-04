@@ -54,7 +54,7 @@ export class ContractWrapper {
    */
   public async loadERC20Async(
     tokenAddress: Address,
-    callerAddress?: Address
+    callerAddress?: Address,
   ): SetToken {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `ERC20_${tokenAddress}_${await signer.getAddress()}`;
@@ -62,7 +62,10 @@ export class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as ERC20;
     } else {
-      const tokenContract = Erc20Factory.connect(tokenAddress, signer);
+      const tokenContract = Erc20Factory.connect(
+        tokenAddress,
+        signer
+      );
 
       this.cache[cacheKey] = tokenContract;
       return tokenContract;
@@ -78,7 +81,7 @@ export class ContractWrapper {
    */
   public async loadSetTokenAsync(
     setTokenAddress: Address,
-    callerAddress?: Address
+    callerAddress?: Address,
   ): SetToken {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `SetToken_${setTokenAddress}_${await signer.getAddress()}`;
@@ -86,7 +89,10 @@ export class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as SetToken;
     } else {
-      const setTokenContract = SetTokenFactory.connect(setTokenAddress, signer);
+      const setTokenContract = SetTokenFactory.connect(
+        setTokenAddress,
+        signer
+      );
 
       this.cache[cacheKey] = setTokenContract;
       return setTokenContract;
@@ -102,7 +108,7 @@ export class ContractWrapper {
    */
   public async loadControllerContractAsync(
     controllerAddress: Address,
-    signer: Signer
+    signer: Signer,
   ): Controller {
     const cacheKey = `Controller_${controllerAddress}_${await signer.getAddress()}`;
 
@@ -128,7 +134,7 @@ export class ContractWrapper {
    */
   public async loadSetTokenCreatorAsync(
     setTokenCreatorAddress: Address,
-    signer: Signer
+    signer: Signer,
   ): SetTokenCreator {
     const cacheKey = `Controller_${setTokenCreatorAddress}_${await signer.getAddress()}`;
 
