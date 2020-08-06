@@ -63,7 +63,7 @@
         "ethereum-types": "^3.2.0",
         "ethereumjs-util": "^7.0.3",
         "ethers": "^4.0.47",
-        "set-protocol-v2": "git+ssh://git@github.com/SetProtocol/set-protocol-v2.git#353de33f00b46795ae7aa1ccfb1d5914a84c7c2e",
+        "set-protocol-v2": "git+ssh://git@github.com/SetProtocol/set-protocol-v2.git#11ff28048398f7eb5b5d679194c79dcb446189db",
         "truffle": "^5.1.35",
         "truffle-hdwallet-provider": "^1.0.17",
         "web3": "^1.2.11",

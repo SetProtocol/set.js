@@ -6,7 +6,7 @@ import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
 import { ContractTransaction } from 'ethers';
 import { JsonRpcProvider } from 'ethers/providers';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import SystemFixture from 'set-protocol-v2/dist/utils/fixtures';
+import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
 import { StandardTokenMock } from 'set-protocol-v2/dist/typechain/StandardTokenMock';
 import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
 import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
@@ -31,7 +31,7 @@ describe('IssuanceModuleWrapper', () => {
 
   let issuanceModuleWrapper: IssuanceModuleWrapper;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     [
       owner,
       manager,
@@ -39,10 +39,10 @@ describe('IssuanceModuleWrapper', () => {
     ] = await provider.listAccounts();
 
     deployer = new DeployHelper(provider.getSigner(owner));
-    setup = new SystemFixture(provider.getSigner(owner), owner);
+    setup = new SystemFixture(provider, owner);
     await setup.initialize();
 
-    const issuanceModule = await deployer.modules.deployIssuanceModule(owner);
+    issuanceModule = await deployer.modules.deployIssuanceModule(owner);
     await setup.controller.addModule(issuanceModule.address);
 
     issuanceModuleWrapper = new IssuanceModuleWrapper(provider, issuanceModule.address);
@@ -58,16 +58,6 @@ describe('IssuanceModuleWrapper', () => {
 
   describe('#issue', () => {
     let setToken: SetToken;
-    let firstComponent: StandardTokenMock;
-    let firstComponentUnits: BigNumber;
-    let secondComponent: StandardTokenMock;
-    let secondComponentUnits: BigNumber;
-
-    let components: Address[];
-    let units: BigNumber[];
-    let modules: Address[];
-    let name: string;
-    let symbol: string;
 
     let subjectSetTokenAddress: Address;
     let subjectIssuanceQuantity: BigNumber;
