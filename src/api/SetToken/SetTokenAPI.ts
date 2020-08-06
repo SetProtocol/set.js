@@ -23,6 +23,7 @@ import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
 import { SetTokenWrapper } from '../../wrappers/set-protocol-v2/SetTokenWrapper';
 import { generateTxOpts } from '@src/utils/transactions';
+import { assertGetController } from './assertions';
 
 /**
  * @title  SetTokenWrapper
@@ -47,6 +48,8 @@ export class SetTokenAPI {
   public async getControllerAsync(
     setAddress: Address,
   ): Promise<string> {
+    assertGetController(setAddress);
+
     return await this.setTokenWrapper.controller(setAddress);
   }
 
