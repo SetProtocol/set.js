@@ -47,7 +47,10 @@ export class ERC20Wrapper {
    * @param  userAddress   Address of the user
    * @return               The balance of the ERC20 token
    */
-  public async balanceOf(tokenAddress: Address, userAddress: Address): Promise<BigNumber> {
+  public async balanceOf(
+    tokenAddress: Address,
+    userAddress: Address
+  ): Promise<BigNumber> {
     const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
 
     return await tokenInstance.balanceOf(userAddress);
@@ -113,7 +116,7 @@ export class ERC20Wrapper {
   public async allowance(
     tokenAddress: Address,
     ownerAddress: Address,
-    spenderAddress: Address,
+    spenderAddress: Address
   ): Promise<BigNumber> {
     const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
 
@@ -136,10 +139,13 @@ export class ERC20Wrapper {
     to: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts?: TransactionOverrides
   ): Promise<string> {
     const txOptions = await generateTxOpts(txOpts);
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.transfer(to, value, txOptions);
   }
@@ -162,9 +168,12 @@ export class ERC20Wrapper {
     to: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts?: TransactionOverrides
   ): Promise<string> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
     const txOptions = await generateTxOpts(txOpts);
 
     return await tokenInstance.transferFrom(from, to, value, txOptions);
@@ -185,10 +194,13 @@ export class ERC20Wrapper {
     spenderAddress: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts?: TransactionOverrides
   ): Promise<string> {
     const txOptions = await generateTxOpts(txOpts);
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.approve(spenderAddress, value, txOptions);
   }

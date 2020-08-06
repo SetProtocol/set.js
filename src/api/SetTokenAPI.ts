@@ -45,9 +45,7 @@ export class SetTokenAPI {
    * @param  setAddress    Address of the SetToken.
    * @return               Address of the controller.
    */
-  public async getControllerAsync(
-    setAddress: Address,
-  ): Promise<string> {
+  public async getControllerAsync(setAddress: Address): Promise<string> {
     assertGetController(setAddress);
 
     return await this.setTokenWrapper.controller(setAddress);
@@ -62,7 +60,7 @@ export class SetTokenAPI {
    */
   public async getPositionsAsync(
     setAddress: Address,
-    callerAddress?: Address,
+    callerAddress?: Address
   ): Promise<Position[]> {
     return await this.setTokenWrapper.getPositions(setAddress, callerAddress);
   }
@@ -73,12 +71,8 @@ export class SetTokenAPI {
    * @param  setAddress    Address of Set
    * @return               Manager of the Set
    */
-  public async manager(
-    setAddress: Address,
-  ): Promise<string> {
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-    );
+  public async manager(setAddress: Address): Promise<string> {
+    const setToken = await this.contracts.loadSetTokenAsync(setAddress);
 
     return await setToken.manager();
   }
@@ -94,11 +88,11 @@ export class SetTokenAPI {
   public async moduleStates(
     setAddress: Address,
     moduleAddress: Address,
-    callerAddress?: Address,
+    callerAddress?: Address
   ): Promise<number> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
-      callerAddress,
+      callerAddress
     );
 
     return await setToken.moduleStates(moduleAddress);
@@ -118,12 +112,12 @@ export class SetTokenAPI {
     setAddress: Address,
     moduleAddress: Address,
     callerAddress: Address = undefined,
-    txOpts: TransactionOverrides = {},
+    txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     const txOptions = await generateTxOpts(txOpts);
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
-      callerAddress,
+      callerAddress
     );
 
     return await setToken.addModule(moduleAddress, txOptions);
@@ -142,12 +136,12 @@ export class SetTokenAPI {
     setAddress: Address,
     managerAddress: Address,
     callerAddress: Address = undefined,
-    txOpts: TransactionOverrides = {},
+    txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     const txOptions = await generateTxOpts(txOpts);
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
-      callerAddress,
+      callerAddress
     );
 
     return await setToken.setManager(managerAddress, txOptions);
@@ -165,12 +159,12 @@ export class SetTokenAPI {
   public async initializeModule(
     setAddress: Address,
     callerAddress: Address = undefined,
-    txOpts: TransactionOverrides = {},
+    txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     const txOptions = await generateTxOpts(txOpts);
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
-      callerAddress,
+      callerAddress
     );
 
     return await setToken.initializeModule(txOptions);
@@ -188,11 +182,11 @@ export class SetTokenAPI {
   public async isModule(
     setAddress: Address,
     moduleAddress: Address,
-    callerAddress?: Address,
+    callerAddress?: Address
   ): Promise<boolean> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
-      callerAddress,
+      callerAddress
     );
 
     return await setToken.isModule(moduleAddress);
@@ -210,11 +204,11 @@ export class SetTokenAPI {
   public async isPendingModule(
     setAddress: Address,
     moduleAddress: Address,
-    callerAddress?: Address,
+    callerAddress?: Address
   ): Promise<boolean> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
-      callerAddress,
+      callerAddress
     );
 
     return await setToken.isPendingModule(moduleAddress);
@@ -228,7 +222,10 @@ export class SetTokenAPI {
    * @param  callerAddress Address of caller (optional)
    * @return               Array of Positions
    */
-  public async getPositions(setAddress: Address, callerAddress?: Address): Promise<Position[]> {
+  public async getPositions(
+    setAddress: Address,
+    callerAddress?: Address
+  ): Promise<Position[]> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
       callerAddress
@@ -245,7 +242,10 @@ export class SetTokenAPI {
    * @param  callerAddress  Address of caller (optional)
    * @return                Array of module addresses
    */
-  public async getModules(setAddress: Address, callerAddress?: Address): Promise<Address[]> {
+  public async getModules(
+    setAddress: Address,
+    callerAddress?: Address
+  ): Promise<Address[]> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
       callerAddress
