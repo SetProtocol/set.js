@@ -64,7 +64,7 @@ export class SetTokenAPI {
     setAddress: Address,
     callerAddress?: Address
   ): Promise<Position[]> {
-    // TODO: add assertion check for positions
+    this.assert.schema.isValidAddress('setAddress', setAddress);
 
     return await this.setTokenWrapper.getPositions(setAddress, callerAddress);
   }
@@ -82,7 +82,21 @@ export class SetTokenAPI {
   }
 
   /**
-   * addModule
+   * Returns a list of modules for the target Set Token.
+   *
+   * @param  setAddress     Address of Set to get list of modules for
+   * @param  callerAddress  Address of caller (optional)
+   * @return                Array of module addresses
+   */
+  public async getModules(
+    setAddress: Address,
+    callerAddress?: Address
+  ): Promise<Address[]> {
+    return this.setTokenWrapper.getModules(setAddress, callerAddress);
+  }
+
+  /**
+   * Adds a module to the target Set Token. Can only be called by Set Manager.
    *
    * @param  setAddress      Address of Set
    * @param  moduleAddress   Address of module state to check
@@ -101,32 +115,28 @@ export class SetTokenAPI {
   }
 
   /**
-   * addModule
-   * Add a module via address to the Set token
+   * Add a module via address to a target Set token.
    *
-   * @param  setAddress    Address Set to issue
-   * @param  moduleAddress Address of potential module
-   * @param  callerAddress Address of caller (optional)
-   * @param  txOpts        Overrides for transaction (optional)
-   * @return               Transaction hash
+   * @param  setAddress      Address of Set
+   * @param  moduleAddress   Address of potential module
+   * @param  callerAddress   Address of caller (optional)
+   * @param  txOpts          Overrides for transaction (optional)
+   * @return                 Transaction hash
    */
-  public async addModule(
+  public async addModuleAsync(
     setAddress: Address,
     moduleAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setAddress);
+    this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
+    // TODO: assert module is a module?
 
-    return await setToken.addModule(moduleAddress, txOptions);
+    return await this.setTokenWrapper.addModule(setAddress, moduleAddress, callerAddress, txOpts);
   }
 
   /**
-   * setManager
    * Sets the manager of the current Set token
    *
    * @param  setAddress    Address Set to issue
@@ -134,69 +144,60 @@ export class SetTokenAPI {
    * @param  txOpts     Overrides for transaction (optional)
    * @return               Transaction hash
    */
-  public async setManager(
+  public async setManagerAsync(
     setAddress: Address,
     managerAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setAddress);
+    this.assert.schema.isValidAddress('managerAddress', managerAddress);
 
-    return await setToken.setManager(managerAddress, txOptions);
+    return this.setTokenWrapper.setManager(setAddress, managerAddress, callerAddress, txOpts);
   }
 
   /**
-   * initializeModule
-   * Initializes the module on the Set
+   * Initialize a module on the target Set
    *
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
    * @param  txOpts     Overrides for transaction (optional)
    * @return               Contract transaction
    */
-  public async initializeModule(
+  public async initializeModuleAsync(
     setAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setAddress);
+    // TODO: confirm this is how initialize module should work.
 
-    return await setToken.initializeModule(txOptions);
+    return this.setTokenWrapper.initializeModule(setAddress, callerAddress, txOpts);
   }
 
   /**
-   * isModule
-   * Determines if given address is a module
+   * Returns true if the given address is a module on the target Set.
    *
-   * @param  setAddress    Address of Set to check
-   * @param  moduleAddress Address of potential module
-   * @param  callerAddress Address of caller (optional)
-   * @return               boolean
+   * @param  setAddress     Address of Set to check
+   * @param  moduleAddress  Address of potential module
+   * @param  callerAddress  Address of caller (optional)
+   * @return                boolean
    */
-  public async isModule(
+  public async isModuleAsync(
     setAddress: Address,
     moduleAddress: Address,
     callerAddress?: Address
   ): Promise<boolean> {
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      callerAddress
-    );
+    // TODO: confirm this is how is module check should work.
+    // Why is a set address required?
+    this.assert.schema.isValidAddress('setAddress', setAddress);
+    this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return await setToken.isModule(moduleAddress);
+    return this.setTokenWrapper.isModule(setAddress, moduleAddress, callerAddress);
   }
 
   /**
-   * isPendingModule
-   * Determines if a given module address is pending on the Set
+   * Returns true if the given module is in "pending" state for the target Set.
    *
    * @param  setAddress    Address of Set to check
    * @param  moduleAddress Address of module
@@ -208,51 +209,9 @@ export class SetTokenAPI {
     moduleAddress: Address,
     callerAddress?: Address
   ): Promise<boolean> {
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setAddress);
+    this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return await setToken.isPendingModule(moduleAddress);
-  }
-
-  /**
-   * getPositions
-   * Returns the list of positions on the SetToken
-   *
-   * @param  setAddress    Address of Set to get list of positions for
-   * @param  callerAddress Address of caller (optional)
-   * @return               Array of Positions
-   */
-  public async getPositions(
-    setAddress: Address,
-    callerAddress?: Address
-  ): Promise<Position[]> {
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      callerAddress
-    );
-
-    return setToken.getPositions();
-  }
-
-  /**
-   * getModules
-   * Returns the list of modules on the SetToken
-   *
-   * @param  setAddress     Address of Set to get list of modules for
-   * @param  callerAddress  Address of caller (optional)
-   * @return                Array of module addresses
-   */
-  public async getModules(
-    setAddress: Address,
-    callerAddress?: Address
-  ): Promise<Address[]> {
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      callerAddress
-    );
-
-    return setToken.getModules();
+    return this.setTokenWrapper.isPendingModule(setAddress, moduleAddress, callerAddress);
   }
 }

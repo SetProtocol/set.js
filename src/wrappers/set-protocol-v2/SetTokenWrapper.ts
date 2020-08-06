@@ -124,7 +124,7 @@ export class SetTokenWrapper {
    *
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
-   * @param  txOpts     Overrides for transaction (optional)
+   * @param  txOpts        Overrides for transaction (optional)
    * @return               Transaction hash
    */
   public async setManager(
@@ -148,7 +148,7 @@ export class SetTokenWrapper {
    *
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
-   * @param  txOpts     Overrides for transaction (optional)
+   * @param  txOpts        Overrides for transaction (optional)
    * @return               Contract transaction
    */
   public async initializeModule(
