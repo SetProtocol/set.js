@@ -19,7 +19,7 @@
 import { values } from 'lodash/values';
 import { Schema, Validator, ValidatorResult } from 'jsonschema';
 
-import { commonSchemas } from './commonSchemas';
+import { schemas } from './schemas';
 
 /**
  * Borrowed, with slight modification, from the wonderful dharma codebase and 0x.js project codebase:
@@ -31,7 +31,7 @@ export class SchemaValidator {
   constructor() {
     this._validator = new Validator();
 
-    for (const schema of values(commonSchemas)) {
+    for (const schema of values(schemas)) {
       this._validator.addSchema(schema, schema.id);
     }
   }

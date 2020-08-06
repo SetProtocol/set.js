@@ -16,5 +16,6 @@
 
 'use strict';
 
-export { commonSchemas } from './commonSchemas';
+export { ValidatorResult, Schema } from 'jsonschema';
+export { schemas } from './schemas';
 export { SchemaValidator } from './schemaValidator';
