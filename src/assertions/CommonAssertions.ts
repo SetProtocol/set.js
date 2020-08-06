@@ -115,3 +115,4 @@ export class CommonAssertions {
       throw new Error(errorMessage);
     }
   }
+}

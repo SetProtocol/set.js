@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { values } from 'lodash/values';
+import values from 'lodash/values';
 import { Schema, Validator, ValidatorResult } from 'jsonschema';
 
 import { schemas } from './schemas';
