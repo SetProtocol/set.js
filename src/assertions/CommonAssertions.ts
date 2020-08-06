@@ -57,7 +57,7 @@ export class CommonAssertions {
   }
 
   public isMultipleOf(quantity: BigNumber, baseQuantity: BigNumber, errorMessage: string) {
-    if (!quantity.modulo(baseQuantity).isZero()) {
+    if (!quantity.mod(baseQuantity).isZero()) {
       throw new Error(errorMessage);
     }
   }
@@ -81,7 +81,7 @@ export class CommonAssertions {
   }
 
   public isValidExpiration(expiration: BigNumber, errorMessage: string) {
-    if (Date.now() > expiration.times(1000).toNumber()) {
+    if (Date.now() > expiration.mul(1000).toNumber()) {
       throw new Error(errorMessage);
     }
   }
