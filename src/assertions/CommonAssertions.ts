@@ -98,8 +98,8 @@ export class CommonAssertions {
     }
   }
 
-  public isValidAddress(value: string, errorMessage: string) {
-    if (!value || typeof value !== 'string' || !(value.length !== 42)) {
+  public isValidAddress(address: string, errorMessage) {
+    if (!address || typeof address !== 'string' || address.length !== 42) {
       throw new Error(errorMessage);
     }
   }
