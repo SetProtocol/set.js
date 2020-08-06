@@ -17,4 +17,3 @@
 'use strict';
 
 export { schemaAssertionsError } from './schemaErrors';
-export { setTokenErrors } from './setTokenErrors';
