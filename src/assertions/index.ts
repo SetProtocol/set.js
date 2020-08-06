@@ -19,6 +19,7 @@
 // Assertions
 import { CommonAssertions } from './CommonAssertions';
 import { SchemaAssertions } from './SchemaAssertions';
+import { Provider } from 'ethers/providers';
 
 export class Assertions {
   public schema: SchemaAssertions;
@@ -26,7 +27,7 @@ export class Assertions {
   // public erc20: ERC20Assertions;
   // public setToken: SetTokenAssertions;
 
-  public constructor() {
+  public constructor(provider: Provider) {
     this.schema = new SchemaAssertions();
     this.common = new CommonAssertions();
     // this.erc20 = new ERC20Assertions(web3);

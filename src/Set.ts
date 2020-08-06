@@ -17,6 +17,8 @@
 'use strict';
 
 import { Provider } from 'ethers/providers';
+import { Assertions } from './assertions';
+import { SetTokenAPI } from './api/SetTokenAPI';
 
 /**
  * @title Set
@@ -30,10 +32,20 @@ class Set {
   private provider: Provider;
 
   /**
+   * An instance of the SetTokenAPI class. Contains interface for interacting
+   * with Set Tokens.
+   */
+  public setToken: SetTokenAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(provider: Provider) {
     this.provider = provider;
+
+    const assertions = new Assertions(provider);
+
+    this.setToken = new SetTokenAPI(provider, assertions);
   }
 }
 
