@@ -21,7 +21,7 @@ import { Provider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
-import { SetTokenWrapper } from '../../wrappers/set-protocol-v2/SetTokenWrapper';
+import { SetTokenWrapper } from '../wrappers/set-protocol-v2/SetTokenWrapper';
 import { generateTxOpts } from '@src/utils/transactions';
 import { Assertions } from '@src/assertions';
 
@@ -48,6 +48,7 @@ export class SetTokenAPI {
    * @return               Address of the controller.
    */
   public async getControllerAsync(setAddress: Address): Promise<string> {
+    this.assert.schema.isValidAddress('setAddress', setAddress);
 
     return await this.setTokenWrapper.controller(setAddress);
   }

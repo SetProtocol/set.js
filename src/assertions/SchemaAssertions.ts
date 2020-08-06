@@ -29,22 +29,52 @@ export class SchemaAssertions {
     this.validator = new SchemaValidator();
   }
 
+  /**
+   * Throws if a given input is not a valid Ethereum Address.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param value           Value being validated.
+   */
   public isValidAddress(variableName: string, value: any) {
     this.assertConformsToSchema(variableName, value, schemas.addressSchema);
   }
 
+  /**
+   * Throws if a given input is not a valid 32 Byte String.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param value           Value being validated.
+   */
   public isValidBytes32(variableName: string, value: any) {
     this.assertConformsToSchema(variableName, value, schemas.bytes32Schema);
   }
 
+  /**
+   * Throws if a given input is not a valid Byte String.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param value           Value being validated.
+   */
   public isValidBytes(variableName: string, value: any) {
     this.assertConformsToSchema(variableName, value, schemas.bytesSchema);
   }
 
+  /**
+   * Throws if a given input is not a number.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param value           Value being validated.
+   */
   public isValidNumber(variableName: string, value: any) {
     this.assertConformsToSchema(variableName, value, schemas.numberSchema);
   }
 
+  /**
+   * Throws if a given input is not a whole number.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param value           Value being validated.
+   */
   public IsValidWholeNumber(variableName: string, value: any) {
     this.assertConformsToSchema(variableName, value, schemas.wholeNumberSchema);
   }
