@@ -44,7 +44,7 @@ export class SetTokenAPI {
   /**
    * Gets the controller address of a target Set Token.
    *
-   * @param  setAddress    Address of the SetToken.
+   * @param  setAddress    Address of the Set.
    * @return               Address of the controller.
    */
   public async getControllerAsync(setAddress: Address): Promise<string> {
@@ -56,48 +56,48 @@ export class SetTokenAPI {
   /**
    * Gets all current positions on a target Set Token.
    *
-   * @param  setAddress    Address of Set.
-   * @param  callerAddress Address of the method caller.
-   * @return               Controller address of the Set.
+   * @param  setAddress      Address of Set.
+   * @param  callerAddress   Address of the method caller.
+   * @return                 Array of current Set Positions.
    */
   public async getPositionsAsync(
     setAddress: Address,
     callerAddress?: Address
   ): Promise<Position[]> {
+    // TODO: add assertion check for positions
+
     return await this.setTokenWrapper.getPositions(setAddress, callerAddress);
   }
 
   /**
-   * manager
+   * Gets the manager address for the target Set Token.
    *
    * @param  setAddress    Address of Set
    * @return               Manager of the Set
    */
-  public async manager(setAddress: Address): Promise<string> {
-    const setToken = await this.contracts.loadSetTokenAsync(setAddress);
+  public async getManagerAddressAsync(setAddress: Address): Promise<Address> {
+    this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return await setToken.manager();
+    return await this.setTokenWrapper.manager(setAddress);
   }
 
   /**
    * addModule
    *
-   * @param  setAddress    Address Set to issue
-   * @param  moduleAddress Address of potential module
-   * @param  callerAddress Address of caller (optional)
-   * @return               Transaction hash
+   * @param  setAddress      Address of Set
+   * @param  moduleAddress   Address of module state to check
+   * @param  callerAddress   Address of caller (optional)
+   * @return                 An integer representing module state
    */
-  public async moduleStates(
+  public async getModuleStateAsync(
     setAddress: Address,
     moduleAddress: Address,
     callerAddress?: Address
   ): Promise<number> {
-    const setToken = await this.contracts.loadSetTokenAsync(
-      setAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setAddress);
+    this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return await setToken.moduleStates(moduleAddress);
+    return await this.setTokenWrapper.moduleStates(setAddress, moduleAddress, callerAddress);
   }
 
   /**
