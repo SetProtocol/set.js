@@ -16,21 +16,17 @@
 
 'use strict';
 
-// Assertions
+import { Provider } from 'ethers/providers';
+
 import { CommonAssertions } from './CommonAssertions';
 import { SchemaAssertions } from './SchemaAssertions';
-import { Provider } from 'ethers/providers';
 
 export class Assertions {
   public schema: SchemaAssertions;
   public common: CommonAssertions;
-  // public erc20: ERC20Assertions;
-  // public setToken: SetTokenAssertions;
 
   public constructor(provider: Provider) {
     this.schema = new SchemaAssertions();
     this.common = new CommonAssertions();
-    // this.erc20 = new ERC20Assertions(web3);
-    // this.setToken = new SetTokenAssertions(web3);
   }
 }
