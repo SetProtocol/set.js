@@ -17,3 +17,4 @@
 'use strict';
 
 export { commonSchemas } from './commonSchemas';
+export { SchemaValidator } from './schemaValidator';
