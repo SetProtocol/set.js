@@ -1,426 +1,44 @@
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
 
 import { Address, Position } from 'set-protocol-v2/utils/types';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 import { SetTokenAPI } from '@src/api/SetTokenAPI';
-import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
-import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
-import { StandardTokenMock } from 'set-protocol-v2/dist/typechain/StandardTokenMock';
-import {
-  ADDRESS_ZERO,
-  EMPTY_BYTES,
-  POSITION_STATE,
-  MODULE_STATE,
-} from 'set-protocol-v2/dist/utils/constants';
-import { ContractTransaction } from 'ethers';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-import { expect } from './utils/chai';
-import { ERC20Wrapper } from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
+import { expect, sinon } from '../utils/chai';
 import { Assertions } from '@src/assertions';
+import { SetTokenWrapper } from '@src/wrappers';
 
-const blockchain = new Blockchain(provider);
 
 describe('SetTokenAPI', () => {
   let owner: Address;
-  let manager: Address;
-  let mockIssuanceModule: Address;
-  let mockLockedModule: Address;
-  let testAccount: Address;
-  let randomAccount: Address;
   let assertions: Assertions;
   let setTokenAPI: SetTokenAPI;
-  let erc20Wrapper: ERC20Wrapper;
-
-  let deployer: DeployHelper;
+  let setTokenWrapper: SetTokenWrapper;
+  let stub: any;
 
   beforeEach(async () => {
     [
       owner,
-      manager,
-      mockIssuanceModule,
-      mockLockedModule,
-      testAccount,
     ] = await provider.listAccounts();
 
     assertions = new Assertions(provider);
-    setTokenAPI = new SetTokenAPI(provider, assertions);
-    erc20Wrapper = new ERC20Wrapper(provider);
+    setTokenWrapper = new SetTokenWrapper(provider);
+    setTokenAPI = new SetTokenAPI(provider, assertions, { setTokenWrapper });
 
     deployer = new DeployHelper(provider.getSigner(owner));
-  });
 
-  beforeEach(async () => {
-    await blockchain.saveSnapshotAsync();
+    stub = sinon.stub(setTokenWrapper);
   });
 
   afterEach(async () => {
-    await blockchain.revertAsync();
+    sinon.restore();
   });
 
   describe('Checking basic functionality', () => {
-    let firstComponent: StandardTokenMock;
-    let firstComponentUnits: BigNumber;
-    let secondComponent: StandardTokenMock;
-    let secondComponentUnits: BigNumber;
-    let controller: Controller;
-
-    let subjectComponentAddresses: Address[];
-    let subjectUnits: BigNumber[];
-    let subjectModuleAddresses: Address[];
-    let subjectControllerAddress: Address;
-    let subjectManagerAddress: Address;
-    let subjectName: string;
-    let subjectSymbol: string;
-
-    beforeEach(async () => {
-      firstComponent = await deployer.mocks.deployTokenMock(manager);
-      firstComponentUnits = ether(1);
-      secondComponent = await deployer.mocks.deployTokenMock(manager);
-      secondComponentUnits = ether(2);
-      controller = await deployer.core.deployController(owner);
-
-      subjectComponentAddresses = [firstComponent.address, secondComponent.address];
-      subjectUnits = [firstComponentUnits, secondComponentUnits];
-      subjectModuleAddresses = [mockIssuanceModule, mockLockedModule];
-      subjectControllerAddress = controller.address;
-      subjectManagerAddress = manager;
-      subjectName = 'TestSetToken';
-      subjectSymbol = 'SET';
-    });
-
-    async function subject(): Promise<SetToken> {
-      return await deployer.core.deploySetToken(
-        subjectComponentAddresses,
-        subjectUnits,
-        subjectModuleAddresses,
-        subjectControllerAddress,
-        subjectManagerAddress,
-        subjectName,
-        subjectSymbol
-      );
-    }
-
     it('should have the correct name, symbol, controller, and manager', async () => {
-      const setToken = await subject();
-
-      const name = await erc20Wrapper.name(setToken.address);
-      const symbol = await erc20Wrapper.symbol(setToken.address);
-      const controllerAddress = await setTokenAPI.controller(setToken.address);
-      const managerAddress = await setTokenAPI.manager(setToken.address);
-      expect(name).to.eq(subjectName);
-      expect(symbol).to.eq(subjectSymbol);
-      expect(controllerAddress).to.eq(subjectControllerAddress);
-      expect(managerAddress).to.eq(subjectManagerAddress);
-    });
-
-    it('should have the correct positions', async () => {
-      const setToken = await subject();
-
-      const positions = await setTokenAPI.getPositions(setToken.address, testAccount);
-      const firstComponentPosition = positions[0];
-      const secondComponentPosition = positions[1];
-      expect(firstComponentPosition.component).to.eq(firstComponent.address);
-      expect(firstComponentPosition.unit.toString()).to.eq(firstComponentUnits.toString());
-      expect(firstComponentPosition.module).to.eq(ADDRESS_ZERO);
-      expect(firstComponentPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
-      expect(firstComponentPosition.data).to.eq(EMPTY_BYTES);
-      expect(secondComponentPosition.component).to.eq(secondComponent.address);
-      expect(secondComponentPosition.unit.toString()).to.eq(secondComponentUnits.toString());
-      expect(secondComponentPosition.module).to.eq(ADDRESS_ZERO);
-      expect(secondComponentPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
-      expect(secondComponentPosition.data).to.eq(EMPTY_BYTES);
-    });
-
-    it('should have the 0 modules initialized', async () => {
-      const setToken = await subject();
-
-      const modules = await setTokenAPI.getModules(setToken.address);
-      expect(modules.length).to.eq(0);
-    });
-
-    it('should have the correct modules in pending state', async () => {
-      const setToken = await subject();
-
-      const mockIssuanceModuleState = await setTokenAPI.moduleStates(setToken.address, mockIssuanceModule);
-      const mockLockedModuleState = await setTokenAPI.moduleStates(setToken.address, mockLockedModule);
-      expect(mockIssuanceModuleState).to.eq(MODULE_STATE['PENDING']);
-      expect(mockLockedModuleState).to.eq(MODULE_STATE['PENDING']);
-    });
-  });
-
-  describe('when there is a deployed SetToken', () => {
-    let setToken: SetToken;
-
-    let subjectCaller: Address;
-    let controller: Controller;
-    let firstComponent: StandardTokenMock;
-    let firstComponentUnits: BigNumber;
-    let secondComponent: StandardTokenMock;
-    let secondComponentUnits: BigNumber;
-
-    let components: Address[];
-    let units: BigNumber[];
-    let modules: Address[];
-    let name: string;
-    let symbol: string;
-
-    beforeEach(async () => {
-      [
-        owner,
-        manager,
-        mockIssuanceModule,
-        mockLockedModule,
-        testAccount,
-        randomAccount,
-      ] = await provider.listAccounts();
-
-      firstComponent = await deployer.mocks.deployTokenMock(manager);
-      firstComponentUnits = ether(1);
-      secondComponent = await deployer.mocks.deployTokenMock(manager);
-      secondComponentUnits = ether(2);
-
-      controller = await deployer.core.deployController(owner);
-      components = [firstComponent.address, secondComponent.address];
-      units = [firstComponentUnits, secondComponentUnits];
-      modules = [mockIssuanceModule, mockLockedModule];
-      name = 'TestSetToken';
-      symbol = 'SET';
-
-      setToken = await deployer.core.deploySetToken(
-        components,
-        units,
-        modules,
-        controller.address,
-        manager,
-        name,
-        symbol,
-      );
-
-      setToken = setToken.connect(provider.getSigner(mockIssuanceModule));
-      await setToken.initializeModule();
-
-      setToken = setToken.connect(provider.getSigner(mockLockedModule));
-      await setToken.initializeModule();
-    });
-
-    describe('#addModule', () => {
-      let subjectModule: Address;
-
-      beforeEach(async () => {
-        await controller.addModule(testAccount);
-
-        subjectModule = testAccount;
-        subjectCaller = manager;
-      });
-
-      async function subject(): Promise<ContractTransaction> {
-        return setTokenAPI.addModule(setToken.address, subjectModule, subjectCaller);
-      }
-
-      it('should change the state to pending', async () => {
-        await subject();
-
-        const moduleState = await setTokenAPI.moduleStates(setToken.address, subjectModule);
-        expect(moduleState).to.eq(MODULE_STATE['PENDING']);
-      });
-
-      describe('when the caller is not the manager', () => {
-        beforeEach(async () => {
-          subjectCaller = randomAccount;
-        });
-
-        it('should revert', async () => {
-          try {
-            await subject();
-          } catch (err) {
-            expect(err.responseText).to.include('Only manager can call');
-          }
-        });
-      });
-
-      describe('when the module is already added', () => {
-        beforeEach(async () => {
-          subjectModule = mockIssuanceModule;
-          const moduleState = await setTokenAPI.moduleStates(setToken.address, mockIssuanceModule);
-        });
-
-        it('should revert', async () => {
-          try {
-            await subject();
-          } catch (err) {
-            expect(err.responseText).to.include('Module must not be added');
-          }
-        });
-      });
-
-      describe('when the module is not enabled', () => {
-        beforeEach(async () => {
-          await controller.removeModule(subjectModule);
-        });
-
-        it('should revert', async () => {
-          try {
-            await subject();
-          } catch (err) {
-            expect(err.responseText).to.include('Must be enabled on Controller');
-          }
-        });
-      });
-    });
-
-    describe('#setManager', () => {
-      let subjectManager: Address;
-
-      beforeEach(async () => {
-        subjectManager = testAccount;
-        subjectCaller = manager;
-      });
-
-      async function subject(): Promise<ContractTransaction> {
-        return setTokenAPI.setManager(setToken.address, subjectManager, subjectCaller);
-      }
-
-      it('should change the manager', async () => {
-        await subject();
-
-        const managerAddress = await setToken.manager();
-        expect(managerAddress).to.eq(subjectManager);
-      });
-
-      describe('when the caller is not the manager', () => {
-        beforeEach(async () => {
-          subjectCaller = randomAccount;
-        });
-
-        it('should revert', async () => {
-          try {
-            await subject();
-          } catch (err) {
-            expect(err.responseText).to.include('Only manager can call');
-          }
-        });
-      });
-    });
-
-    describe('#initializeModule', () => {
-      let subjectModule: Address;
-
-      beforeEach(async () => {
-        subjectModule = testAccount;
-        subjectCaller = testAccount;
-
-        setToken = setToken.connect(provider.getSigner(manager));
-        await controller.addModule(subjectModule);
-        await setToken.addModule(subjectModule);
-      });
-
-      async function subject(): Promise<ContractTransaction> {
-        return setTokenAPI.initializeModule(setToken.address, subjectCaller);
-      }
-
-      it('should add the module to the modules list', async () => {
-        await subject();
-
-        const moduleList = await setToken.getModules();
-        expect(moduleList).to.include(subjectModule);
-      });
-
-      it('should update the module state to initialized', async () => {
-        await subject();
-
-        const moduleState = await setTokenAPI.moduleStates(setToken.address, subjectModule);
-        expect(moduleState).to.eq(MODULE_STATE['INITIALIZED']);
-      });
-
-      describe('when the module is not added', () => {
-        beforeEach(async () => {
-          subjectCaller = owner;
-        });
-
-        it('should revert', async () => {
-          try {
-            await subject();
-          } catch (err) {
-            expect(err.responseText).to.include('Module must be pending');
-          }
-        });
-      });
-
-      describe('when the module already added', () => {
-        beforeEach(async () => {
-          subjectCaller = mockIssuanceModule;
-        });
-
-        it('should revert', async () => {
-          try {
-            await subject();
-          } catch (err) {
-            expect(err.responseText).to.include('Module must be pending');
-          }
-        });
-      });
-
-      describe('when the module is locked', () => {
-        beforeEach(async () => {
-          setToken = setToken.connect(provider.getSigner(mockIssuanceModule));
-          await setToken.lock();
-        });
-
-        it('should revert', async () => {
-          try {
-            await subject();
-          } catch (err) {
-            expect(err.responseText).to.include('Only when unlocked');
-          }
-        });
-      });
-    });
-
-    describe ('#getPositions', () => {
-      beforeEach(async () => {
-        subjectCaller = testAccount;
-      });
-
-      async function subject(): Promise<Position[]> {
-        return await setTokenAPI.getPositions(setToken.address, subjectCaller);
-      }
-
-      it('should return the correct Positions', async () => {
-        const positions = await subject();
-
-        const firstPosition = positions[0];
-        expect(firstPosition.component).to.eq(firstComponent.address);
-        expect(firstPosition.unit.toString()).to.eq(units[0].toString());
-        expect(firstPosition.module).to.eq(ADDRESS_ZERO);
-        expect(firstPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
-        expect(firstPosition.data).to.eq(EMPTY_BYTES);
-
-        const secondPosition = positions[1];
-        expect(secondPosition.component).to.eq(secondComponent.address);
-        expect(secondPosition.unit.toString()).to.eq(units[1].toString());
-        expect(secondPosition.module).to.eq(ADDRESS_ZERO);
-        expect(secondPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
-        expect(secondPosition.data).to.eq(EMPTY_BYTES);
-      });
-    });
-
-    describe('#getModules', () => {
-      beforeEach(async () => {
-        subjectCaller = testAccount;
-      });
-
-      async function subject(): Promise<Address[]> {
-        return await setTokenAPI.getModules(setToken.address, subjectCaller);
-      }
-
-      it('should return the correct modules', async () => {
-        const moduleAddresses = await subject();
-
-        expect(JSON.stringify(moduleAddresses)).to.eq(JSON.stringify(modules));
-      });
+      setTokenAPI.getControllerAddressAsync(owner);
+      expect(setTokenWrapper.controller).to.have.been.called;
     });
   });
 });

@@ -8,7 +8,7 @@ import { ControllerWrapper } from '../../../src/wrappers/set-protocol-v2/Control
 import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-import { expect } from './utils/chai';
+import { expect } from '../../utils/chai';
 
 const blockchain = new Blockchain(provider);
 
