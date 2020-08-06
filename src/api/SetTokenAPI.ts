@@ -25,6 +25,10 @@ import { SetTokenWrapper } from '../wrappers/set-protocol-v2/SetTokenWrapper';
 import { Assertions } from '@src/assertions';
 import { ModuleState } from '@src/types';
 
+export interface SetTokenAPIConfig {
+  setTokenWrapper: SetTokenWrapper;
+}
+
 /**
  * @title  SetTokenWrapper
  * @author Set Protocol
@@ -36,8 +40,8 @@ export class SetTokenAPI {
   private setTokenWrapper: SetTokenWrapper;
   private assert: Assertions;
 
-  public constructor(provider: Provider, assertions: Assertions) {
-    this.setTokenWrapper = new SetTokenWrapper(provider);
+  public constructor(provider: Provider, assertions: Assertions, options?: SetTokenAPIConfig) {
+    this.setTokenWrapper = (options && options.setTokenWrapper) || new SetTokenWrapper(provider);
     this.assert = assertions;
   }
 
