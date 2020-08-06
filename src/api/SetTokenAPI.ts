@@ -22,8 +22,8 @@ import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
 import { SetTokenWrapper } from '../wrappers/set-protocol-v2/SetTokenWrapper';
-import { generateTxOpts } from '@src/utils/transactions';
 import { Assertions } from '@src/assertions';
+import { ModuleState } from '@src/types';
 
 /**
  * @title  SetTokenWrapper
@@ -47,16 +47,28 @@ export class SetTokenAPI {
    * @param  setAddress    Address of the Set.
    * @return               Address of the controller.
    */
-  public async getControllerAsync(setAddress: Address): Promise<string> {
+  public async getControllerAddressAsync(setAddress: Address): Promise<string> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
     return await this.setTokenWrapper.controller(setAddress);
   }
 
   /**
-   * Gets all current positions on a target Set Token.
+   * Gets the manager address of the target Set Token.
    *
-   * @param  setAddress      Address of Set.
+   * @param  setAddress    Address of the Set.
+   * @return               Address of the manager.
+   */
+  public async getManagerAddressAsync(setAddress: Address): Promise<Address> {
+    this.assert.schema.isValidAddress('setAddress', setAddress);
+
+    return await this.setTokenWrapper.manager(setAddress);
+  }
+
+  /**
+   * Gets all current positions on the target Set Token.
+   *
+   * @param  setAddress      Address of the Set.
    * @param  callerAddress   Address of the method caller.
    * @return                 Array of current Set Positions.
    */
@@ -70,44 +82,34 @@ export class SetTokenAPI {
   }
 
   /**
-   * Gets the manager address for the target Set Token.
-   *
-   * @param  setAddress    Address of Set
-   * @return               Manager of the Set
-   */
-  public async getManagerAddressAsync(setAddress: Address): Promise<Address> {
-    this.assert.schema.isValidAddress('setAddress', setAddress);
-
-    return await this.setTokenWrapper.manager(setAddress);
-  }
-
-  /**
    * Returns a list of modules for the target Set Token.
    *
-   * @param  setAddress     Address of Set to get list of modules for
-   * @param  callerAddress  Address of caller (optional)
-   * @return                Array of module addresses
+   * @param  setAddress      Address of the Set.
+   * @param  callerAddress   Address of caller (optional).
+   * @return                 Array of module addresses.
    */
   public async getModules(
     setAddress: Address,
     callerAddress?: Address
   ): Promise<Address[]> {
+    this.assert.schema.isValidAddress('setAddress', setAddress);
+
     return this.setTokenWrapper.getModules(setAddress, callerAddress);
   }
 
   /**
-   * Adds a module to the target Set Token. Can only be called by Set Manager.
+   * Get the target module initialization state for the target Set Token.
    *
-   * @param  setAddress      Address of Set
-   * @param  moduleAddress   Address of module state to check
-   * @param  callerAddress   Address of caller (optional)
-   * @return                 An integer representing module state
+   * @param  setAddress      Address of the Set.
+   * @param  moduleAddress   Address of the module state to check.
+   * @param  callerAddress   Address of caller (optional).
+   * @return                 An integer representing module state.
    */
   public async getModuleStateAsync(
     setAddress: Address,
     moduleAddress: Address,
     callerAddress?: Address
-  ): Promise<number> {
+  ): Promise<ModuleState> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
@@ -115,13 +117,13 @@ export class SetTokenAPI {
   }
 
   /**
-   * Add a module via address to a target Set token.
+   * Add a module via address to the target Set token.
    *
-   * @param  setAddress      Address of Set
-   * @param  moduleAddress   Address of potential module
-   * @param  callerAddress   Address of caller (optional)
-   * @param  txOpts          Overrides for transaction (optional)
-   * @return                 Transaction hash
+   * @param  setAddress      Address of the Set.
+   * @param  moduleAddress   Address of the module to be added.
+   * @param  callerAddress   Address of caller (optional).
+   * @param  txOpts          Overrides for transaction (optional).
+   * @return                 Transaction hash.
    */
   public async addModuleAsync(
     setAddress: Address,
@@ -131,18 +133,18 @@ export class SetTokenAPI {
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
-    // TODO: assert module is a module?
+    // TODO: assert module is an approved module on controller?
 
     return await this.setTokenWrapper.addModule(setAddress, moduleAddress, callerAddress, txOpts);
   }
 
   /**
-   * Sets the manager of the current Set token
+   * Sets the manager of the target Set token.
    *
-   * @param  setAddress    Address Set to issue
-   * @param  callerAddress Address of caller (optional)
-   * @param  txOpts     Overrides for transaction (optional)
-   * @return               Transaction hash
+   * @param  setAddress      Address of the Set.
+   * @param  callerAddress   Address of caller (optional).
+   * @param  txOpts          Overrides for transaction (optional).
+   * @return                 Transaction hash.
    */
   public async setManagerAsync(
     setAddress: Address,
@@ -157,12 +159,12 @@ export class SetTokenAPI {
   }
 
   /**
-   * Initialize a module on the target Set
+   * Initialize a module on the target Set.
    *
-   * @param  setAddress    Address Set to issue
-   * @param  callerAddress Address of caller (optional)
-   * @param  txOpts     Overrides for transaction (optional)
-   * @return               Contract transaction
+   * @param  setAddress    Address Set to issue.
+   * @param  callerAddress Address of caller (optional).
+   * @param  txOpts     Overrides for transaction (optional).
+   * @return               Contract transaction.
    */
   public async initializeModuleAsync(
     setAddress: Address,
@@ -170,26 +172,23 @@ export class SetTokenAPI {
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
-    // TODO: confirm this is how initialize module should work.
 
     return this.setTokenWrapper.initializeModule(setAddress, callerAddress, txOpts);
   }
 
   /**
-   * Returns true if the given address is a module on the target Set.
+   * Returns true if the given address is an enabled module on the target Set.
    *
    * @param  setAddress     Address of Set to check
    * @param  moduleAddress  Address of potential module
    * @param  callerAddress  Address of caller (optional)
    * @return                boolean
    */
-  public async isModuleAsync(
+  public async isModuleEnabledAsync(
     setAddress: Address,
     moduleAddress: Address,
     callerAddress?: Address
   ): Promise<boolean> {
-    // TODO: confirm this is how is module check should work.
-    // Why is a set address required?
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
@@ -204,7 +203,7 @@ export class SetTokenAPI {
    * @param  callerAddress Address of caller (optional)
    * @return               boolean
    */
-  public async isPendingModule(
+  public async isModulePendingAsync(
     setAddress: Address,
     moduleAddress: Address,
     callerAddress?: Address
