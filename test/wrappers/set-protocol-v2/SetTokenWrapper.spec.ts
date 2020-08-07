@@ -17,7 +17,7 @@ import {
 import { ContractTransaction } from 'ethers';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-import { expect } from './utils/chai';
+import { expect } from '../../utils/chai';
 import { ERC20Wrapper } from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 
 const blockchain = new Blockchain(provider);

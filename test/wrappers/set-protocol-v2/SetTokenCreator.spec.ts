@@ -28,7 +28,7 @@ import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
 import { ADDRESS_ZERO, ZERO, ONE } from 'set-protocol-v2/dist/utils/constants';
 import { Address } from 'set-protocol-v2/dist/utils/types';
 
-import { expect } from './utils/chai';
+import { expect } from '../../utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 const blockchain = new Blockchain(provider);

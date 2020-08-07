@@ -18,6 +18,10 @@
 
 import { Provider } from 'ethers/providers';
 
+import { SetJSConfig } from './types';
+import { Assertions } from './assertions';
+import { SetTokenAPI } from './api/SetTokenAPI';
+
 /**
  * @title Set
  * @author Set Protocol
@@ -30,10 +34,20 @@ class Set {
   private provider: Provider;
 
   /**
+   * An instance of the SetTokenAPI class. Contains interface for interacting
+   * with Set Tokens.
+   */
+  public setToken: SetTokenAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
-  constructor(provider: Provider) {
+  constructor(provider: Provider, config: SetJSConfig) {
     this.provider = provider;
+
+    const assertions = new Assertions(provider);
+
+    this.setToken = new SetTokenAPI(provider, { assertions });
   }
 }
 

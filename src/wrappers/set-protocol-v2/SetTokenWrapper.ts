@@ -48,7 +48,7 @@ export class SetTokenWrapper {
    */
   public async controller(
     setAddress: Address,
-  ): Promise<string> {
+  ): Promise<Address> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
     );
@@ -64,7 +64,7 @@ export class SetTokenWrapper {
    */
   public async manager(
     setAddress: Address,
-  ): Promise<string> {
+  ): Promise<Address> {
     const setToken = await this.contracts.loadSetTokenAsync(
       setAddress,
     );
@@ -73,12 +73,12 @@ export class SetTokenWrapper {
   }
 
   /**
-   * addModule
+   * moduleStates
    *
-   * @param  setAddress    Address Set to issue
-   * @param  moduleAddress Address of potential module
-   * @param  callerAddress Address of caller (optional)
-   * @return               Transaction hash
+   * @param  setAddress     Address of Set
+   * @param  moduleAddress  Address of module state to check
+   * @param  callerAddress  Address of caller (optional)
+   * @return                An integer representing module state
    */
   public async moduleStates(
     setAddress: Address,
@@ -124,7 +124,7 @@ export class SetTokenWrapper {
    *
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
-   * @param  txOpts     Overrides for transaction (optional)
+   * @param  txOpts        Overrides for transaction (optional)
    * @return               Transaction hash
    */
   public async setManager(
@@ -148,7 +148,7 @@ export class SetTokenWrapper {
    *
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
-   * @param  txOpts     Overrides for transaction (optional)
+   * @param  txOpts        Overrides for transaction (optional)
    * @return               Contract transaction
    */
   public async initializeModule(

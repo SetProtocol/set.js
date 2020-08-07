@@ -24,7 +24,7 @@ import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 import { ERC20Wrapper } from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 
-import { expect } from './utils/chai';
+import { expect } from '../../utils/chai';
 
 const blockchain = new Blockchain(provider);
 
