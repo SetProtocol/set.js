@@ -26,7 +26,8 @@ import { Assertions } from '@src/assertions';
 import { ModuleState } from '@src/types';
 
 export interface SetTokenAPIConfig {
-  setTokenWrapper: SetTokenWrapper;
+  setTokenWrapper?: SetTokenWrapper;
+  assertions?: Assertions;
 }
 
 /**
@@ -40,9 +41,9 @@ export class SetTokenAPI {
   private setTokenWrapper: SetTokenWrapper;
   private assert: Assertions;
 
-  public constructor(provider: Provider, assertions: Assertions, options?: SetTokenAPIConfig) {
-    this.setTokenWrapper = (options && options.setTokenWrapper) || new SetTokenWrapper(provider);
-    this.assert = assertions;
+  public constructor(provider: Provider, options?: SetTokenAPIConfig) {
+    this.setTokenWrapper = (options?.setTokenWrapper) || new SetTokenWrapper(provider);
+    this.assert = (options?.assertions) || new Assertions(provider);
   }
 
   /**
@@ -51,10 +52,10 @@ export class SetTokenAPI {
    * @param  setAddress    Address of the Set.
    * @return               Address of the controller.
    */
-  public async getControllerAddressAsync(setAddress: Address): Promise<string> {
+  public getControllerAddressAsync(setAddress: Address): Promise<string> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return await this.setTokenWrapper.controller(setAddress);
+    return this.setTokenWrapper.controller(setAddress);
   }
 
   /**
@@ -63,10 +64,10 @@ export class SetTokenAPI {
    * @param  setAddress    Address of the Set.
    * @return               Address of the manager.
    */
-  public async getManagerAddressAsync(setAddress: Address): Promise<Address> {
+  public getManagerAddressAsync(setAddress: Address): Promise<Address> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return await this.setTokenWrapper.manager(setAddress);
+    return this.setTokenWrapper.manager(setAddress);
   }
 
   /**
@@ -76,13 +77,13 @@ export class SetTokenAPI {
    * @param  callerAddress   Address of the method caller.
    * @return                 Array of current Set Positions.
    */
-  public async getPositionsAsync(
+  public getPositionsAsync(
     setAddress: Address,
     callerAddress?: Address
   ): Promise<Position[]> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return await this.setTokenWrapper.getPositions(setAddress, callerAddress);
+    return this.setTokenWrapper.getPositions(setAddress, callerAddress);
   }
 
   /**
