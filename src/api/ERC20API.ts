@@ -53,7 +53,7 @@ export class ERC20API {
    * @param  userAddress   Address of the user
    * @return               The balance of the ERC20 token
    */
-  public async balanceOf(tokenAddress: Address, userAddress: Address): Promise<BigNumber> {
+  public async getBalanceAsync(tokenAddress: Address, userAddress: Address): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('userAddress', userAddress);
 
@@ -66,7 +66,7 @@ export class ERC20API {
    * @param  tokenAddress  Address of the ERC20 token
    * @return               The name of the ERC20 token
    */
-  public async name(tokenAddress: Address): Promise<string> {
+  public async getTokenNameAsync(tokenAddress: Address): Promise<string> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
     return this.erc20Wrapper.name(tokenAddress);
@@ -78,7 +78,7 @@ export class ERC20API {
    * @param  tokenAddress  Address of the ERC20 token
    * @return               The symbol of the ERC20 token
    */
-  public async symbol(tokenAddress: Address): Promise<string> {
+  public async getTokenSymbolAsync(tokenAddress: Address): Promise<string> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
     return this.erc20Wrapper.symbol(tokenAddress);
@@ -90,7 +90,7 @@ export class ERC20API {
    * @param  tokenAddress  Address of the ERC20 token
    * @return               The symbol of the ERC20 token
    */
-  public async totalSupply(tokenAddress: Address): Promise<BigNumber> {
+  public async getTotalSupplyAsync(tokenAddress: Address): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
     return this.erc20Wrapper.totalSupply(tokenAddress);
@@ -103,7 +103,7 @@ export class ERC20API {
    * @param  userAddress   Address of the user
    * @return               The decimals of the ERC20 token
    */
-  public async decimals(tokenAddress: Address): Promise<BigNumber> {
+  public async getDecimalsAsync(tokenAddress: Address): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
     return this.erc20Wrapper.decimals(tokenAddress);
@@ -117,7 +117,7 @@ export class ERC20API {
    * @param  spenderAddress    Address of the spender
    * @return                   The allowance of the spender
    */
-  public async allowance(
+  public async getAllowanceAsync(
     tokenAddress: Address,
     ownerAddress: Address,
     spenderAddress: Address,
@@ -140,7 +140,7 @@ export class ERC20API {
    * @param  txOpts         Any parameters necessary to modify the transaction.
    * @return                The hash of the resulting transaction.
    */
-  public async transfer(
+  public async transferAsync(
     tokenAddress: Address,
     to: Address,
     value: BigNumber,
@@ -166,7 +166,7 @@ export class ERC20API {
    * @param  txOpts         Any parameters necessary to modify the transaction.
    * @return                The hash of the resulting transaction.
    */
-  public async transferFrom(
+  public async proxyTransferAsync(
     tokenAddress: Address,
     from: Address,
     to: Address,
@@ -192,7 +192,7 @@ export class ERC20API {
    * @param  txOpts               any parameters necessary to modify the transaction.
    * @return                      the hash of the resulting transaction.
    */
-  public async approve(
+  public async approveProxyAsync(
     tokenAddress: Address,
     spenderAddress: Address,
     value: BigNumber,
