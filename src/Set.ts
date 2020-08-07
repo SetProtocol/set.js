@@ -47,7 +47,7 @@ class Set {
 
     const assertions = new Assertions(provider);
 
-    this.setToken = new SetTokenAPI(provider, assertions);
+    this.setToken = new SetTokenAPI(provider);
   }
 }
 
