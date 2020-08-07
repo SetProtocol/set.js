@@ -20,14 +20,13 @@ import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
-import { generateTxOpts } from '@src/utils/transactions';
 
 import { ERC20Wrapper } from '../wrappers/set-protocol-v2/ERC20Wrapper';
 import { Assertions } from '@src/assertions';
 
 export interface ERC20APIConfig {
-  assertions: Assertions;
-  erc20Wrapper: ERC20Wrapper;
+  assertions?: Assertions;
+  erc20Wrapper?: ERC20Wrapper;
 }
 
 /**
@@ -42,8 +41,8 @@ export class ERC20API {
   private erc20Wrapper: ERC20Wrapper;
 
   public constructor(provider: Provider, options?: ERC20APIConfig) {
-    this.assert = (options?.assertions) || new Assertions(provider);
     this.erc20Wrapper = (options?.erc20Wrapper) || new ERC20Wrapper(provider);
+    this.assert = (options?.assertions) || new Assertions(provider);
   }
 
   /**
