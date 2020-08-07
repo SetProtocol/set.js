@@ -24,10 +24,10 @@ import { Provider } from 'ethers/providers';
 import { ERC20Wrapper } from '../wrappers/set-protocol-v2/ERC20Wrapper';
 import { Assertions } from '@src/assertions';
 
-export interface ERC20APIConfig {
+export type ERC20APIConfig = {
   assertions?: Assertions;
   erc20Wrapper?: ERC20Wrapper;
-}
+};
 
 /**
  * @title  ERC20Wrapper

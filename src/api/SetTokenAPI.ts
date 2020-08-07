@@ -25,10 +25,10 @@ import { SetTokenWrapper } from '../wrappers/set-protocol-v2/SetTokenWrapper';
 import { Assertions } from '@src/assertions';
 import { ModuleState } from '@src/types';
 
-export interface SetTokenAPIConfig {
+export type SetTokenAPIConfig = {
   setTokenWrapper?: SetTokenWrapper;
   assertions?: Assertions;
-}
+};
 
 /**
  * @title  SetTokenWrapper
