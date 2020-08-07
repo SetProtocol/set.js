@@ -20,8 +20,8 @@ import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
-import { generateTxOpts } from '@src/utils/transactions';
 
+import { generateTxOpts } from '@src/utils/transactions';
 import { ContractWrapper } from './ContractWrapper';
 
 /**

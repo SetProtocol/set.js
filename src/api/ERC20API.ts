@@ -22,7 +22,13 @@ import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
 import { generateTxOpts } from '@src/utils/transactions';
 
-import { ContractWrapper } from './ContractWrapper';
+import { ERC20Wrapper } from '../wrappers/set-protocol-v2/ERC20Wrapper';
+import { Assertions } from '@src/assertions';
+
+export interface ERC20APIConfig {
+  assertions: Assertions;
+  erc20Wrapper: ERC20Wrapper;
+}
 
 /**
  * @title  ERC20Wrapper
@@ -31,13 +37,13 @@ import { ContractWrapper } from './ContractWrapper';
  * The ERC20 Wrapper contract gives basic functionality common to all ERC20 tokens
  *
  */
-export class ERC20Wrapper {
-  private provider: Provider;
-  private contracts: ContractWrapper;
+export class ERC20API {
+  private assert: Assertions;
+  private erc20Wrapper: ERC20Wrapper;
 
-  public constructor(provider: Provider) {
-    this.provider = provider;
-    this.contracts = new ContractWrapper(this.provider);
+  public constructor(provider: Provider, options?: ERC20APIConfig) {
+    this.assert = (options?.assertions) || new Assertions(provider);
+    this.erc20Wrapper = (options?.erc20Wrapper) || new ERC20Wrapper(provider);
   }
 
   /**
@@ -48,9 +54,10 @@ export class ERC20Wrapper {
    * @return               The balance of the ERC20 token
    */
   public async balanceOf(tokenAddress: Address, userAddress: Address): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
+    this.assert.schema.isValidAddress('userAddress', userAddress);
 
-    return await tokenInstance.balanceOf(userAddress);
+    return this.erc20Wrapper.balanceOf(tokenAddress, userAddress);
   }
 
   /**
@@ -60,9 +67,9 @@ export class ERC20Wrapper {
    * @return               The name of the ERC20 token
    */
   public async name(tokenAddress: Address): Promise<string> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
-    return await tokenInstance.name();
+    return this.erc20Wrapper.name(tokenAddress);
   }
 
   /**
@@ -72,9 +79,9 @@ export class ERC20Wrapper {
    * @return               The symbol of the ERC20 token
    */
   public async symbol(tokenAddress: Address): Promise<string> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
-    return await tokenInstance.symbol();
+    return this.erc20Wrapper.symbol(tokenAddress);
   }
 
   /**
@@ -84,9 +91,9 @@ export class ERC20Wrapper {
    * @return               The symbol of the ERC20 token
    */
   public async totalSupply(tokenAddress: Address): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
-    return await tokenInstance.totalSupply();
+    return this.erc20Wrapper.totalSupply(tokenAddress);
   }
 
   /**
@@ -97,9 +104,9 @@ export class ERC20Wrapper {
    * @return               The decimals of the ERC20 token
    */
   public async decimals(tokenAddress: Address): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
-    return await tokenInstance.decimals();
+    return this.erc20Wrapper.decimals(tokenAddress);
   }
 
   /**
@@ -115,9 +122,11 @@ export class ERC20Wrapper {
     ownerAddress: Address,
     spenderAddress: Address,
   ): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
+    this.assert.schema.isValidAddress('ownerAddress', ownerAddress);
+    this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
 
-    return await tokenInstance.allowance(ownerAddress, spenderAddress);
+    return this.erc20Wrapper.allowance(tokenAddress, ownerAddress, spenderAddress);
   }
 
   /**
@@ -138,10 +147,11 @@ export class ERC20Wrapper {
     callerAddress: Address = undefined,
     txOpts?: TransactionOverrides,
   ): Promise<string> {
-    const txOptions = await generateTxOpts(txOpts);
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
+    this.assert.schema.isValidAddress('toAddress', to);
+    this.assert.schema.isValidNumber('value', value);
 
-    return await tokenInstance.transfer(to, value, txOptions);
+    return this.erc20Wrapper.transfer(tokenAddress, to, value, callerAddress, txOpts);
   }
 
   /**
@@ -164,10 +174,12 @@ export class ERC20Wrapper {
     callerAddress: Address = undefined,
     txOpts?: TransactionOverrides,
   ): Promise<string> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
-    const txOptions = await generateTxOpts(txOpts);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
+    this.assert.schema.isValidAddress('toAddress', to);
+    this.assert.schema.isValidAddress('fromAddress', from);
+    this.assert.schema.isValidNumber('value', value);
 
-    return await tokenInstance.transferFrom(from, to, value, txOptions);
+    return this.erc20Wrapper.transferFrom(tokenAddress, from, to, value, callerAddress, txOpts);
   }
 
   /**
@@ -187,9 +199,10 @@ export class ERC20Wrapper {
     callerAddress: Address = undefined,
     txOpts?: TransactionOverrides,
   ): Promise<string> {
-    const txOptions = await generateTxOpts(txOpts);
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
+    this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
+    this.assert.schema.isValidNumber('value', value);
 
-    return await tokenInstance.approve(spenderAddress, value, txOptions);
+    return this.erc20Wrapper.approve(tokenAddress, spenderAddress, value, callerAddress, txOpts);
   }
 }
