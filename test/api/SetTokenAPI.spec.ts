@@ -22,10 +22,6 @@ describe('SetTokenAPI', () => {
     sinon.stub(setTokenWrapper);
   });
 
-  afterEach(async () => {
-    sinon.restore();
-  });
-
   describe('#getControllerAddressAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.getControllerAddressAsync(setAddress);
