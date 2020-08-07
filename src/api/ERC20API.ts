@@ -33,7 +33,7 @@ export interface ERC20APIConfig {
  * @title  ERC20Wrapper
  * @author Set Protocol
  *
- * The ERC20 Wrapper contract gives basic functionality common to all ERC20 tokens
+ * The ERC20API exposes basic functionality common to all ERC-20 tokens.
  *
  */
 export class ERC20API {
@@ -50,7 +50,7 @@ export class ERC20API {
    *
    * @param  tokenAddress  Address of the ERC20 token
    * @param  userAddress   Address of the user
-   * @return               The balance of the ERC20 token
+   * @return               The balance of the ERC20 token in BigNumber format
    */
   public async getBalanceAsync(tokenAddress: Address, userAddress: Address): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
@@ -72,7 +72,7 @@ export class ERC20API {
   }
 
   /**
-   * Gets balance of the ERC20 token
+   * Gets symbol of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
    * @return               The symbol of the ERC20 token
@@ -87,7 +87,7 @@ export class ERC20API {
    * Gets the total supply of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
-   * @return               The symbol of the ERC20 token
+   * @return               The total supply of ERC-20 in BigNumber format
    */
   public async getTotalSupplyAsync(tokenAddress: Address): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
@@ -99,7 +99,6 @@ export class ERC20API {
    * Gets decimals of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
-   * @param  userAddress   Address of the user
    * @return               The decimals of the ERC20 token
    */
   public async getDecimalsAsync(tokenAddress: Address): Promise<BigNumber> {
@@ -109,12 +108,12 @@ export class ERC20API {
   }
 
   /**
-   * Gets the allowance of the spender by the owner account
+   * Gets the token allowance of the spender by the owner account
    *
    * @param  tokenAddress      Address of the token
    * @param  ownerAddress      Address of the owner
    * @param  spenderAddress    Address of the spender
-   * @return                   The allowance of the spender
+   * @return                   The allowance of the spender in BigNumber format
    */
   public async getAllowanceAsync(
     tokenAddress: Address,
@@ -129,15 +128,15 @@ export class ERC20API {
   }
 
   /**
-   * Asynchronously transfer value denominated in the specified ERC20 token to
-   * the address specified.
+   * Asynchronously transfer target ERC20 tokens from the caller's wallet to
+   * the target address
    *
-   * @param  tokenAddress   The address of the token being used.
+   * @param  tokenAddress   The address of the token being transferred.
    * @param  to             To whom the transfer is being made.
    * @param  value          The amount being transferred.
-   * @param  callerAddress  The address of user transferring from.
-   * @param  txOpts         Any parameters necessary to modify the transaction.
-   * @return                The hash of the resulting transaction.
+   * @param  callerAddress  Optional. The address of user transferring from.
+   * @param  txOpts         Optional. Any parameters necessary to modify the transaction.
+   * @return                The approval transaction hash.
    */
   public async transferAsync(
     tokenAddress: Address,
@@ -154,14 +153,14 @@ export class ERC20API {
   }
 
   /**
-   * Asynchronously approves the value amount of the spender from the owner
+   * Approve a proxy address to conduct tokens transfers from the method caller's wallet.
    *
-   * @param  tokenAddress         the address of the token being used.
-   * @param  spenderAddress       the spender.
-   * @param  value                the amount to be approved.
-   * @param  callerAddress        the address of user giving the approval.
-   * @param  txOpts               any parameters necessary to modify the transaction.
-   * @return                      the hash of the resulting transaction.
+   * @param  tokenAddress         The address of the token being transferred.
+   * @param  spenderAddress       The proxy address that is being approved.
+   * @param  value                The spendable token quantity being approved.
+   * @param  callerAddress        Optional. The address of user giving the approval.
+   * @param  txOpts               Any parameters necessary to modify the transaction.
+   * @return                      The approval transaction hash.
    */
   public async approveProxyAsync(
     tokenAddress: Address,
@@ -178,16 +177,15 @@ export class ERC20API {
   }
 
   /**
-   * Asynchronously transfer the value amount in the token specified so long
-   * as the sender of the message has received sufficient allowance on behalf
-   * of `from` to do so.
+   * Conduct a token transfer on behalf of a target wallet.
    *
-   * @param  tokenAddress   The address of the token being used.
-   * @param  from           From whom are the funds being transferred.
-   * @param  to             To whom are the funds being transferred.
+   * @param  tokenAddress   The address of the token being transferred.
+   * @param  from           From whom are the tokens being transferred.
+   * @param  to             To whom are the tokens being transferred.
    * @param  value          The amount to be transferred.
-   * @param  txOpts         Any parameters necessary to modify the transaction.
-   * @return                The hash of the resulting transaction.
+   * @param  callerAddress  Optional. The address of the user conducting transfer.
+   * @param  txOpts         Optional. Any parameters necessary to modify the transaction.
+   * @return                The transfer transaction hash.
    */
   public async proxyTransferAsync(
     tokenAddress: Address,
