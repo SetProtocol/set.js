@@ -10,16 +10,16 @@ const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 describe('SetTokenAPI', () => {
   let setAddress: Address;
   let moduleAddress: Address;
+  let managerAddress: Address;
   let setTokenAPI: SetTokenAPI;
   let setTokenWrapper: SetTokenWrapper;
-  let stub: any;
 
   beforeEach(async () => {
-    [setAddress, moduleAddress] = await provider.listAccounts();
+    [setAddress, moduleAddress, managerAddress] = await provider.listAccounts();
 
     setTokenWrapper = new SetTokenWrapper(provider);
     setTokenAPI = new SetTokenAPI(provider, { setTokenWrapper });
-    stub = sinon.stub(setTokenWrapper);
+    sinon.stub(setTokenWrapper);
   });
 
   afterEach(async () => {
@@ -34,9 +34,9 @@ describe('SetTokenAPI', () => {
     });
 
     it('should throw with invalid params', async () => {
-      expect(() =>
+      await expect(
         setTokenAPI.getControllerAddressAsync('InvalidAddress')
-      ).to.throw('Validation error');
+      ).to.be.rejectedWith('Validation error');
     });
   });
 
@@ -48,9 +48,9 @@ describe('SetTokenAPI', () => {
     });
 
     it('should throw with invalid params', async () => {
-      expect(() =>
+      await expect(
         setTokenAPI.getManagerAddressAsync('InvalidAddress')
-      ).to.throw('Validation error');
+      ).to.be.rejectedWith('Validation error');
     });
   });
 
@@ -62,9 +62,116 @@ describe('SetTokenAPI', () => {
     });
 
     it('should throw with invalid params', async () => {
-      expect(() => setTokenAPI.getPositionsAsync('InvalidAddress')).to.throw(
-        'Validation error'
+      await expect(
+        setTokenAPI.getPositionsAsync('InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#getModulesAsync', () => {
+    it('should call the Set Token Wrapper with correct params', async () => {
+      setTokenAPI.getModulesAsync(setAddress);
+
+      expect(setTokenWrapper.getModules).to.have.been.calledWith(setAddress);
+    });
+
+    it('should throw with invalid params', async () => {
+      await expect(
+        setTokenAPI.getModulesAsync('InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#getModuleStateAsync', () => {
+    it('should call the Set Token Wrapper with correct params', async () => {
+      setTokenAPI.getModuleStateAsync(setAddress, moduleAddress);
+
+      expect(setTokenWrapper.moduleStates).to.have.been.calledWith(
+        setAddress,
+        moduleAddress
       );
+    });
+
+    it('should throw with invalid params', async () => {
+      await expect(
+        setTokenAPI.getModuleStateAsync('InvalidAddress', 'InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#addModuleAsync', () => {
+    it('should call the Set Token Wrapper with correct params', async () => {
+      setTokenAPI.addModuleAsync(setAddress, moduleAddress);
+
+      expect(setTokenWrapper.addModule).to.have.been.calledWith(
+        setAddress,
+        moduleAddress
+      );
+    });
+
+    it('should throw with invalid params', async () => {
+      await expect(
+        setTokenAPI.addModuleAsync('InvalidAddress', 'InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#setManagerAsync', () => {
+    it('should call the Set Token Wrapper with correct params', async () => {
+      setTokenAPI.setManagerAsync(setAddress, managerAddress);
+
+      expect(setTokenWrapper.setManager).to.have.been.calledWith(
+        setAddress,
+        managerAddress
+      );
+    });
+
+    it('should throw with invalid params', async () => {
+      await expect(
+        setTokenAPI.addModuleAsync('InvalidAddress', 'InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#initializeModuleAsync', () => {
+    it('should call the Set Token Wrapper with correct params', async () => {
+      setTokenAPI.initializeModuleAsync(setAddress);
+
+      expect(setTokenWrapper.initializeModule).to.have.been.calledWith(setAddress);
+    });
+
+    it('should throw with invalid params', async () => {
+      await expect(
+        setTokenAPI.initializeModuleAsync('InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#isModuleEnabledAsync', () => {
+    it('should call the Set Token Wrapper with correct params', async () => {
+      setTokenAPI.isModuleEnabledAsync(setAddress, moduleAddress);
+
+      expect(setTokenWrapper.isModule).to.have.been.calledWith(setAddress, moduleAddress);
+    });
+
+    it('should throw with invalid params', async () => {
+      await expect(
+        setTokenAPI.isModuleEnabledAsync('InvalidAddress', 'InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#isModulePendingAsync', () => {
+    it('should call the Set Token Wrapper with correct params', async () => {
+      setTokenAPI.isModulePendingAsync(setAddress, moduleAddress);
+
+      expect(setTokenWrapper.isPendingModule).to.have.been.calledWith(setAddress, moduleAddress);
+    });
+
+    it('should throw with invalid params', async () => {
+      await expect(
+        setTokenAPI.isModulePendingAsync('InvalidAddress', 'InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
     });
   });
 });

@@ -52,10 +52,10 @@ export class SetTokenAPI {
    * @param  setAddress    Address of the Set.
    * @return               Address of the controller.
    */
-  public getControllerAddressAsync(setAddress: Address): Promise<string> {
+  public async getControllerAddressAsync(setAddress: Address): Promise<string> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return this.setTokenWrapper.controller(setAddress);
+    return await this.setTokenWrapper.controller(setAddress);
   }
 
   /**
@@ -64,7 +64,7 @@ export class SetTokenAPI {
    * @param  setAddress    Address of the Set.
    * @return               Address of the manager.
    */
-  public getManagerAddressAsync(setAddress: Address): Promise<Address> {
+  public async getManagerAddressAsync(setAddress: Address): Promise<Address> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
     return this.setTokenWrapper.manager(setAddress);
@@ -77,7 +77,7 @@ export class SetTokenAPI {
    * @param  callerAddress   Address of the method caller.
    * @return                 Array of current Set Positions.
    */
-  public getPositionsAsync(
+  public async getPositionsAsync(
     setAddress: Address,
     callerAddress?: Address
   ): Promise<Position[]> {
@@ -93,7 +93,7 @@ export class SetTokenAPI {
    * @param  callerAddress   Address of caller (optional).
    * @return                 Array of module addresses.
    */
-  public async getModules(
+  public async getModulesAsync(
     setAddress: Address,
     callerAddress?: Address
   ): Promise<Address[]> {
@@ -118,7 +118,7 @@ export class SetTokenAPI {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return await this.setTokenWrapper.moduleStates(setAddress, moduleAddress, callerAddress);
+    return this.setTokenWrapper.moduleStates(setAddress, moduleAddress, callerAddress);
   }
 
   /**
