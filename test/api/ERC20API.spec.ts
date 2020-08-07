@@ -28,7 +28,7 @@ import { ERC20API } from '@src/api/ERC20API';
 describe('ERC20Wrapper', () => {
   let tokenAddress: Address;
   let userAddress: Address;
-  let managerAddress: Address;
+  let externalAddress: Address;
   let proxyAddress: Address;
   let erc20API: ERC20API;
   let erc20Wrapper: ERC20Wrapper;
@@ -37,7 +37,7 @@ describe('ERC20Wrapper', () => {
     [
       tokenAddress,
       userAddress,
-      managerAddress,
+      externalAddress,
       proxyAddress,
     ] = await provider.listAccounts();
 
@@ -54,6 +54,190 @@ describe('ERC20Wrapper', () => {
         tokenAddress,
         userAddress
       );
+    });
+
+    it('should reject with invalid params', async () => {
+      await expect(
+        erc20API.getBalanceAsync('InvalidAddress', 'InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#getTokenNameAsync', () => {
+    it('should call the ERC20Wrapper with correct params', async () => {
+      erc20API.getTokenNameAsync(tokenAddress);
+
+      expect(erc20Wrapper.name).to.have.been.calledWith(tokenAddress);
+    });
+
+    it('should reject with invalid params', async () => {
+      await expect(
+        erc20API.getTokenNameAsync('InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#getTokenSymbolAsync', () => {
+    it('should call the ERC20Wrapper with correct params', async () => {
+      erc20API.getTokenSymbolAsync(tokenAddress);
+
+      expect(erc20Wrapper.symbol).to.have.been.calledWith(tokenAddress);
+    });
+
+    it('should reject with invalid params', async () => {
+      await expect(
+        erc20API.getTokenSymbolAsync('InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#getTotalSupplyAsync', () => {
+    it('should call the ERC20Wrapper with correct params', async () => {
+      erc20API.getTotalSupplyAsync(tokenAddress);
+
+      expect(erc20Wrapper.totalSupply).to.have.been.calledWith(tokenAddress);
+    });
+
+    it('should reject with invalid params', async () => {
+      await expect(
+        erc20API.getTotalSupplyAsync('InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#getDecimalsAsync', () => {
+    it('should call the ERC20Wrapper with correct params', async () => {
+      erc20API.getDecimalsAsync(tokenAddress);
+
+      expect(erc20Wrapper.decimals).to.have.been.calledWith(tokenAddress);
+    });
+
+    it('should reject with invalid params', async () => {
+      await expect(
+        erc20API.getDecimalsAsync('InvalidAddress')
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#getAllowanceAsync', () => {
+    it('should call the ERC20Wrapper with correct params', async () => {
+      erc20API.getAllowanceAsync(tokenAddress, userAddress, proxyAddress);
+
+      expect(erc20Wrapper.allowance).to.have.been.calledWith(
+        tokenAddress,
+        userAddress,
+        proxyAddress
+      );
+    });
+
+    it('should reject with invalid params', async () => {
+      await expect(
+        erc20API.getAllowanceAsync(
+          'InvalidAddress',
+          'InvalidAddress',
+          'InvalidAddress'
+        )
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#transferAsync', () => {
+    it('should call the ERC20Wrapper with correct params', async () => {
+      erc20API.transferAsync(tokenAddress, externalAddress, new BigNumber(1));
+
+      expect(erc20Wrapper.transfer).to.have.been.calledWith(
+        tokenAddress,
+        externalAddress,
+        new BigNumber(1)
+      );
+    });
+
+    it('should reject with invalid address params', async () => {
+      await expect(
+        erc20API.transferAsync(
+          'InvalidAddress',
+          'InvalidAddress',
+          new BigNumber(1)
+        )
+      ).to.be.rejectedWith('Validation error');
+    });
+
+    it('should reject with invalid value param', async () => {
+      await expect(
+        erc20API.transferAsync(tokenAddress, externalAddress, 100 as any)
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#approveProxyAsync', () => {
+    it('should call the ERC20Wrapper with correct params', async () => {
+      erc20API.approveProxyAsync(
+        tokenAddress,
+        externalAddress,
+        new BigNumber(1)
+      );
+
+      expect(erc20Wrapper.approve).to.have.been.calledWith(
+        tokenAddress,
+        externalAddress,
+        new BigNumber(1)
+      );
+    });
+
+    it('should reject with invalid address params', async () => {
+      await expect(
+        erc20API.approveProxyAsync(
+          'InvalidAddress',
+          'InvalidAddress',
+          new BigNumber(1)
+        )
+      ).to.be.rejectedWith('Validation error');
+    });
+
+    it('should reject with invalid value param', async () => {
+      await expect(
+        erc20API.approveProxyAsync(tokenAddress, externalAddress, 100 as any)
+      ).to.be.rejectedWith('Validation error');
+    });
+  });
+
+  describe('#proxyTransferAsync', () => {
+    it('should call the ERC20Wrapper with correct params', async () => {
+      erc20API.proxyTransferAsync(
+        tokenAddress,
+        userAddress,
+        externalAddress,
+        new BigNumber(1)
+      );
+
+      expect(erc20Wrapper.transferFrom).to.have.been.calledWith(
+        tokenAddress,
+        userAddress,
+        externalAddress,
+        new BigNumber(1)
+      );
+    });
+
+    it('should reject with invalid address params', async () => {
+      await expect(
+        erc20API.proxyTransferAsync(
+          'InvalidAddress',
+          'InvalidAddress',
+          'InvalidAddress',
+          new BigNumber(1)
+        )
+      ).to.be.rejectedWith('Validation error');
+    });
+
+    it('should reject with invalid value param', async () => {
+      await expect(
+        erc20API.proxyTransferAsync(
+          tokenAddress,
+          userAddress,
+          externalAddress,
+          100 as any
+        )
+      ).to.be.rejectedWith('Validation error');
     });
   });
 });

@@ -154,6 +154,30 @@ export class ERC20API {
   }
 
   /**
+   * Asynchronously approves the value amount of the spender from the owner
+   *
+   * @param  tokenAddress         the address of the token being used.
+   * @param  spenderAddress       the spender.
+   * @param  value                the amount to be approved.
+   * @param  callerAddress        the address of user giving the approval.
+   * @param  txOpts               any parameters necessary to modify the transaction.
+   * @return                      the hash of the resulting transaction.
+   */
+  public async approveProxyAsync(
+    tokenAddress: Address,
+    spenderAddress: Address,
+    value: BigNumber,
+    callerAddress: Address = undefined,
+    txOpts?: TransactionOverrides,
+  ): Promise<string> {
+    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
+    this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
+    this.assert.schema.isValidNumber('value', value);
+
+    return this.erc20Wrapper.approve(tokenAddress, spenderAddress, value, callerAddress, txOpts);
+  }
+
+  /**
    * Asynchronously transfer the value amount in the token specified so long
    * as the sender of the message has received sufficient allowance on behalf
    * of `from` to do so.
@@ -179,29 +203,5 @@ export class ERC20API {
     this.assert.schema.isValidNumber('value', value);
 
     return this.erc20Wrapper.transferFrom(tokenAddress, from, to, value, callerAddress, txOpts);
-  }
-
-  /**
-   * Asynchronously approves the value amount of the spender from the owner
-   *
-   * @param  tokenAddress         the address of the token being used.
-   * @param  spenderAddress       the spender.
-   * @param  value                the amount to be approved.
-   * @param  callerAddress        the address of user giving the approval.
-   * @param  txOpts               any parameters necessary to modify the transaction.
-   * @return                      the hash of the resulting transaction.
-   */
-  public async approveProxyAsync(
-    tokenAddress: Address,
-    spenderAddress: Address,
-    value: BigNumber,
-    callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
-  ): Promise<string> {
-    this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
-    this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
-    this.assert.schema.isValidNumber('value', value);
-
-    return this.erc20Wrapper.approve(tokenAddress, spenderAddress, value, callerAddress, txOpts);
   }
 }
