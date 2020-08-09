@@ -41,6 +41,17 @@ describe('ControllerWrapper', () => {
     deployer = new DeployHelper(provider.getSigner(owner));
     controller = await deployer.core.deployController(owner);
 
+    const initialFactoryAddesses = [];
+    const initialModuleAddresses = [];
+    const initialResourceAddresses = [];
+    const initialResourceIDs = [];
+    await controller.initialize(
+      initialFactoryAddesses,
+      initialModuleAddresses,
+      initialResourceAddresses,
+      initialResourceIDs
+    );
+
     controllerWrapper = new ControllerWrapper(provider, controller.address);
   });
 
