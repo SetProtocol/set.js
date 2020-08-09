@@ -28,13 +28,15 @@ describe('SetTokenWrapper', () => {
   let mockIssuanceModule: Address;
   let mockLockedModule: Address;
   let testAccount: Address;
-  let randomAccount: Address;
-  let setTokenWrapper: SetTokenWrapper;
-  let erc20Wrapper: ERC20Wrapper;
+
+  let controller: Controller;
 
   let deployer: DeployHelper;
 
-  beforeEach(async () => {
+  let setTokenWrapper: SetTokenWrapper;
+  let erc20Wrapper: ERC20Wrapper;
+
+  beforeAll(async () => {
     [
       owner,
       manager,
@@ -43,14 +45,26 @@ describe('SetTokenWrapper', () => {
       testAccount,
     ] = await provider.listAccounts();
 
+    deployer = new DeployHelper(provider.getSigner(owner));
+
     setTokenWrapper = new SetTokenWrapper(provider);
     erc20Wrapper = new ERC20Wrapper(provider);
-
-    deployer = new DeployHelper(provider.getSigner(owner));
   });
 
   beforeEach(async () => {
     await blockchain.saveSnapshotAsync();
+
+    controller = await deployer.core.deployController(owner);
+    const initialFactoryAddesses = [];
+    const initialModuleAddresses = [];
+    const initialResourceAddresses = [];
+    const initialResourceIDs = [];
+    await controller.initialize(
+      initialFactoryAddesses,
+      initialModuleAddresses,
+      initialResourceAddresses,
+      initialResourceIDs
+    );
   });
 
   afterEach(async () => {
@@ -62,7 +76,6 @@ describe('SetTokenWrapper', () => {
     let firstComponentUnits: BigNumber;
     let secondComponent: StandardTokenMock;
     let secondComponentUnits: BigNumber;
-    let controller: Controller;
 
     let subjectComponentAddresses: Address[];
     let subjectUnits: BigNumber[];
@@ -77,7 +90,6 @@ describe('SetTokenWrapper', () => {
       firstComponentUnits = ether(1);
       secondComponent = await deployer.mocks.deployTokenMock(manager);
       secondComponentUnits = ether(2);
-      controller = await deployer.core.deployController(owner);
 
       subjectComponentAddresses = [firstComponent.address, secondComponent.address];
       subjectUnits = [firstComponentUnits, secondComponentUnits];
@@ -104,12 +116,15 @@ describe('SetTokenWrapper', () => {
       const setToken = await subject();
 
       const name = await erc20Wrapper.name(setToken.address);
-      const symbol = await erc20Wrapper.symbol(setToken.address);
-      const controllerAddress = await setTokenWrapper.controller(setToken.address);
-      const managerAddress = await setTokenWrapper.manager(setToken.address);
       expect(name).to.eq(subjectName);
+
+      const symbol = await erc20Wrapper.symbol(setToken.address);
       expect(symbol).to.eq(subjectSymbol);
+
+      const controllerAddress = await setTokenWrapper.controller(setToken.address);
       expect(controllerAddress).to.eq(subjectControllerAddress);
+
+      const managerAddress = await setTokenWrapper.manager(setToken.address);
       expect(managerAddress).to.eq(subjectManagerAddress);
     });
 
@@ -117,13 +132,15 @@ describe('SetTokenWrapper', () => {
       const setToken = await subject();
 
       const positions = await setTokenWrapper.getPositions(setToken.address, testAccount);
+
       const firstComponentPosition = positions[0];
-      const secondComponentPosition = positions[1];
       expect(firstComponentPosition.component).to.eq(firstComponent.address);
       expect(firstComponentPosition.unit.toString()).to.eq(firstComponentUnits.toString());
       expect(firstComponentPosition.module).to.eq(ADDRESS_ZERO);
       expect(firstComponentPosition.positionState).to.eq(POSITION_STATE['DEFAULT']);
       expect(firstComponentPosition.data).to.eq(EMPTY_BYTES);
+
+      const secondComponentPosition = positions[1];
       expect(secondComponentPosition.component).to.eq(secondComponent.address);
       expect(secondComponentPosition.unit.toString()).to.eq(secondComponentUnits.toString());
       expect(secondComponentPosition.module).to.eq(ADDRESS_ZERO);
@@ -142,8 +159,9 @@ describe('SetTokenWrapper', () => {
       const setToken = await subject();
 
       const mockIssuanceModuleState = await setTokenWrapper.moduleStates(setToken.address, mockIssuanceModule);
-      const mockLockedModuleState = await setTokenWrapper.moduleStates(setToken.address, mockLockedModule);
       expect(mockIssuanceModuleState).to.eq(MODULE_STATE['PENDING']);
+
+      const mockLockedModuleState = await setTokenWrapper.moduleStates(setToken.address, mockLockedModule);
       expect(mockLockedModuleState).to.eq(MODULE_STATE['PENDING']);
     });
   });
@@ -151,8 +169,6 @@ describe('SetTokenWrapper', () => {
   describe('when there is a deployed SetToken', () => {
     let setToken: SetToken;
 
-    let subjectCaller: Address;
-    let controller: Controller;
     let firstComponent: StandardTokenMock;
     let firstComponentUnits: BigNumber;
     let secondComponent: StandardTokenMock;
@@ -164,22 +180,14 @@ describe('SetTokenWrapper', () => {
     let name: string;
     let symbol: string;
 
-    beforeEach(async () => {
-      [
-        owner,
-        manager,
-        mockIssuanceModule,
-        mockLockedModule,
-        testAccount,
-        randomAccount,
-      ] = await provider.listAccounts();
+    let subjectCaller: Address;
 
+    beforeEach(async () => {
       firstComponent = await deployer.mocks.deployTokenMock(manager);
       firstComponentUnits = ether(1);
       secondComponent = await deployer.mocks.deployTokenMock(manager);
       secondComponentUnits = ether(2);
 
-      controller = await deployer.core.deployController(owner);
       components = [firstComponent.address, secondComponent.address];
       units = [firstComponentUnits, secondComponentUnits];
       modules = [mockIssuanceModule, mockLockedModule];
@@ -226,7 +234,7 @@ describe('SetTokenWrapper', () => {
 
       describe('when the caller is not the manager', () => {
         beforeEach(async () => {
-          subjectCaller = randomAccount;
+          subjectCaller = testAccount;
         });
 
         it('should revert', async () => {
@@ -240,8 +248,9 @@ describe('SetTokenWrapper', () => {
 
       describe('when the module is already added', () => {
         beforeEach(async () => {
-          subjectModule = mockIssuanceModule;
           const moduleState = await setTokenWrapper.moduleStates(setToken.address, mockIssuanceModule);
+
+          subjectModule = mockIssuanceModule;
         });
 
         it('should revert', async () => {
@@ -289,7 +298,7 @@ describe('SetTokenWrapper', () => {
 
       describe('when the caller is not the manager', () => {
         beforeEach(async () => {
-          subjectCaller = randomAccount;
+          subjectCaller = testAccount;
         });
 
         it('should revert', async () => {
@@ -306,12 +315,12 @@ describe('SetTokenWrapper', () => {
       let subjectModule: Address;
 
       beforeEach(async () => {
+        setToken = setToken.connect(provider.getSigner(manager));
+        await controller.addModule(testAccount);
+        await setToken.addModule(testAccount);
+
         subjectModule = testAccount;
         subjectCaller = testAccount;
-
-        setToken = setToken.connect(provider.getSigner(manager));
-        await controller.addModule(subjectModule);
-        await setToken.addModule(subjectModule);
       });
 
       async function subject(): Promise<ContractTransaction> {
@@ -362,6 +371,8 @@ describe('SetTokenWrapper', () => {
 
       describe('when the module is locked', () => {
         beforeEach(async () => {
+          await controller.addModule(mockIssuanceModule);
+
           setToken = setToken.connect(provider.getSigner(mockIssuanceModule));
           await setToken.lock();
         });
