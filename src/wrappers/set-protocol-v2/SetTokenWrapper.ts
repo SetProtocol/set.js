@@ -31,7 +31,7 @@ import { generateTxOpts } from '@src/utils/transactions';
  * The Set Token wrapper handles all functions on the SetToken smart contract.
  *
  */
-export class SetTokenWrapper {
+export default class SetTokenWrapper {
   private provider: Provider;
   private contracts: ContractWrapper;
 
