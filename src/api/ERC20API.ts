@@ -138,7 +138,7 @@ export default class ERC20API {
     to: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts: TransactionOverrides = {},
   ): Promise<string> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('toAddress', to);
@@ -162,7 +162,7 @@ export default class ERC20API {
     spenderAddress: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts: TransactionOverrides = {}
   ): Promise<string> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
@@ -188,7 +188,7 @@ export default class ERC20API {
     to: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts: TransactionOverrides = {},
   ): Promise<string> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('toAddress', to);
