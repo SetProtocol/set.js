@@ -35,9 +35,11 @@ describe('SetTokenAPI', () => {
   beforeEach(async () => {
     [setAddress, moduleAddress, managerAddress] = await provider.listAccounts();
 
-    setTokenWrapper = new SetTokenWrapper(provider);
     setTokenAPI = new SetTokenAPI(provider);
+    setTokenWrapper = (SetTokenWrapper as any).mock.instances[0];
+  });
 
+  afterEach(async () => {
     (SetTokenWrapper as any).mockClear();
   });
 
@@ -55,11 +57,11 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#getManagerAddressAsync', () => {
+  describe('#getManagerAddressAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.getManagerAddressAsync(setAddress);
 
-      expect(setTokenWrapper.manager).to.have.been.calledWith(setAddress);
+      expect(setTokenWrapper.manager).to.have.beenCalledWith(setAddress);
     });
 
     it('should throw with invalid params', async () => {
@@ -69,11 +71,11 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#getPositionsAsync', () => {
+  describe('#getPositionsAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.getPositionsAsync(setAddress);
 
-      expect(setTokenWrapper.getPositions).to.have.been.calledWith(setAddress);
+      expect(setTokenWrapper.getPositions).to.have.beenCalledWith(setAddress, undefined);
     });
 
     it('should throw with invalid params', async () => {
@@ -83,11 +85,11 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#getModulesAsync', () => {
+  describe('#getModulesAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.getModulesAsync(setAddress);
 
-      expect(setTokenWrapper.getModules).to.have.been.calledWith(setAddress);
+      expect(setTokenWrapper.getModules).to.have.beenCalledWith(setAddress, undefined);
     });
 
     it('should throw with invalid params', async () => {
@@ -97,13 +99,14 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#getModuleStateAsync', () => {
+  describe('#getModuleStateAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.getModuleStateAsync(setAddress, moduleAddress);
 
-      expect(setTokenWrapper.moduleStates).to.have.been.calledWith(
+      expect(setTokenWrapper.moduleStates).to.have.beenCalledWith(
         setAddress,
-        moduleAddress
+        moduleAddress,
+        undefined,
       );
     });
 
@@ -114,13 +117,15 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#addModuleAsync', () => {
+  describe('#addModuleAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.addModuleAsync(setAddress, moduleAddress);
 
-      expect(setTokenWrapper.addModule).to.have.been.calledWith(
+      expect(setTokenWrapper.addModule).to.have.beenCalledWith(
         setAddress,
-        moduleAddress
+        moduleAddress,
+        undefined,
+        {}
       );
     });
 
@@ -131,13 +136,15 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#setManagerAsync', () => {
+  describe('#setManagerAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.setManagerAsync(setAddress, managerAddress);
 
-      expect(setTokenWrapper.setManager).to.have.been.calledWith(
+      expect(setTokenWrapper.setManager).to.have.beenCalledWith(
         setAddress,
-        managerAddress
+        managerAddress,
+        undefined,
+        {}
       );
     });
 
@@ -148,11 +155,11 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#initializeModuleAsync', () => {
+  describe('#initializeModuleAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.initializeModuleAsync(setAddress);
 
-      expect(setTokenWrapper.initializeModule).to.have.been.calledWith(setAddress);
+      expect(setTokenWrapper.initializeModule).to.have.beenCalledWith(setAddress, undefined, {});
     });
 
     it('should throw with invalid params', async () => {
@@ -162,11 +169,11 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#isModuleEnabledAsync', () => {
+  describe('#isModuleEnabledAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.isModuleEnabledAsync(setAddress, moduleAddress);
 
-      expect(setTokenWrapper.isModule).to.have.been.calledWith(setAddress, moduleAddress);
+      expect(setTokenWrapper.isModule).to.have.beenCalledWith(setAddress, moduleAddress, undefined);
     });
 
     it('should throw with invalid params', async () => {
@@ -176,11 +183,11 @@ describe('SetTokenAPI', () => {
     });
   });
 
-  xdescribe('#isModulePendingAsync', () => {
+  describe('#isModulePendingAsync', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.isModulePendingAsync(setAddress, moduleAddress);
 
-      expect(setTokenWrapper.isPendingModule).to.have.been.calledWith(setAddress, moduleAddress);
+      expect(setTokenWrapper.isPendingModule).to.have.beenCalledWith(setAddress, moduleAddress, undefined);
     });
 
     it('should throw with invalid params', async () => {
