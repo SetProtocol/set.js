@@ -20,12 +20,14 @@ import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Contract, Signer } from 'ethers';
 import { Address } from 'set-protocol-v2/utils/types';
 
-import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
-import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
+import { BasicIssuanceModule } from 'set-protocol-v2/dist/utils/contracts';
+import { BasicIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
 import { Controller } from 'set-protocol-v2/dist/utils/contracts';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
 import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
 import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
+import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
+import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
 import { SetTokenCreator } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
 
@@ -43,6 +45,32 @@ export class ContractWrapper {
   public constructor(provider: Provider) {
     this.provider = provider;
     this.cache = {};
+  }
+
+  /**
+   * Load Controller contract
+   *
+   * @param  controllerAddress  Address of the Controller contract
+   * @param  signer             Caller of the methods
+   * @return                    The Controller Contract
+   */
+  public async loadControllerContractAsync(
+    controllerAddress: Address,
+    signer: Signer,
+  ): Controller {
+    const cacheKey = `Controller_${controllerAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as Controller;
+    } else {
+      const controllerContract = ControllerFactory.connect(
+        controllerAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = controllerContract;
+      return controllerContract;
+    }
   }
 
   /**
@@ -73,6 +101,33 @@ export class ContractWrapper {
   }
 
   /**
+   * Load BasicIssuanceModule contract
+   *
+   * @param  basicIssuanceModuleAddress   Address of the token contract
+   * @param  callerAddress                Address of caller, uses first one on node if none provided.
+   * @return                              BasicIssuanceModule contract instance
+   */
+  public async loadBasicIssuanceModuleAsync(
+    basicIssuanceModuleAddress: Address,
+    callerAddress?: Address,
+  ): BasicIssuanceModule {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `ERC20_${basicIssuanceModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as ERC20;
+    } else {
+      const basicIssuanceModuleContract = BasicIssuanceModuleFactory.connect(
+        basicIssuanceModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = basicIssuanceModuleContract;
+      return basicIssuanceModuleContract;
+    }
+  }
+
+  /**
    * Load Set Token contract
    *
    * @param  setTokenAddress    Address of the Set Token contract
@@ -96,32 +151,6 @@ export class ContractWrapper {
 
       this.cache[cacheKey] = setTokenContract;
       return setTokenContract;
-    }
-  }
-
-  /**
-   * Load Controller contract
-   *
-   * @param  controllerAddress  Address of the Controller contract
-   * @param  signer             Caller of the methods
-   * @return                    The Controller Contract
-   */
-  public async loadControllerContractAsync(
-    controllerAddress: Address,
-    signer: Signer,
-  ): Controller {
-    const cacheKey = `Controller_${controllerAddress}_${await signer.getAddress()}`;
-
-    if (cacheKey in this.cache) {
-      return this.cache[cacheKey] as Controller;
-    } else {
-      const controllerContract = ControllerFactory.connect(
-        controllerAddress,
-        signer
-      );
-
-      this.cache[cacheKey] = controllerContract;
-      return controllerContract;
     }
   }
 
