@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { Address } from 'set-protocol-v2/utils/types';
 import { SetTokenAPI } from '@src/api/SetTokenAPI';
 import SetTokenWrapper from '../../src/wrappers/set-protocol-v2/SetTokenWrapper';
-import { expect, sinon } from '../utils/chai';
+import { expect } from '../utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
@@ -21,7 +21,7 @@ describe('SetTokenAPI', () => {
 
     setTokenWrapper = new SetTokenWrapper(provider);
     setTokenAPI = new SetTokenAPI(provider, { setTokenWrapper });
-    // sinon.stub(setTokenWrapper);
+
     (SetTokenWrapper as any).mockClear();
   });
 
@@ -29,7 +29,7 @@ describe('SetTokenAPI', () => {
     it('should call the Set Token Wrapper with correct params', async () => {
       setTokenAPI.getControllerAddressAsync(setAddress);
 
-      expect(setTokenWrapper.controller).to.have.been.calledWith(setAddress);
+      expect(setTokenWrapper.controller).to.have.beenCalledWith(setAddress);
     });
 
     xit('should throw with invalid params', async () => {

@@ -21,7 +21,7 @@ import { Provider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
-import { SetTokenWrapper } from '../wrappers/set-protocol-v2/SetTokenWrapper';
+import SetTokenWrapper from '../wrappers/set-protocol-v2/SetTokenWrapper';
 import { Assertions } from '@src/assertions';
 import { ModuleState } from '@src/types';
 
