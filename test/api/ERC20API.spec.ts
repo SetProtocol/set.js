@@ -22,7 +22,7 @@ import { Address } from 'set-protocol-v2/utils/types';
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 import { ERC20Wrapper } from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 
-import { expect, sinon } from '../utils/chai';
+import { expect } from '../utils/chai';
 import { ERC20API } from '@src/api/ERC20API';
 
 describe('ERC20Wrapper', () => {
@@ -43,7 +43,6 @@ describe('ERC20Wrapper', () => {
 
     erc20Wrapper = new ERC20Wrapper(provider);
     erc20API = new ERC20API(provider, { erc20Wrapper });
-    sinon.stub(erc20Wrapper);
   });
 
   describe('#getBalanceAsync', () => {
