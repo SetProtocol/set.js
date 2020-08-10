@@ -1,5 +1,5 @@
 /*
-  Copyright 2018 Set Labs Inc.
+  Copyright 2020 Set Labs Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ import { BigNumber } from 'ethers/utils';
 
 import { Address } from 'set-protocol-v2/utils/types';
 
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-import { ERC20Wrapper } from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
+import ERC20API from '@src/api/ERC20API';
+import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
+import { expect } from '../utils/chai';
 
-import { expect, sinon } from '../utils/chai';
-import { ERC20API } from '@src/api/ERC20API';
+const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+
+jest.mock('@src/wrappers/set-protocol-v2/ERC20Wrapper');
 
 describe('ERC20Wrapper', () => {
   let tokenAddress: Address;
@@ -41,16 +43,19 @@ describe('ERC20Wrapper', () => {
       proxyAddress,
     ] = await provider.listAccounts();
 
-    erc20Wrapper = new ERC20Wrapper(provider);
-    erc20API = new ERC20API(provider, { erc20Wrapper });
-    sinon.stub(erc20Wrapper);
+    erc20API = new ERC20API(provider);
+    erc20Wrapper = (ERC20Wrapper as any).mock.instances[0];
+  });
+
+  afterEach(() => {
+    (ERC20Wrapper as any).mockClear();
   });
 
   describe('#getBalanceAsync', () => {
     it('should call the ERC20Wrapper with correct params', async () => {
       erc20API.getBalanceAsync(tokenAddress, userAddress);
 
-      expect(erc20Wrapper.balanceOf).to.have.been.calledWith(
+      expect(erc20Wrapper.balanceOf).to.have.beenCalledWith(
         tokenAddress,
         userAddress
       );
@@ -67,7 +72,7 @@ describe('ERC20Wrapper', () => {
     it('should call the ERC20Wrapper with correct params', async () => {
       erc20API.getTokenNameAsync(tokenAddress);
 
-      expect(erc20Wrapper.name).to.have.been.calledWith(tokenAddress);
+      expect(erc20Wrapper.name).to.have.beenCalledWith(tokenAddress);
     });
 
     it('should reject with invalid params', async () => {
@@ -81,7 +86,7 @@ describe('ERC20Wrapper', () => {
     it('should call the ERC20Wrapper with correct params', async () => {
       erc20API.getTokenSymbolAsync(tokenAddress);
 
-      expect(erc20Wrapper.symbol).to.have.been.calledWith(tokenAddress);
+      expect(erc20Wrapper.symbol).to.have.beenCalledWith(tokenAddress);
     });
 
     it('should reject with invalid params', async () => {
@@ -95,7 +100,7 @@ describe('ERC20Wrapper', () => {
     it('should call the ERC20Wrapper with correct params', async () => {
       erc20API.getTotalSupplyAsync(tokenAddress);
 
-      expect(erc20Wrapper.totalSupply).to.have.been.calledWith(tokenAddress);
+      expect(erc20Wrapper.totalSupply).to.have.beenCalledWith(tokenAddress);
     });
 
     it('should reject with invalid params', async () => {
@@ -109,7 +114,7 @@ describe('ERC20Wrapper', () => {
     it('should call the ERC20Wrapper with correct params', async () => {
       erc20API.getDecimalsAsync(tokenAddress);
 
-      expect(erc20Wrapper.decimals).to.have.been.calledWith(tokenAddress);
+      expect(erc20Wrapper.decimals).to.have.beenCalledWith(tokenAddress);
     });
 
     it('should reject with invalid params', async () => {
@@ -123,7 +128,7 @@ describe('ERC20Wrapper', () => {
     it('should call the ERC20Wrapper with correct params', async () => {
       erc20API.getAllowanceAsync(tokenAddress, userAddress, proxyAddress);
 
-      expect(erc20Wrapper.allowance).to.have.been.calledWith(
+      expect(erc20Wrapper.allowance).to.have.beenCalledWith(
         tokenAddress,
         userAddress,
         proxyAddress
@@ -145,10 +150,12 @@ describe('ERC20Wrapper', () => {
     it('should call the ERC20Wrapper with correct params', async () => {
       erc20API.transferAsync(tokenAddress, externalAddress, new BigNumber(1));
 
-      expect(erc20Wrapper.transfer).to.have.been.calledWith(
+      expect(erc20Wrapper.transfer).to.have.beenCalledWith(
         tokenAddress,
         externalAddress,
-        new BigNumber(1)
+        new BigNumber(1),
+        undefined,
+        {}
       );
     });
 
@@ -177,10 +184,12 @@ describe('ERC20Wrapper', () => {
         new BigNumber(1)
       );
 
-      expect(erc20Wrapper.approve).to.have.been.calledWith(
+      expect(erc20Wrapper.approve).to.have.beenCalledWith(
         tokenAddress,
         externalAddress,
-        new BigNumber(1)
+        new BigNumber(1),
+        undefined,
+        {},
       );
     });
 
@@ -210,11 +219,13 @@ describe('ERC20Wrapper', () => {
         new BigNumber(1)
       );
 
-      expect(erc20Wrapper.transferFrom).to.have.been.calledWith(
+      expect(erc20Wrapper.transferFrom).to.have.beenCalledWith(
         tokenAddress,
         userAddress,
         externalAddress,
-        new BigNumber(1)
+        new BigNumber(1),
+        undefined,
+        {},
       );
     });
 

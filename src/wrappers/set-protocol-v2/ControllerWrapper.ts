@@ -16,11 +16,10 @@
 
 'use strict';
 
-import { ContractTransaction } from 'ethers';
 import { Provider, JsonRpcProvider } from 'ethers/providers';
-import { Address, Position } from 'set-protocol-v2/utils/types';
+import { Address } from 'set-protocol-v2/utils/types';
 
-import { ContractWrapper } from './ContractWrapper';
+import ContractWrapper from './ContractWrapper';
 
 /**
  * @title  ControllerWrapper
@@ -29,7 +28,7 @@ import { ContractWrapper } from './ContractWrapper';
  * The Controller wrapper handles all functions on the Controller smart contract.
  *
  */
-export class ControllerWrapper {
+export default class ControllerWrapper {
   private provider: Provider;
   private contracts: ContractWrapper;
 

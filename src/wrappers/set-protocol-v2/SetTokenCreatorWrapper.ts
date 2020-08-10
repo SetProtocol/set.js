@@ -20,7 +20,7 @@ import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { BigNumber } from 'ethers/utils';
 import { Address } from 'set-protocol-v2/utils/types';
 
-import { ContractWrapper } from './ContractWrapper';
+import ContractWrapper from './ContractWrapper';
 
 /**
  * @title  SetTokenCreatorWrapper
@@ -29,7 +29,7 @@ import { ContractWrapper } from './ContractWrapper';
  * The SetTokenCreatorWrapper handles instantiation and registering of new Set Tokens.
  *
  */
-export class SetTokenCreatorWrapper {
+export default class SetTokenCreatorWrapper {
   private provider: Provider;
   private contracts: ContractWrapper;
 

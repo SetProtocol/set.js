@@ -21,7 +21,7 @@ import { Provider } from 'ethers/providers';
 import { CommonAssertions } from './CommonAssertions';
 import { SchemaAssertions } from './SchemaAssertions';
 
-export class Assertions {
+export default class Assertions {
   public schema: SchemaAssertions;
   public common: CommonAssertions;
 

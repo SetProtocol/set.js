@@ -19,8 +19,8 @@
 import { Provider } from 'ethers/providers';
 
 import { SetJSConfig } from './types';
-import { Assertions } from './assertions';
-import { SetTokenAPI } from './api/SetTokenAPI';
+import Assertions from './assertions';
+import SetTokenAPI from './api/SetTokenAPI';
 
 /**
  * @title Set
@@ -47,7 +47,7 @@ class Set {
 
     const assertions = new Assertions(provider);
 
-    this.setToken = new SetTokenAPI(provider, { assertions });
+    this.setToken = new SetTokenAPI(provider, assertions);
   }
 }
 

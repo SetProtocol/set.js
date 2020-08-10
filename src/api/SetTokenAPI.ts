@@ -21,14 +21,9 @@ import { Provider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
-import { SetTokenWrapper } from '../wrappers/set-protocol-v2/SetTokenWrapper';
-import { Assertions } from '@src/assertions';
+import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
+import Assertions from '@src/assertions';
 import { ModuleState } from '@src/types';
-
-export type SetTokenAPIConfig = {
-  setTokenWrapper?: SetTokenWrapper;
-  assertions?: Assertions;
-};
 
 /**
  * @title  SetTokenWrapper
@@ -37,13 +32,13 @@ export type SetTokenAPIConfig = {
  * The Set Token wrapper handles all functions on the SetToken smart contract.
  *
  */
-export class SetTokenAPI {
+export default class SetTokenAPI {
   private setTokenWrapper: SetTokenWrapper;
   private assert: Assertions;
 
-  public constructor(provider: Provider, options?: SetTokenAPIConfig) {
-    this.setTokenWrapper = (options?.setTokenWrapper) || new SetTokenWrapper(provider);
-    this.assert = (options?.assertions) || new Assertions(provider);
+  public constructor(provider: Provider, assertions?: Assertions) {
+    this.setTokenWrapper = new SetTokenWrapper(provider);
+    this.assert = assertions || new Assertions(provider);
   }
 
   /**

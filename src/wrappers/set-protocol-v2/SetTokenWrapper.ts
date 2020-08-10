@@ -21,7 +21,7 @@ import { Provider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
-import { ContractWrapper } from './ContractWrapper';
+import ContractWrapper from './ContractWrapper';
 import { generateTxOpts } from '@src/utils/transactions';
 
 /**
@@ -31,7 +31,7 @@ import { generateTxOpts } from '@src/utils/transactions';
  * The Set Token wrapper handles all functions on the SetToken smart contract.
  *
  */
-export class SetTokenWrapper {
+export default class SetTokenWrapper {
   private provider: Provider;
   private contracts: ContractWrapper;
 

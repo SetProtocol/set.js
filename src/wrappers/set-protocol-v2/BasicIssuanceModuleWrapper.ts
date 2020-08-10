@@ -20,7 +20,7 @@ import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
 import { generateTxOpts } from '@src/utils/transactions';
 
-import { ContractWrapper } from './ContractWrapper';
+import ContractWrapper from './ContractWrapper';
 
 /**
  * @title  BasicIssuanceModuleWrapper
@@ -29,7 +29,7 @@ import { ContractWrapper } from './ContractWrapper';
  * The BasicIssuanceModuleWrapper forwards functionality from the IssuanceModule contract
  *
  */
-export class BasicIssuanceModuleWrapper {
+export default class BasicIssuanceModuleWrapper {
   private provider: Provider;
   private contracts: ContractWrapper;
 
