@@ -1,20 +1,22 @@
-import { ethers } from 'ethers';
+import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SetTokenWrapper } from '../../../src/wrappers/set-protocol-v2/SetTokenWrapper';
-import { SetToken } from 'set-protocol-v2/dist/typechain/SetToken';
-import { Controller } from 'set-protocol-v2/dist/typechain/Controller';
-import { StandardTokenMock } from 'set-protocol-v2/dist/typechain/StandardTokenMock';
+import {
+  Controller,
+  SetToken,
+  StandardTokenMock,
+} from 'set-protocol-v2/dist/utils/contracts';
 import {
   ADDRESS_ZERO,
   EMPTY_BYTES,
   POSITION_STATE,
   MODULE_STATE,
 } from 'set-protocol-v2/dist/utils/constants';
-import { ContractTransaction } from 'ethers';
+
+import { SetTokenWrapper } from '../../../src/wrappers/set-protocol-v2/SetTokenWrapper';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 import { expect } from '../../utils/chai';
