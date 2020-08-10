@@ -37,7 +37,7 @@ export type SetTokenAPIConfig = {
  * The Set Token wrapper handles all functions on the SetToken smart contract.
  *
  */
-export class SetTokenAPI {
+export default class SetTokenAPI {
   private setTokenWrapper: SetTokenWrapper;
   private assert: Assertions;
 

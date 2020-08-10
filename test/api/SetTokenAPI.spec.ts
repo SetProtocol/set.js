@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
 
 import { Address } from 'set-protocol-v2/utils/types';
-import { SetTokenAPI } from '@src/api/SetTokenAPI';
-import SetTokenWrapper from '../../src/wrappers/set-protocol-v2/SetTokenWrapper';
-import { expect } from '../utils/chai';
+import SetTokenAPI from '@src/api/SetTokenAPI';
+import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
+import { expect } from '@test/utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
-jest.mock('../../src/wrappers/set-protocol-v2/SetTokenWrapper');
+jest.mock('@src/wrappers/set-protocol-v2/SetTokenWrapper');
 
 describe('SetTokenAPI', () => {
   let setAddress: Address;
@@ -32,7 +32,7 @@ describe('SetTokenAPI', () => {
       expect(setTokenWrapper.controller).to.have.beenCalledWith(setAddress);
     });
 
-    xit('should throw with invalid params', async () => {
+    it('should throw with invalid params', async () => {
       await expect(
         setTokenAPI.getControllerAddressAsync('InvalidAddress')
       ).to.be.rejectedWith('Validation error');

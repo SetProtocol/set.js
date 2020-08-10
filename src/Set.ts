@@ -20,7 +20,7 @@ import { Provider } from 'ethers/providers';
 
 import { SetJSConfig } from './types';
 import { Assertions } from './assertions';
-import { SetTokenAPI } from './api/SetTokenAPI';
+import SetTokenAPI from './api/SetTokenAPI';
 
 /**
  * @title Set

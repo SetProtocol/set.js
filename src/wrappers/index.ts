@@ -16,4 +16,4 @@
 
 'use strict';
 
-export { SetTokenWrapper } from './set-protocol-v2/SetTokenWrapper';
+export * from './set-protocol-v2/SetTokenWrapper';
