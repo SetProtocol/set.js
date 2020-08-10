@@ -22,7 +22,7 @@ import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
 
 import { generateTxOpts } from '@src/utils/transactions';
-import { ContractWrapper } from './ContractWrapper';
+import ContractWrapper from './ContractWrapper';
 
 /**
  * @title  ERC20Wrapper
@@ -31,7 +31,7 @@ import { ContractWrapper } from './ContractWrapper';
  * The ERC20 Wrapper contract gives basic functionality common to all ERC20 tokens
  *
  */
-export class ERC20Wrapper {
+export default class ERC20Wrapper {
   private provider: Provider;
   private contracts: ContractWrapper;
 

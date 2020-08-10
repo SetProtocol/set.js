@@ -1,5 +1,5 @@
 /*
-  Copyright 2018 Set Labs Inc.
+  Copyright 2020 Set Labs Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ import { BigNumber } from 'ethers/utils';
 
 import { Address } from 'set-protocol-v2/utils/types';
 
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-import { ERC20Wrapper } from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
-
+import ERC20API from '@src/api/ERC20API';
+import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 import { expect } from '../utils/chai';
-import { ERC20API } from '@src/api/ERC20API';
+
+const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 describe('ERC20Wrapper', () => {
   let tokenAddress: Address;
@@ -42,7 +42,7 @@ describe('ERC20Wrapper', () => {
     ] = await provider.listAccounts();
 
     erc20Wrapper = new ERC20Wrapper(provider);
-    erc20API = new ERC20API(provider, { erc20Wrapper });
+    erc20API = new ERC20API(provider);
   });
 
   describe('#getBalanceAsync', () => {

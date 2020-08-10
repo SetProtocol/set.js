@@ -3,10 +3,10 @@ import { BigNumber } from 'ethers/utils';
 
 import { Address } from 'set-protocol-v2/utils/types';
 import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 import { Controller } from 'set-protocol-v2/dist/utils/contracts';
+import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 
-import { ControllerWrapper } from '../../../src/wrappers/set-protocol-v2/ControllerWrapper';
+import ControllerWrapper from '@src/wrappers/set-protocol-v2/ControllerWrapper';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 import { expect } from '../../utils/chai';

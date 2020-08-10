@@ -21,13 +21,8 @@ import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
 
-import { ERC20Wrapper } from '../wrappers/set-protocol-v2/ERC20Wrapper';
-import { Assertions } from '@src/assertions';
-
-export type ERC20APIConfig = {
-  assertions?: Assertions;
-  erc20Wrapper?: ERC20Wrapper;
-};
+import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
+import Assertions from '@src/assertions';
 
 /**
  * @title  ERC20Wrapper
@@ -36,13 +31,13 @@ export type ERC20APIConfig = {
  * The ERC20API exposes basic functionality common to all ERC-20 tokens.
  *
  */
-export class ERC20API {
+export default class ERC20API {
   private assert: Assertions;
   private erc20Wrapper: ERC20Wrapper;
 
-  public constructor(provider: Provider, options?: ERC20APIConfig) {
-    this.erc20Wrapper = (options?.erc20Wrapper) || new ERC20Wrapper(provider);
-    this.assert = (options?.assertions) || new Assertions(provider);
+  public constructor(provider: Provider, assertions?: Assertions) {
+    this.erc20Wrapper = new ERC20Wrapper(provider);
+    this.assert = assertions || new Assertions(provider);
   }
 
   /**

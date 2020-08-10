@@ -1,6 +1,5 @@
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
-import { JsonRpcProvider } from 'ethers/providers';
 
 import { Account, Address, Wallet } from 'set-protocol-v2/utils/types';
 import { ADDRESS_ZERO, ZERO } from 'set-protocol-v2/dist/utils/constants';
@@ -14,11 +13,10 @@ import {
   StandardTokenMock,
 } from 'set-protocol-v2/dist/utils/contracts';
 
-import { BasicIssuanceModuleWrapper } from '../../../src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
-
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
 import { expect } from '../../utils/chai';
 
+const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 const blockchain = new Blockchain(provider);
 
 

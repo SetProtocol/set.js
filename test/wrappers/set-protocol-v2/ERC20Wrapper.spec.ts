@@ -21,7 +21,7 @@ import { Address } from 'set-protocol-v2/utils/types';
 import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 
-import { ERC20Wrapper } from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
+import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 import { expect } from '../../utils/chai';

@@ -38,7 +38,7 @@ import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenC
  * The Contracts API handles all functions that load contracts
  *
  */
-export class ContractWrapper {
+export default class ContractWrapper {
   private provider: Provider;
   private cache: { [contractName: string]: Contract };
 

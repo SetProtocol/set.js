@@ -21,7 +21,7 @@ import { Provider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
-import { ContractWrapper } from './ContractWrapper';
+import ContractWrapper from './ContractWrapper';
 import { generateTxOpts } from '@src/utils/transactions';
 
 /**

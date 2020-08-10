@@ -28,7 +28,7 @@ import {
   StandardTokenMock,
 } from 'set-protocol-v2/dist/utils/contracts';
 
-import { expect } from '../../utils/chai';
+import { expect } from '@test/utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 const blockchain = new Blockchain(provider);
