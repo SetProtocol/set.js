@@ -20,7 +20,8 @@ import { Provider } from 'ethers/providers';
 
 import { SetJSConfig } from './types';
 import Assertions from './assertions';
-import SetTokenAPI from './api/SetTokenAPI';
+import IssuanceAPI from '@src/api/IssuanceAPI';
+import SetTokenAPI from '@src/api/SetTokenAPI';
 
 /**
  * @title Set
@@ -40,6 +41,12 @@ class Set {
   public setToken: SetTokenAPI;
 
   /**
+   * An instance of the IssuanceAPI class. Contains interface for interacting
+   * with Issuance Modules to mint and redeem SetTokens.
+   */
+  public issuance: IssuanceAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(provider: Provider, config: SetJSConfig) {
@@ -48,6 +55,7 @@ class Set {
     const assertions = new Assertions(provider);
 
     this.setToken = new SetTokenAPI(provider, assertions);
+    this.issuance = new IssuanceAPI(provider, config.basicIssuanceModuleAddress);
   }
 }
 
