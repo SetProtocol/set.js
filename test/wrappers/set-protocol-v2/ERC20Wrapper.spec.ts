@@ -83,6 +83,7 @@ describe('ERC20Wrapper', () => {
 
     it('fetches the erc20 token properties correctly', async () => {
       const { name, symbol, supply, decimals } = await subject();
+
       expect(name).to.eql(tokenName);
       expect(symbol).to.eql(tokenSymbol);
       expect(supply.toString()).to.eql(tokenSupply.toString());
