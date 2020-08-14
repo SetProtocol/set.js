@@ -14,9 +14,9 @@
   limitations under the License.
 */
 
-import { ethers } from 'ethers';
+import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
-
+import { ether } from 'set-protocol-v2/dist/utils/common';
 import { Address } from 'set-protocol-v2/utils/types';
 
 import ERC20API from '@src/api/ERC20API';
@@ -27,7 +27,8 @@ const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 jest.mock('@src/wrappers/set-protocol-v2/ERC20Wrapper');
 
-describe('ERC20Wrapper', () => {
+
+describe('ERC20API', () => {
   let tokenAddress: Address;
   let userAddress: Address;
   let externalAddress: Address;
@@ -52,203 +53,406 @@ describe('ERC20Wrapper', () => {
   });
 
   describe('#getBalanceAsync', () => {
+    let subjectTokenAddress: Address;
+    let subjectHolderAddress: Address;
+
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectHolderAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+    });
+
+    async function subject(): Promise<BigNumber> {
+      return await erc20API.getBalanceAsync(
+        subjectTokenAddress,
+        subjectHolderAddress
+      );
+    }
+
     it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.getBalanceAsync(tokenAddress, userAddress);
+      await subject();
 
       expect(erc20Wrapper.balanceOf).to.have.beenCalledWith(
-        tokenAddress,
-        userAddress
+        subjectTokenAddress,
+        subjectHolderAddress
       );
     });
 
-    it('should reject with invalid params', async () => {
-      await expect(
-        erc20API.getBalanceAsync('InvalidAddress', 'InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getTokenNameAsync', () => {
-    it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.getTokenNameAsync(tokenAddress);
+    let subjectTokenAddress: Address;
 
-      expect(erc20Wrapper.name).to.have.beenCalledWith(tokenAddress);
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
     });
 
-    it('should reject with invalid params', async () => {
-      await expect(
-        erc20API.getTokenNameAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<string> {
+      return await erc20API.getTokenNameAsync(
+        subjectTokenAddress,
+      );
+    }
+
+    it('should call the ERC20Wrapper with correct params', async () => {
+      await subject();
+
+      expect(erc20Wrapper.name).to.have.beenCalledWith(subjectTokenAddress);
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getTokenSymbolAsync', () => {
-    it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.getTokenSymbolAsync(tokenAddress);
+    let subjectTokenAddress: Address;
 
-      expect(erc20Wrapper.symbol).to.have.beenCalledWith(tokenAddress);
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
     });
 
-    it('should reject with invalid params', async () => {
-      await expect(
-        erc20API.getTokenSymbolAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<string> {
+      return await erc20API.getTokenSymbolAsync(
+        subjectTokenAddress,
+      );
+    }
+
+    it('should call the ERC20Wrapper with correct params', async () => {
+      await subject();
+
+      expect(erc20Wrapper.symbol).to.have.beenCalledWith(subjectTokenAddress);
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getTotalSupplyAsync', () => {
-    it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.getTotalSupplyAsync(tokenAddress);
+    let subjectTokenAddress: Address;
 
-      expect(erc20Wrapper.totalSupply).to.have.beenCalledWith(tokenAddress);
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
     });
 
-    it('should reject with invalid params', async () => {
-      await expect(
-        erc20API.getTotalSupplyAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<BigNumber> {
+      return await erc20API.getTotalSupplyAsync(
+        subjectTokenAddress,
+      );
+    }
+
+    it('should call the ERC20Wrapper with correct params', async () => {
+      await subject();
+
+      expect(erc20Wrapper.totalSupply).to.have.beenCalledWith(subjectTokenAddress);
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getDecimalsAsync', () => {
-    it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.getDecimalsAsync(tokenAddress);
+    let subjectTokenAddress: Address;
 
-      expect(erc20Wrapper.decimals).to.have.beenCalledWith(tokenAddress);
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
     });
 
-    it('should reject with invalid params', async () => {
-      await expect(
-        erc20API.getDecimalsAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<BigNumber> {
+      return await erc20API.getDecimalsAsync(
+        subjectTokenAddress,
+      );
+    }
+
+    it('should call the ERC20Wrapper with correct params', async () => {
+      await subject();
+
+      expect(erc20Wrapper.decimals).to.have.beenCalledWith(subjectTokenAddress);
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getAllowanceAsync', () => {
+    let subjectTokenAddress: Address;
+    let subjectUserAddress: Address;
+    let subjectSpenderAddress: Address;
+
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectUserAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectSpenderAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+    });
+
+    async function subject(): Promise<BigNumber> {
+      return await erc20API.getAllowanceAsync(
+        subjectTokenAddress,
+        subjectUserAddress,
+        subjectSpenderAddress
+      );
+    }
+
     it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.getAllowanceAsync(tokenAddress, userAddress, proxyAddress);
+      await subject();
 
       expect(erc20Wrapper.allowance).to.have.beenCalledWith(
-        tokenAddress,
-        userAddress,
-        proxyAddress
+        subjectTokenAddress,
+        subjectUserAddress,
+        subjectSpenderAddress
       );
     });
 
-    it('should reject with invalid params', async () => {
-      await expect(
-        erc20API.getAllowanceAsync(
-          'InvalidAddress',
-          'InvalidAddress',
-          'InvalidAddress'
-        )
-      ).to.be.rejectedWith('Validation error');
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the User address is invalid', () => {
+      beforeEach(async () => {
+        subjectUserAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the Spender address is invalid', () => {
+      beforeEach(async () => {
+        subjectSpenderAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#transferAsync', () => {
+    let subjectTokenAddress: Address;
+    let subjectReceiverAddress: Address;
+    let subjectQuantity: BigNumber;
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectReceiverAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectQuantity = ether(1);
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<string> {
+      return await erc20API.transferAsync(
+        subjectTokenAddress,
+        subjectReceiverAddress,
+        subjectQuantity,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    }
+
     it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.transferAsync(tokenAddress, externalAddress, new BigNumber(1));
+      await subject();
 
       expect(erc20Wrapper.transfer).to.have.beenCalledWith(
-        tokenAddress,
-        externalAddress,
-        new BigNumber(1),
-        undefined,
-        {}
+        subjectTokenAddress,
+        subjectReceiverAddress,
+        subjectQuantity,
+        subjectCallerAddress,
+        subjectTransactionOptions
       );
     });
 
-    it('should reject with invalid address params', async () => {
-      await expect(
-        erc20API.transferAsync(
-          'InvalidAddress',
-          'InvalidAddress',
-          new BigNumber(1)
-        )
-      ).to.be.rejectedWith('Validation error');
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
 
-    it('should reject with invalid value param', async () => {
-      await expect(
-        erc20API.transferAsync(tokenAddress, externalAddress, 100 as any)
-      ).to.be.rejectedWith('Validation error');
+    describe('when the receiver address is invalid', () => {
+      beforeEach(async () => {
+        subjectReceiverAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#approveProxyAsync', () => {
-    it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.approveProxyAsync(
-        tokenAddress,
-        externalAddress,
-        new BigNumber(1)
+    let subjectTokenAddress: Address;
+    let subjectSpenderAddress: Address;
+    let subjectQuantity: BigNumber;
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectSpenderAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectQuantity = ether(1);
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<string> {
+      return await erc20API.approveProxyAsync(
+        subjectTokenAddress,
+        subjectSpenderAddress,
+        subjectQuantity,
+        subjectCallerAddress,
+        subjectTransactionOptions
       );
+    }
+
+    it('should call the ERC20Wrapper with correct params', async () => {
+      await subject();
 
       expect(erc20Wrapper.approve).to.have.beenCalledWith(
-        tokenAddress,
-        externalAddress,
-        new BigNumber(1),
-        undefined,
-        {},
+        subjectTokenAddress,
+        subjectSpenderAddress,
+        subjectQuantity,
+        subjectCallerAddress,
+        subjectTransactionOptions
       );
     });
 
-    it('should reject with invalid address params', async () => {
-      await expect(
-        erc20API.approveProxyAsync(
-          'InvalidAddress',
-          'InvalidAddress',
-          new BigNumber(1)
-        )
-      ).to.be.rejectedWith('Validation error');
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
 
-    it('should reject with invalid value param', async () => {
-      await expect(
-        erc20API.approveProxyAsync(tokenAddress, externalAddress, 100 as any)
-      ).to.be.rejectedWith('Validation error');
+    describe('when the spender address is invalid', () => {
+      beforeEach(async () => {
+        subjectSpenderAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#proxyTransferAsync', () => {
-    it('should call the ERC20Wrapper with correct params', async () => {
-      erc20API.proxyTransferAsync(
-        tokenAddress,
-        userAddress,
-        externalAddress,
-        new BigNumber(1)
+    let subjectTokenAddress: Address;
+    let subjectFromAddress: Address;
+    let subjectToAddress: Address;
+    let subjectTransferQuantity: BigNumber;
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectFromAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectToAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectTransferQuantity = ether(1);
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<string> {
+      return await erc20API.proxyTransferAsync(
+        subjectTokenAddress,
+        subjectFromAddress,
+        subjectToAddress,
+        subjectTransferQuantity,
+        subjectCallerAddress,
+        subjectTransactionOptions
       );
+    }
+
+    it('should call the ERC20Wrapper with correct params', async () => {
+      await subject();
 
       expect(erc20Wrapper.transferFrom).to.have.beenCalledWith(
-        tokenAddress,
-        userAddress,
-        externalAddress,
-        new BigNumber(1),
-        undefined,
-        {},
+        subjectTokenAddress,
+        subjectFromAddress,
+        subjectToAddress,
+        subjectTransferQuantity,
+        subjectCallerAddress,
+        subjectTransactionOptions
       );
     });
 
-    it('should reject with invalid address params', async () => {
-      await expect(
-        erc20API.proxyTransferAsync(
-          'InvalidAddress',
-          'InvalidAddress',
-          'InvalidAddress',
-          new BigNumber(1)
-        )
-      ).to.be.rejectedWith('Validation error');
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
 
-    it('should reject with invalid value param', async () => {
-      await expect(
-        erc20API.proxyTransferAsync(
-          tokenAddress,
-          userAddress,
-          externalAddress,
-          100 as any
-        )
-      ).to.be.rejectedWith('Validation error');
+    describe('when the from address is invalid', () => {
+      beforeEach(async () => {
+        subjectFromAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the to address is invalid', () => {
+      beforeEach(async () => {
+        subjectToAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 });

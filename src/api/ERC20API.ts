@@ -144,7 +144,7 @@ export default class ERC20API {
     this.assert.schema.isValidAddress('toAddress', to);
     this.assert.schema.isValidNumber('value', value);
 
-    return this.erc20Wrapper.transfer(tokenAddress, to, value, callerAddress, txOpts);
+    return await this.erc20Wrapper.transfer(tokenAddress, to, value, callerAddress, txOpts);
   }
 
   /**
