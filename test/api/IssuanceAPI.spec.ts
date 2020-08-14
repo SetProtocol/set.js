@@ -77,13 +77,7 @@ describe('IssuanceAPI', () => {
     }
 
     it('should call the BasicIssuanceModuleWrapper with correct params', async () => {
-      issuanceAPI.issueAsync(
-        subjectSetTokenAddress,
-        subjectIssuanceQuantity,
-        subjectSetTokenRecipientAddress,
-        subjectCallerAddress,
-        subjectTransactionOptions
-      );
+      await subject();
 
       expect(basicIssuanceModuleWrapper.issue).to.have.beenCalledWith(
         subjectSetTokenAddress,
@@ -138,12 +132,7 @@ describe('IssuanceAPI', () => {
     }
 
     it('should call the BasicIssuanceModuleWrapper with correct params', async () => {
-      issuanceAPI.redeemAsync(
-        subjectSetTokenAddress,
-        subjectRedemptionQuantity,
-        subjectCallerAddress,
-        subjectTransactionOptions
-      );
+      await subject();
 
       expect(basicIssuanceModuleWrapper.redeem).to.have.beenCalledWith(
         subjectSetTokenAddress,
