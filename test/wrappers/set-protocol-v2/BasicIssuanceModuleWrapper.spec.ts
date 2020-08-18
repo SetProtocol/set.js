@@ -16,7 +16,7 @@ import {
 import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
 import { expect } from '../../utils/chai';
 
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+const provider = new ethers.providers.JsonRpcProvider();
 const blockchain = new Blockchain(provider);
 
 
@@ -32,7 +32,7 @@ describe('BasicIssuanceModuleWrapper', () => {
 
   let basicIssuanceModuleWrapper: BasicIssuanceModuleWrapper;
 
-  beforeEach(async () => {
+  beforeAll(async() => {
     [
       owner,
       manager,
@@ -41,16 +41,17 @@ describe('BasicIssuanceModuleWrapper', () => {
 
     deployer = new DeployHelper(provider.getSigner(owner));
     setup = new SystemFixture(provider, owner);
+  });
+
+  beforeEach(async () => {
+    await blockchain.saveSnapshotAsync();
+
     await setup.initialize();
 
     basicIssuanceModule = await deployer.modules.deployBasicIssuanceModule(setup.controller.address);
     await setup.controller.addModule(basicIssuanceModule.address);
 
     basicIssuanceModuleWrapper = new BasicIssuanceModuleWrapper(provider, basicIssuanceModule.address);
-  });
-
-  beforeEach(async () => {
-    await blockchain.saveSnapshotAsync();
   });
 
   afterEach(async () => {

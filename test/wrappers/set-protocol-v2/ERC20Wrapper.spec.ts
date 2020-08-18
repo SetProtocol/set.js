@@ -22,11 +22,11 @@ import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 
 import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
-
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 import { expect } from '../../utils/chai';
 
+const provider = new ethers.providers.JsonRpcProvider();
 const blockchain = new Blockchain(provider);
+
 
 describe('ERC20Wrapper', () => {
   let owner: Address;
@@ -35,19 +35,19 @@ describe('ERC20Wrapper', () => {
 
   let deployer: DeployHelper;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     [
       owner,
       manager,
     ] = await provider.listAccounts();
-
-    erc20Wrapper = new ERC20Wrapper(provider);
-
-    deployer = new DeployHelper(provider.getSigner(owner));
   });
 
   beforeEach(async () => {
     await blockchain.saveSnapshotAsync();
+
+    erc20Wrapper = new ERC20Wrapper(provider);
+
+    deployer = new DeployHelper(provider.getSigner(owner));
   });
 
   afterEach(async () => {

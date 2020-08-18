@@ -20,8 +20,9 @@ import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
 import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 import { expect } from '@test/utils/chai';
 
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+const provider = new ethers.providers.JsonRpcProvider();
 const blockchain = new Blockchain(provider);
+
 
 describe('SetTokenWrapper', () => {
   let owner: Address;
@@ -47,9 +48,6 @@ describe('SetTokenWrapper', () => {
     ] = await provider.listAccounts();
 
     deployer = new DeployHelper(provider.getSigner(owner));
-
-    setTokenWrapper = new SetTokenWrapper(provider);
-    erc20Wrapper = new ERC20Wrapper(provider);
   });
 
   beforeEach(async () => {
@@ -66,6 +64,9 @@ describe('SetTokenWrapper', () => {
       initialResourceAddresses,
       initialResourceIDs
     );
+
+    setTokenWrapper = new SetTokenWrapper(provider);
+    erc20Wrapper = new ERC20Wrapper(provider);
   });
 
   afterEach(async () => {
