@@ -30,6 +30,8 @@ import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
 import { SetTokenCreator } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
+import { StreamingFeeModule } from 'set-protocol-v2/dist/typechain/StreamingFeeModule';
+import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
 
 /**
  * @title ContractWrapper
@@ -177,6 +179,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = setTokenCreator;
       return setTokenCreator;
+    }
+  }
+
+  /**
+   * Load StreamingFeeModule contract
+   *
+   * @param  streamingFeeModuleAddress  Address of the streaming fee module contract
+   * @param  callerAddress              Address of caller, uses first one on node if none provided.
+   * @return                            The Streaming Fee Module Contract
+   */
+  public async loadStreamingFeeModuleAsync(
+    streamingFeeModuleAddress: Address,
+    callerAddress?: Address,
+  ): StreamingFeeModule {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `StreamingFeeModule_${streamingFeeModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as StreamingFeeModule;
+    } else {
+      const streamingFeeModuleContract = StreamingFeeModuleFactory.connect(
+        streamingFeeModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = streamingFeeModuleContract;
+      return streamingFeeModuleContract;
     }
   }
 }
