@@ -66,7 +66,7 @@ describe('StreamingFeeModuleWrapper', () => {
     await blockchain.revertAsync();
   });
 
-  describe.only('#accrueFee', () => {
+  describe('#accrueFee', () => {
     let setToken: SetToken;
     let settings: StreamingFeeState;
 
@@ -132,45 +132,105 @@ describe('StreamingFeeModuleWrapper', () => {
     });
   });
 
-  // describe('#updateStreamingFee', () => {
-  //   let setToken: SetToken;
-  //   let streamingFee: BigNumber;
+  describe('#updateStreamingFee', () => {
+    let setToken: SetToken;
+    let previousStreamingFee: BigNumber;
 
-  //   let subjectSetToken: Address;
-  //   let subjectNewFee: BigNumber;
+    let subjectSetToken: Address;
+    let subjectNewFee: BigNumber;
+    let subjectCaller: Address;
 
-  //   beforeEach(async () => {
-  //     setToken = await setup.createSetToken(
-  //       [setup.weth.address],
-  //       [ether(1)],
-  //       [streamingFeeModule.address]
-  //     );
-  //     streamingFee = ether(0.1);
+    beforeEach(async () => {
+      // Create the settings to initialize the streaming fee module with
+      previousStreamingFee = ether(.02);
+      const settings = {
+        feeRecipient: feeRecipient,
+        maxStreamingFeePercentage: ether(.1),
+        streamingFeePercentage: previousStreamingFee,
+        lastStreamingFeeTimestamp: ZERO,
+      } as StreamingFeeState;
 
-  //     const preIssueHook = ADDRESS_ZERO;
-  //     await streamingFeeModule.initialize(setToken.address, preIssueHook);
+      // Create the SetToken with the Issuance and StreamingFee modules
+      setToken = await setup.createSetToken(
+        [setup.weth.address],
+        [ether(.01)],
+        [streamingFeeModule.address]
+      );
 
-  //     subjectSetToken = setToken.address;
-  //     subjectNewFee = ether(0.2);
-  //   });
+      // Initialize the SetToken to the StreamingFee module
+      await streamingFeeModule.initialize(setToken.address, settings);
 
-  //   async function subject(): Promise<ContractTransaction> {
-  //     return streamingFeeModule.updateStreamingFee(
-  //       subjectSetToken,
-  //       subjectNewFee
-  //     );
-  //   }
+      subjectSetToken = setToken.address;
+      subjectNewFee = ether(0.03);
+      subjectCaller = owner;
+    });
 
-  //   it('should update the streaming fee', async () => {
-  //   });
+    async function subject(): Promise<ContractTransaction> {
+      return streamingFeeModuleWrapper.updateStreamingFee(
+        subjectSetToken,
+        subjectNewFee,
+        subjectCaller
+      );
+    }
 
-  //   describe('#updateFeeRecipient', () => {
-  //     it('should update the fee recipient', async () => {
-  //       try {
-  //         await subject();
-  //       } catch (err) {
-  //       }
-  //     });
-  //   });
-  // });
+    it('should update the streaming fee', async () => {
+      const previousFeeState: any = await streamingFeeModule.feeStates(subjectSetToken);
+      expect(previousFeeState.streamingFeePercentage.toString()).to.eq(previousStreamingFee.toString());
+
+      await subject();
+
+      const updatedFeeState: any = await streamingFeeModule.feeStates(subjectSetToken);
+      expect(updatedFeeState.streamingFeePercentage.toString()).to.eq(subjectNewFee.toString());
+    });
+  });
+
+  describe('#updateFeeRecipient', () => {
+    let setToken: SetToken;
+
+    let subjectSetToken: Address;
+    let subjectNewFeeRecipientAddress: Address;
+    let subjectCaller: Address;
+
+    beforeEach(async () => {
+      // Create the settings to initialize the streaming fee module with
+      const settings = {
+        feeRecipient: feeRecipient,
+        maxStreamingFeePercentage: ether(.1),
+        streamingFeePercentage: ether(.02),
+        lastStreamingFeeTimestamp: ZERO,
+      } as StreamingFeeState;
+
+      // Create the SetToken with the Issuance and StreamingFee modules
+      setToken = await setup.createSetToken(
+        [setup.weth.address],
+        [ether(.01)],
+        [streamingFeeModule.address]
+      );
+
+      // Initialize the SetToken to the StreamingFee module
+      await streamingFeeModule.initialize(setToken.address, settings);
+
+      subjectSetToken = setToken.address;
+      subjectNewFeeRecipientAddress = owner;
+      subjectCaller = owner;
+    });
+
+    async function subject(): Promise<ContractTransaction> {
+      return streamingFeeModuleWrapper.updateFeeRecipient(
+        subjectSetToken,
+        subjectNewFeeRecipientAddress,
+        subjectCaller
+      );
+    }
+
+    it('updates the fee recipient', async () => {
+      const previousFeeState: any = await streamingFeeModule.feeStates(subjectSetToken);
+      expect(previousFeeState.feeRecipient).to.eq(feeRecipient);
+
+      await subject();
+
+      const newFeeState: any = await streamingFeeModule.feeStates(subjectSetToken);
+      expect(newFeeState.feeRecipient).to.eq(subjectNewFeeRecipientAddress);
+    });
+  });
 });
