@@ -549,7 +549,6 @@
 "@jest/types@^24.9.0":
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/@jest/types/-/types-24.9.0.tgz#63cb26cb7500d069e5a389441a7c6ab5e909fc59"
-  integrity sha512-XKK7ze1apu5JWQ5eZjHITP66AX+QsLlbaJRBGYr8pNzwcAE2JVkwnf0yqjHTsDRcjR0mujy/NmZMXw5kl+kGBw==
   dependencies:
     "@types/istanbul-lib-coverage" "^2.0.0"
     "@types/istanbul-reports" "^1.1.1"
@@ -1039,7 +1038,6 @@
 "@types/yargs@^13.0.0":
   version "13.0.10"
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-13.0.10.tgz#e77bf3fc73c781d48c2eb541f87c453e321e5f4b"
-  integrity sha512-MU10TSgzNABgdzKvQVW1nuuT+sgBMWeXNc3XOs5YXV5SDAK+PPja2eUuBNB9iqElu03xyEDqlnGw0jgl4nbqGQ==
   dependencies:
     "@types/yargs-parser" "*"
 
@@ -1768,7 +1766,6 @@ chai-as-promised@^7.1.1:
 chai-jest-mocks@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/chai-jest-mocks/-/chai-jest-mocks-1.2.4.tgz#d83b863de2b54ab774bcdf2252aace5fe99edb9c"
-  integrity sha512-3vDooUoGxto2AG4llcYk6BqZVvoO/NXl1lxEHItusXbCuqAY1+iSB9rybcsvkRWFoYBqBBvNDPA5fEoBxlY8MQ==
   dependencies:
     jest-matcher-utils "^24.8.0"
 
@@ -2410,7 +2407,6 @@ detect-node@2.0.3:
 diff-sequences@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/diff-sequences/-/diff-sequences-24.9.0.tgz#5715d6244e2aa65f48bba0bc972db0b0b11e95b5"
-  integrity sha512-Dj6Wk3tWyTE+Fo1rW8v0Xhwk80um6yFYKbuAxc9c3EZxIHFDYwbi34Uk42u1CdnIiVorvt4RmlSDjIPyzGC2ew==
 
 diff-sequences@^25.2.6:
   version "25.2.6"
@@ -4324,7 +4320,6 @@ jest-config@^26.2.2:
 jest-diff@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/jest-diff/-/jest-diff-24.9.0.tgz#931b7d0d5778a1baf7452cb816e325e3724055da"
-  integrity sha512-qMfrTs8AdJE2iqrTp0hzh7kTd2PQWrsFyj9tORoKmu32xjPjeE4NyjVRDz8ybYwqS2ik8N4hsIpiVTyFeo2lBQ==
   dependencies:
     chalk "^2.0.1"
     diff-sequences "^24.9.0"
@@ -4391,7 +4386,6 @@ jest-environment-node@^26.2.0:
 jest-get-type@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/jest-get-type/-/jest-get-type-24.9.0.tgz#1684a0c8a50f2e4901b6644ae861f579eed2ef0e"
-  integrity sha512-lUseMzAley4LhIcpSP9Jf+fTrQ4a1yHQwLNeeVa2cEmbCGeoZAtYPOIv8JaxLD/sUpKxetKGP+gsHl8f8TSj8Q==
 
 jest-get-type@^25.2.6:
   version "25.2.6"
@@ -4454,7 +4448,6 @@ jest-leak-detector@^26.2.0:
 jest-matcher-utils@^24.8.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/jest-matcher-utils/-/jest-matcher-utils-24.9.0.tgz#f5b3661d5e628dffe6dd65251dfdae0e87c3a073"
-  integrity sha512-OZz2IXsu6eaiMAwe67c1T+5tUAtQyQx27/EMEkbFAGiw52tB9em+uGbzpcgYVpA8wl0hlxKPZxrly4CXU/GjHA==
   dependencies:
     chalk "^2.0.1"
     jest-diff "^24.9.0"
@@ -6001,7 +5994,6 @@ prettier@^1.14.2:
 pretty-format@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/pretty-format/-/pretty-format-24.9.0.tgz#12fac31b37019a4eea3c11aa9a959eb7628aa7c9"
-  integrity sha512-00ZMZUiHaJrNfk33guavqgvfJS30sLYf0f8+Srklv0AMPodGGHcoHgksZ3OThYnIvOd+8yMCn0YiEOogjlgsnA==
   dependencies:
     "@jest/types" "^24.9.0"
     ansi-regex "^4.0.0"
@@ -6564,9 +6556,9 @@ set-blocking@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
 
-"set-protocol-v2@git+ssh://git@github.com/SetProtocol/set-protocol-v2.git#b96ce10e8c3b9ac7b8a07454e9d9a588f307bc43":
+"set-protocol-v2@git+ssh://git@github.com/SetProtocol/set-protocol-v2.git#59d62e16ecee32bb6c5dcc87dd47392cc3427171":
   version "0.0.1"
-  resolved "git+ssh://git@github.com/SetProtocol/set-protocol-v2.git#b96ce10e8c3b9ac7b8a07454e9d9a588f307bc43"
+  resolved "git+ssh://git@github.com/SetProtocol/set-protocol-v2.git#59d62e16ecee32bb6c5dcc87dd47392cc3427171"
   dependencies:
     "@nomiclabs/buidler" "^1.3.4"
     "@nomiclabs/buidler-ethers" "^1.3.3"

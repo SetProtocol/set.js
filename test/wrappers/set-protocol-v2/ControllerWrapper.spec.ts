@@ -7,10 +7,9 @@ import { Controller } from 'set-protocol-v2/dist/utils/contracts';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 
 import ControllerWrapper from '@src/wrappers/set-protocol-v2/ControllerWrapper';
-
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 import { expect } from '../../utils/chai';
 
+const provider = new ethers.providers.JsonRpcProvider();
 const blockchain = new Blockchain(provider);
 
 
@@ -28,7 +27,7 @@ describe('ControllerWrapper', () => {
 
   let deployer: DeployHelper;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     [
       owner,
       manager,
@@ -40,6 +39,11 @@ describe('ControllerWrapper', () => {
     ] = await provider.listAccounts();
 
     deployer = new DeployHelper(provider.getSigner(owner));
+  });
+
+  beforeEach(async () => {
+    await blockchain.saveSnapshotAsync();
+
     controller = await deployer.core.deployController(owner);
 
     const initialFactoryAddesses = [];
@@ -54,10 +58,6 @@ describe('ControllerWrapper', () => {
     );
 
     controllerWrapper = new ControllerWrapper(provider, controller.address);
-  });
-
-  beforeEach(async () => {
-    await blockchain.saveSnapshotAsync();
   });
 
   afterEach(async () => {

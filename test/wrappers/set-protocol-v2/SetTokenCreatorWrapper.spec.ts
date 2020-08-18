@@ -30,9 +30,10 @@ import {
 
 import { expect } from '@test/utils/chai';
 
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+const provider = new ethers.providers.JsonRpcProvider();
 const blockchain = new Blockchain(provider);
 const protocolUtils = new CreateProtocolUtils(provider);
+
 
 describe('SetTokenCreatorWrapper', () => {
   let owner: Address;
@@ -44,7 +45,7 @@ describe('SetTokenCreatorWrapper', () => {
 
   let deployer: DeployHelper;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     [
       owner,
       manager,
@@ -53,10 +54,12 @@ describe('SetTokenCreatorWrapper', () => {
       secondModuleAddress,
       invalidModuleAddress,
     ] = await provider.listAccounts();
+  });
+
+  beforeEach(async () => {
+    await blockchain.saveSnapshotAsync();
 
     deployer = new DeployHelper(provider.getSigner(owner));
-
-    await blockchain.saveSnapshotAsync();
   });
 
   afterEach(async () => {
