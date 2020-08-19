@@ -20,6 +20,7 @@ import { Provider } from 'ethers/providers';
 
 import { SetJSConfig } from './types';
 import Assertions from './assertions';
+import FeeAPI from '@src/api/FeeAPI';
 import IssuanceAPI from '@src/api/IssuanceAPI';
 import SetTokenAPI from '@src/api/SetTokenAPI';
 
@@ -33,6 +34,12 @@ import SetTokenAPI from '@src/api/SetTokenAPI';
  */
 class Set {
   private provider: Provider;
+
+  /**
+   * An instance of the FeeAPI class. Contains interface for interacting
+   * with Fee modules.
+   */
+  public fees: FeeAPI;
 
   /**
    * An instance of the SetTokenAPI class. Contains interface for interacting
@@ -54,8 +61,9 @@ class Set {
 
     const assertions = new Assertions(provider);
 
+    this.fees = new FeeAPI(provider, config.streamingFeeModuleAddress, assertions);
     this.setToken = new SetTokenAPI(provider, assertions);
-    this.issuance = new IssuanceAPI(provider, config.basicIssuanceModuleAddress);
+    this.issuance = new IssuanceAPI(provider, config.basicIssuanceModuleAddress, assertions);
   }
 }
 
