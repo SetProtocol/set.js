@@ -44,10 +44,10 @@ export default class BasicIssuanceModuleWrapper {
   /**
    * Issue a SetToken from its underlying positions
    *
-   * @param  setTokenAddress                 Address of the SetToken contract to issue
-   * @param  quantity                        Quantity to issue
-   * @param  setTokenRecipientAddress        Address of the recipient of the issuance
-   * @param  callerAddress Address of caller (optional)
+   * @param  setTokenAddress             Address of the SetToken contract to issue
+   * @param  quantity                    Quantity to issue
+   * @param  setTokenRecipientAddress    Address of the recipient of the issuance
+   * @param  callerAddress               Address of caller (optional)
    * @return                             Transaction hash of the issuance transaction
    */
   public async issue(

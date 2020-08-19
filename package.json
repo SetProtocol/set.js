@@ -99,6 +99,7 @@
             "/dist/",
             "/_versions/"
         ],
+        "testTimeout": 10000,
         "testURL": "http://localhost/",
         "moduleFileExtensions": [
             "ts",

@@ -44,8 +44,9 @@ export default class StreamingFeeModuleWrapper {
   /**
    * Calculates total inflation percentage then mints new Sets to the fee recipient.
    *
-   * @param  setTokenAddress  Address of the SetToken contract to issue
-   * @return                  Transaction hash of the issuance transaction
+   * @param  setTokenAddress    Address of the SetToken contract to issue
+   * @param  callerAddress      Address of caller (optional)
+   * @return                    Transaction hash of the issuance transaction
    */
   public async accrueFee(
     setTokenAddress: Address,
@@ -67,9 +68,10 @@ export default class StreamingFeeModuleWrapper {
   /**
    * Updates the streaming fee to a new streaming fee amount.
    *
-   * @param  setTokenAddress  Address of the SetToken contract to issue
-   * @param  newFee           The new streaming fee amount
-   * @return                  Transaction hash of the issuance transaction
+   * @param  setTokenAddress    Address of the SetToken contract to issue
+   * @param  newFee             The new streaming fee amount 18 decimal precision
+   * @param  callerAddress      Address of caller (optional)
+   * @return                    Transaction hash of the issuance transaction
    */
   public async updateStreamingFee(
     setTokenAddress: Address,
@@ -91,11 +93,12 @@ export default class StreamingFeeModuleWrapper {
   }
 
   /**
-   * Updates the recipient of the Set's fees.
+   * Updates the recipient address of the SetToken's streaming fees
    *
-   * @param  setTokenAddress      Address of the SetToken contract to issue
-   * @param  newRecipientAddress  The address of the new fee recipient
-   * @return                      Transaction hash of the issuance transaction
+   * @param  setTokenAddress        Address of the SetToken contract to issue
+   * @param  newRecipientAddress    The address of the new fee recipient
+   * @param  callerAddress          Address of caller (optional)
+   * @return                        Transaction hash of the issuance transaction
    */
   public async updateFeeRecipient(
     setTokenAddress: Address,
@@ -117,25 +120,18 @@ export default class StreamingFeeModuleWrapper {
   }
 
   /**
-   * Calculates total inflation percentage in order to accrue fees to manager.
+   * Calculates total inflation percentage in order to accrue fees to manager
    *
-   * @param  setTokenAddress  Address of the SetToken contract to issue
-   * @return                  Transaction hash of the issuance transaction
+   * @param  setTokenAddress    Address of the SetToken contract to issue
+   * @return                    Current unaccumulate fee amount in percentage of supply
    */
   public async getFee(
     setTokenAddress: Address,
-    callerAddress: Address = undefined,
-    txOpts: TransactionOverrides = {}
-  ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
+  ): Promise<BigNumber> {
     const streamingFeeModuleInstance = await this.contracts.loadStreamingFeeModuleAsync(
-      this.streamingFeeModuleAddress,
-      callerAddress
+      this.streamingFeeModuleAddress
     );
 
-    return await streamingFeeModuleInstance.getFee(
-      setTokenAddress,
-      txOptions
-    );
+    return await streamingFeeModuleInstance.getFee(setTokenAddress);
   }
 }
