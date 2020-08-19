@@ -20,9 +20,12 @@ import { Provider } from 'ethers/providers';
 
 import { SetJSConfig } from './types';
 import Assertions from './assertions';
-import FeeAPI from '@src/api/FeeAPI';
-import IssuanceAPI from '@src/api/IssuanceAPI';
-import SetTokenAPI from '@src/api/SetTokenAPI';
+import {
+  FeeAPI,
+  IssuanceAPI,
+  SetTokenAPI,
+  SystemAPI
+} from '@src/api/index';
 
 /**
  * @title Set
@@ -42,16 +45,22 @@ class Set {
   public fees: FeeAPI;
 
   /**
+   * An instance of the IssuanceAPI class. Contains interface for interacting
+   * with Issuance Modules to mint and redeem SetTokens.
+   */
+  public issuance: IssuanceAPI;
+
+  /**
    * An instance of the SetTokenAPI class. Contains interface for interacting
    * with Set Tokens.
    */
   public setToken: SetTokenAPI;
 
   /**
-   * An instance of the IssuanceAPI class. Contains interface for interacting
-   * with Issuance Modules to mint and redeem SetTokens.
+   * An instance of the SystemAPI class. Contains interface for interacting
+   * with the Controller contract to read system state
    */
-  public issuance: IssuanceAPI;
+  public system: SystemAPI;
 
   /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
@@ -62,8 +71,9 @@ class Set {
     const assertions = new Assertions(provider);
 
     this.fees = new FeeAPI(provider, config.streamingFeeModuleAddress, assertions);
-    this.setToken = new SetTokenAPI(provider, assertions);
     this.issuance = new IssuanceAPI(provider, config.basicIssuanceModuleAddress, assertions);
+    this.setToken = new SetTokenAPI(provider, assertions);
+    this.system = new SystemAPI(provider, config.controllerAddress, assertions);
   }
 }
 
