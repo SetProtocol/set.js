@@ -15,15 +15,17 @@
 */
 
 import { ethers } from 'ethers';
+import { Address, ContractTransaction, Position } from 'set-protocol-v2/utils/types';
 
-import { Address } from 'set-protocol-v2/utils/types';
 import SetTokenAPI from '@src/api/SetTokenAPI';
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
+import { ModuleState } from '@src/types';
 import { expect } from '@test/utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 jest.mock('@src/wrappers/set-protocol-v2/SetTokenWrapper');
+
 
 describe('SetTokenAPI', () => {
   let setAddress: Address;
@@ -33,7 +35,11 @@ describe('SetTokenAPI', () => {
   let setTokenWrapper: SetTokenWrapper;
 
   beforeEach(async () => {
-    [setAddress, moduleAddress, managerAddress] = await provider.listAccounts();
+    [
+      setAddress,
+      moduleAddress,
+      managerAddress,
+    ] = await provider.listAccounts();
 
     setTokenAPI = new SetTokenAPI(provider);
     setTokenWrapper = (SetTokenWrapper as any).mock.instances[0];
@@ -44,156 +50,424 @@ describe('SetTokenAPI', () => {
   });
 
   describe('#getControllerAddressAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.getControllerAddressAsync(setAddress);
+    let subjectSetTokenAddress: Address;
 
-      expect(setTokenWrapper.controller).to.have.beenCalledWith(setAddress);
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.getControllerAddressAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<Address> {
+      return await setTokenAPI.getControllerAddressAsync(
+        subjectSetTokenAddress
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenWrapper.controller).to.have.beenCalledWith(subjectSetTokenAddress);
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getManagerAddressAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.getManagerAddressAsync(setAddress);
+    let subjectSetTokenAddress: Address;
 
-      expect(setTokenWrapper.manager).to.have.beenCalledWith(setAddress);
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.getManagerAddressAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<Address> {
+      return await setTokenAPI.getManagerAddressAsync(
+        subjectSetTokenAddress
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenWrapper.manager).to.have.beenCalledWith(subjectSetTokenAddress);
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getPositionsAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.getPositionsAsync(setAddress);
+    let subjectSetTokenAddress: Address;
 
-      expect(setTokenWrapper.getPositions).to.have.beenCalledWith(setAddress, undefined);
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.getPositionsAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<Position[]> {
+      return await setTokenAPI.getPositionsAsync(
+        subjectSetTokenAddress
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenWrapper.getPositions).to.have.beenCalledWith(subjectSetTokenAddress);
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getModulesAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.getModulesAsync(setAddress);
+    let subjectSetTokenAddress: Address;
 
-      expect(setTokenWrapper.getModules).to.have.beenCalledWith(setAddress, undefined);
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.getModulesAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<Address[]> {
+      return await setTokenAPI.getModulesAsync(
+        subjectSetTokenAddress
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenWrapper.getModules).to.have.beenCalledWith(subjectSetTokenAddress);
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#getModuleStateAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.getModuleStateAsync(setAddress, moduleAddress);
+    let subjectSetTokenAddress: Address;
+    let subjectModuleAddress: Address;
+
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectModuleAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+    });
+
+    async function subject(): Promise<ModuleState> {
+      return await setTokenAPI.getModuleStateAsync(
+        subjectSetTokenAddress,
+        subjectModuleAddress
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
 
       expect(setTokenWrapper.moduleStates).to.have.beenCalledWith(
-        setAddress,
-        moduleAddress,
-        undefined,
+        subjectSetTokenAddress,
+        subjectModuleAddress,
       );
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.getModuleStateAsync('InvalidAddress', 'InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#addModuleAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.addModuleAsync(setAddress, moduleAddress);
+    let subjectSetTokenAddress: Address;
+    let subjectModuleAddress: Address;
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions = {};
+
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectModuleAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<ContractTransaction> {
+      return await setTokenAPI.addModuleAsync(
+        subjectSetTokenAddress,
+        subjectModuleAddress,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
 
       expect(setTokenWrapper.addModule).to.have.beenCalledWith(
-        setAddress,
-        moduleAddress,
-        undefined,
-        {}
+        subjectSetTokenAddress,
+        subjectModuleAddress,
+        subjectCallerAddress,
+        subjectTransactionOptions
       );
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.addModuleAsync('InvalidAddress', 'InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#setManagerAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.setManagerAsync(setAddress, managerAddress);
+    let subjectSetTokenAddress: Address;
+    let subjectManagerAddress: Address;
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions = {};
+
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectManagerAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<ContractTransaction> {
+      return await setTokenAPI.setManagerAsync(
+        subjectSetTokenAddress,
+        subjectManagerAddress,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
 
       expect(setTokenWrapper.setManager).to.have.beenCalledWith(
-        setAddress,
-        managerAddress,
-        undefined,
-        {}
+        subjectSetTokenAddress,
+        subjectManagerAddress,
+        subjectCallerAddress,
+        subjectTransactionOptions
       );
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.addModuleAsync('InvalidAddress', 'InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#initializeModuleAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.initializeModuleAsync(setAddress);
+    let subjectSetTokenAddress: Address;
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions = {};
 
-      expect(setTokenWrapper.initializeModule).to.have.beenCalledWith(setAddress, undefined, {});
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectTransactionOptions = {};
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.initializeModuleAsync('InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<ContractTransaction> {
+      return await setTokenAPI.initializeModuleAsync(
+        subjectSetTokenAddress,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenWrapper.initializeModule).to.have.beenCalledWith(
+        subjectSetTokenAddress,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#isModuleEnabledAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.isModuleEnabledAsync(setAddress, moduleAddress);
+    let subjectSetTokenAddress: Address;
+    let subjectModuleAddress: Address;
 
-      expect(setTokenWrapper.isModule).to.have.beenCalledWith(setAddress, moduleAddress, undefined);
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectModuleAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.isModuleEnabledAsync('InvalidAddress', 'InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<boolean> {
+      return await setTokenAPI.isModuleEnabledAsync(
+        subjectSetTokenAddress,
+        subjectModuleAddress
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenWrapper.isModule).to.have.beenCalledWith(
+        subjectSetTokenAddress,
+        subjectModuleAddress,
+      );
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the module address is invalid', () => {
+      beforeEach(async () => {
+        subjectModuleAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+  });
+
+  describe('#isModuleEnabledAsync', () => {
+    let subjectSetTokenAddress: Address;
+    let subjectModuleAddress: Address;
+
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectModuleAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
+    });
+
+    async function subject(): Promise<boolean> {
+      return await setTokenAPI.isModuleEnabledAsync(
+        subjectSetTokenAddress,
+        subjectModuleAddress
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenWrapper.isModule).to.have.beenCalledWith(
+        subjectSetTokenAddress,
+        subjectModuleAddress,
+      );
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the module address is invalid', () => {
+      beforeEach(async () => {
+        subjectModuleAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 
   describe('#isModulePendingAsync', () => {
-    it('should call the Set Token Wrapper with correct params', async () => {
-      setTokenAPI.isModulePendingAsync(setAddress, moduleAddress);
+    let subjectSetTokenAddress: Address;
+    let subjectModuleAddress: Address;
 
-      expect(setTokenWrapper.isPendingModule).to.have.beenCalledWith(setAddress, moduleAddress, undefined);
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectModuleAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
     });
 
-    it('should throw with invalid params', async () => {
-      await expect(
-        setTokenAPI.isModulePendingAsync('InvalidAddress', 'InvalidAddress')
-      ).to.be.rejectedWith('Validation error');
+    async function subject(): Promise<boolean> {
+      return await setTokenAPI.isModulePendingAsync(
+        subjectSetTokenAddress,
+        subjectModuleAddress
+      );
+    }
+
+    it('should call the SetTokenWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenWrapper.isPendingModule).to.have.beenCalledWith(
+        subjectSetTokenAddress,
+        subjectModuleAddress,
+      );
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the module address is invalid', () => {
+      beforeEach(async () => {
+        subjectModuleAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
     });
   });
 });

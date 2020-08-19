@@ -69,32 +69,28 @@ export default class SetTokenAPI {
    * Gets all current positions on the target Set Token.
    *
    * @param  setAddress      Address of the Set.
-   * @param  callerAddress   Address of the method caller.
    * @return                 Array of current Set Positions.
    */
   public async getPositionsAsync(
-    setAddress: Address,
-    callerAddress?: Address
+    setAddress: Address
   ): Promise<Position[]> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return this.setTokenWrapper.getPositions(setAddress, callerAddress);
+    return this.setTokenWrapper.getPositions(setAddress);
   }
 
   /**
    * Returns a list of modules for the target Set Token.
    *
    * @param  setAddress      Address of the Set.
-   * @param  callerAddress   Address of caller (optional).
    * @return                 Array of module addresses.
    */
   public async getModulesAsync(
-    setAddress: Address,
-    callerAddress?: Address
+    setAddress: Address
   ): Promise<Address[]> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return this.setTokenWrapper.getModules(setAddress, callerAddress);
+    return this.setTokenWrapper.getModules(setAddress);
   }
 
   /**
@@ -102,18 +98,16 @@ export default class SetTokenAPI {
    *
    * @param  setAddress      Address of the Set.
    * @param  moduleAddress   Address of the module state to check.
-   * @param  callerAddress   Address of caller (optional).
    * @return                 An integer representing module state.
    */
   public async getModuleStateAsync(
     setAddress: Address,
     moduleAddress: Address,
-    callerAddress?: Address
   ): Promise<ModuleState> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return this.setTokenWrapper.moduleStates(setAddress, moduleAddress, callerAddress);
+    return this.setTokenWrapper.moduleStates(setAddress, moduleAddress);
   }
 
   /**
@@ -163,7 +157,7 @@ export default class SetTokenAPI {
    *
    * @param  setAddress    Address Set to issue.
    * @param  callerAddress Address of caller (optional).
-   * @param  txOpts     Overrides for transaction (optional).
+   * @param  txOpts        Overrides for transaction (optional).
    * @return               Contract transaction.
    */
   public async initializeModuleAsync(
@@ -181,18 +175,16 @@ export default class SetTokenAPI {
    *
    * @param  setAddress     Address of Set to check
    * @param  moduleAddress  Address of potential module
-   * @param  callerAddress  Address of caller (optional)
    * @return                boolean
    */
   public async isModuleEnabledAsync(
     setAddress: Address,
-    moduleAddress: Address,
-    callerAddress?: Address
+    moduleAddress: Address
   ): Promise<boolean> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return this.setTokenWrapper.isModule(setAddress, moduleAddress, callerAddress);
+    return this.setTokenWrapper.isModule(setAddress, moduleAddress);
   }
 
   /**
@@ -200,17 +192,15 @@ export default class SetTokenAPI {
    *
    * @param  setAddress    Address of Set to check
    * @param  moduleAddress Address of module
-   * @param  callerAddress Address of caller (optional)
    * @return               boolean
    */
   public async isModulePendingAsync(
     setAddress: Address,
-    moduleAddress: Address,
-    callerAddress?: Address
+    moduleAddress: Address
   ): Promise<boolean> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return this.setTokenWrapper.isPendingModule(setAddress, moduleAddress, callerAddress);
+    return this.setTokenWrapper.isPendingModule(setAddress, moduleAddress);
   }
 }
