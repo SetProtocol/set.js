@@ -1,3 +1,5 @@
+import 'module-alias/register';
+
 import Set from './Set';
 export {
   SetJSConfig,
