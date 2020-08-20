@@ -1,4 +1,4 @@
-import 'module-alias/register';
+require('module-alias')(__dirname);
 
 import Set from './Set';
 export {
