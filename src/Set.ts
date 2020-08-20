@@ -21,6 +21,7 @@ import { Provider } from 'ethers/providers';
 import { SetJSConfig } from './types';
 import Assertions from './assertions';
 import {
+  ERC20API,
   FeeAPI,
   IssuanceAPI,
   SetTokenAPI,
@@ -36,28 +37,32 @@ import {
  * of Set with the web3 provider argument
  */
 class Set {
-  private provider: Provider;
+  /**
+   * An instance of the ERC20API class. Contains interfaces for interacting
+   * with standard ERC20 methods such as name and symbol.
+   */
+  public erc20: ERC20API;
 
   /**
-   * An instance of the FeeAPI class. Contains interface for interacting
+   * An instance of the FeeAPI class. Contains interfaces for interacting
    * with Fee modules.
    */
   public fees: FeeAPI;
 
   /**
-   * An instance of the IssuanceAPI class. Contains interface for interacting
+   * An instance of the IssuanceAPI class. Contains interfaces for interacting
    * with Issuance Modules to mint and redeem SetTokens.
    */
   public issuance: IssuanceAPI;
 
   /**
-   * An instance of the SetTokenAPI class. Contains interface for interacting
+   * An instance of the SetTokenAPI class. Contains interfaces for interacting
    * with Set Tokens.
    */
   public setToken: SetTokenAPI;
 
   /**
-   * An instance of the SystemAPI class. Contains interface for interacting
+   * An instance of the SystemAPI class. Contains interfaces for interacting
    * with the Controller contract to read system state
    */
   public system: SystemAPI;
@@ -66,10 +71,9 @@ class Set {
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(provider: Provider, config: SetJSConfig) {
-    this.provider = provider;
-
     const assertions = new Assertions(provider);
 
+    this.erc20 = new ERC20API(provider, assertions);
     this.fees = new FeeAPI(provider, config.streamingFeeModuleAddress, assertions);
     this.issuance = new IssuanceAPI(provider, config.basicIssuanceModuleAddress, assertions);
     this.setToken = new SetTokenAPI(provider, assertions);
