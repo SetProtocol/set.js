@@ -16,8 +16,8 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
 

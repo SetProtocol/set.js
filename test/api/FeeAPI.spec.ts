@@ -16,7 +16,7 @@
 
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import FeeAPI from '@src/api/FeeAPI';
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';

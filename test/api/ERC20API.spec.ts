@@ -16,8 +16,8 @@
 
 import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
-import { ether } from 'set-protocol-v2/dist/utils/common';
-import { Address } from 'set-protocol-v2/utils/types';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import ERC20API from '@src/api/ERC20API';
 import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';

@@ -1,10 +1,10 @@
 import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
-import { Address } from 'set-protocol-v2/utils/types';
-import { Blockchain } from 'set-protocol-v2/dist/utils/common';
-import { Controller } from 'set-protocol-v2/dist/utils/contracts';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { Address } from '@setprotocol/set-protocol-v2/dist/utils/types';
+import { Blockchain } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import { Controller } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import ControllerWrapper from '@src/wrappers/set-protocol-v2/ControllerWrapper';
 import { expect } from '../../utils/chai';

@@ -1,8 +1,8 @@
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
-import { Address, NAVIssuanceSettings } from 'set-protocol-v2/utils/types';
-import { ONE, TWO, THREE, ZERO, ADDRESS_ZERO } from 'set-protocol-v2/dist/utils/constants';
+import { Address, NAVIssuanceSettings } from '@setprotocol/set-protocol-v2/utils/types';
+import { ONE, TWO, THREE, ZERO, ADDRESS_ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import {
   Blockchain,
   ether,
@@ -16,15 +16,15 @@ import {
   getExpectedReserveRedeemQuantity,
   getExpectedRedeemPositionMultiplier,
   getExpectedRedeemPositionUnit
-} from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
-import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
+} from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
+import { Erc20Factory } from '@setprotocol/set-protocol-v2/dist/typechain/Erc20Factory';
 import {
   NAVIssuanceModule,
   ManagerIssuanceHookMock,
   SetToken,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import NAVIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/NavIssuanceModuleWrapper';
 import { expect } from '../../utils/chai';

@@ -1,22 +1,22 @@
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
-import { Address, StreamingFeeState } from 'set-protocol-v2/utils/types';
-import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from 'set-protocol-v2/dist/utils/constants';
+import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
+import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import {
   Blockchain,
   ether,
   getStreamingFee,
   getStreamingFeeInflationAmount,
   preciseMul,
-} from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
+} from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
 import {
   BasicIssuanceModule,
   StreamingFeeModule,
   SetToken,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import { expect } from '../../utils/chai';

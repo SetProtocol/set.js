@@ -18,8 +18,8 @@
 
 import { ContractTransaction } from 'ethers';
 import { Provider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber, Arrayish } from 'ethers/utils';
 
 import TradeModuleWrapper from '../wrappers/set-protocol-v2/TradeModuleWrapper';

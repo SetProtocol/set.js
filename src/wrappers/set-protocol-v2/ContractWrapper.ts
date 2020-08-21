@@ -18,8 +18,8 @@
 
 import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Contract, Signer } from 'ethers';
-import { Address } from 'set-protocol-v2/utils/types';
 
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import {
   BasicIssuanceModule,
   Controller,
@@ -31,17 +31,17 @@ import {
   TradeModule,
   NavIssuanceModule,
   PriceOracle,
-} from 'set-protocol-v2/dist/utils/contracts';
-import { BasicIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
-import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
-import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
-import { ProtocolViewerFactory } from 'set-protocol-v2/dist/typechain/ProtocolViewerFactory';
-import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
-import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
-import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
-import { TradeModuleFactory } from 'set-protocol-v2/dist/typechain/TradeModuleFactory';
-import { NavIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/NavIssuanceModuleFactory';
-import { PriceOracleFactory } from 'set-protocol-v2/dist/typechain/PriceOracleFactory';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+import { BasicIssuanceModuleFactory } from '@setprotocol/set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
+import { ControllerFactory } from '@setprotocol/set-protocol-v2/dist/typechain/ControllerFactory';
+import { Erc20Factory } from '@setprotocol/set-protocol-v2/dist/typechain/Erc20Factory';
+import { ProtocolViewerFactory } from '@setprotocol/set-protocol-v2/dist/typechain/ProtocolViewerFactory';
+import { SetTokenFactory } from '@setprotocol/set-protocol-v2/dist/typechain/SetTokenFactory';
+import { SetTokenCreatorFactory } from '@setprotocol/set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
+import { StreamingFeeModuleFactory } from '@setprotocol/set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
+import { TradeModuleFactory } from '@setprotocol/set-protocol-v2/dist/typechain/TradeModuleFactory';
+import { NavIssuanceModuleFactory } from '@setprotocol/set-protocol-v2/dist/typechain/NavIssuanceModuleFactory';
+import { PriceOracleFactory } from '@setprotocol/set-protocol-v2/dist/typechain/PriceOracleFactory';
 
 /**
  * @title ContractWrapper

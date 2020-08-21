@@ -17,7 +17,7 @@
 'use strict';
 
 import { Provider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { BigNumber } from 'ethers/utils';
 
 import PriceOracleWrapper from '../wrappers/set-protocol-v2/PriceOracleWrapper';

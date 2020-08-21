@@ -18,7 +18,7 @@
 
 import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import ContractWrapper from './ContractWrapper';
 

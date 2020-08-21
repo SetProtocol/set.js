@@ -16,8 +16,8 @@
 
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
-import { ether } from 'set-protocol-v2/dist/utils/common';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import NavIssuanceAPI from '@src/api/NavIssuanceAPI';
 import NavIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/NavIssuanceModuleWrapper';

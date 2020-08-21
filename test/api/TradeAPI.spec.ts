@@ -16,9 +16,9 @@
 
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber, Arrayish } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
-import { EMPTY_BYTES } from 'set-protocol-v2/dist/utils/constants';
-import { ether } from 'set-protocol-v2/dist/utils/common';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { EMPTY_BYTES } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import TradeAPI from '@src/api/TradeAPI';
 import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
