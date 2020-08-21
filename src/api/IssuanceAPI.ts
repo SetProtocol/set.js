@@ -18,12 +18,12 @@
 
 import { ContractTransaction } from 'ethers';
 import { Provider } from 'ethers/providers';
-import { Address, Position } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
+import { Address, Position } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 
-import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
-import Assertions from '@src/assertions';
+import BasicIssuanceModuleWrapper from '../wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
+import Assertions from '../assertions';
 
 /**
  * @title  IssuanceAPI

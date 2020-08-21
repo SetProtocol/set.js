@@ -16,7 +16,7 @@
 
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import FeeAPI from '@src/api/FeeAPI';
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
@@ -57,7 +57,7 @@ describe('FeeAPI', () => {
     (ProtocolViewerWrapper as any).mockClear();
   });
 
-  describe('#batchFetchStreamingFeeInfo', () => {
+  describe('#batchFetchStreamingFeeInfoAsync', () => {
     let subjectSetTokenAddress1: Address;
     let subjectSetTokenAddress2: Address;
 
@@ -67,7 +67,7 @@ describe('FeeAPI', () => {
     });
 
     async function subject(): Promise<StreamingFeeInfo[]> {
-      return await feeAPI.batchFetchStreamingFeeInfo(
+      return await feeAPI.batchFetchStreamingFeeInfoAsync(
         [subjectSetTokenAddress1, subjectSetTokenAddress2]
       );
     }

@@ -13,12 +13,12 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { ContractTransaction } from 'ethers';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
-import { generateTxOpts } from '@src/utils/transactions';
+import { generateTxOpts } from '../../utils/transactions';
 
 import ContractWrapper from './ContractWrapper';
 

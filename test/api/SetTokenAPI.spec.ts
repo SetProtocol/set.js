@@ -15,7 +15,7 @@
 */
 
 import { ethers } from 'ethers';
-import { Address, ContractTransaction, Position } from 'set-protocol-v2/utils/types';
+import { Address, ContractTransaction, Position } from '@setprotocol/set-protocol-v2/utils/types';
 
 import SetTokenAPI from '@src/api/SetTokenAPI';
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
@@ -57,7 +57,7 @@ describe('SetTokenAPI', () => {
     (ProtocolViewerWrapper as any).mockClear();
   });
 
-  describe('#batchFetchManagers', () => {
+  describe('#batchFetchManagersAsync', () => {
     let subjectSetTokenAddress1: Address;
     let subjectSetTokenAddress2: Address;
     let setTokenAddresses: Address[];
@@ -69,7 +69,7 @@ describe('SetTokenAPI', () => {
     });
 
     async function subject(): Promise<Address[]> {
-      return await setTokenAPI.batchFetchManagers(setTokenAddresses);
+      return await setTokenAPI.batchFetchManagersAsync(setTokenAddresses);
     }
 
     it('should call the ProtocolViewerWrapper with correct params', async () => {

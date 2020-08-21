@@ -26,7 +26,7 @@ import {
   IssuanceAPI,
   SetTokenAPI,
   SystemAPI
-} from '@src/api/index';
+} from './api/index';
 
 const ethersProviders = require('ethers').providers;
 

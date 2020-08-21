@@ -17,9 +17,9 @@
 import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
-import { Address } from 'set-protocol-v2/utils/types';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { Blockchain, ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
 
 import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 import { expect } from '../../utils/chai';

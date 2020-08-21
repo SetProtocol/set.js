@@ -1,15 +1,15 @@
 import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
-import { Address, StreamingFeeState } from 'set-protocol-v2/utils/types';
-import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from 'set-protocol-v2/dist/utils/constants';
-import { Blockchain, ether, getStreamingFee } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
+import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
+import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import { Blockchain, ether, getStreamingFee } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
 import {
   ProtocolViewer,
   SetToken,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
 import { expect } from '../../utils/chai';

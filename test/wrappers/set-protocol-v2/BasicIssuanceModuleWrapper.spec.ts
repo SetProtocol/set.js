@@ -1,15 +1,15 @@
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
-import { Address } from 'set-protocol-v2/utils/types';
-import { ADDRESS_ZERO, ZERO } from 'set-protocol-v2/dist/utils/constants';
-import { Blockchain, ether, bitcoin } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
+import { Address } from '@setprotocol/set-protocol-v2/dist/utils/types';
+import { ADDRESS_ZERO, ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import { Blockchain, ether, bitcoin } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
 import {
   BasicIssuanceModule,
   SetToken,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
 import { expect } from '../../utils/chai';

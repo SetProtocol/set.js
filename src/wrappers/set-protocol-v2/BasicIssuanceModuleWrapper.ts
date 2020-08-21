@@ -13,12 +13,12 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { ContractTransaction } from 'ethers';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
-import { generateTxOpts } from '@src/utils/transactions';
+import { generateTxOpts } from '../../utils/transactions';
 
 import ContractWrapper from './ContractWrapper';
 
@@ -76,7 +76,7 @@ export default class BasicIssuanceModuleWrapper {
    *
    * @param  setTokenAddress  Address of the SetToken contract
    * @param  quantity         Quantity to issue
-   * @param  recipient        Address of recipient of tokens
+   * @param  to               Address of recipient
    * @param  callerAddress    Address of caller (optional)
    * @return                  Transaction hash of the redemption transaction
    */

@@ -16,8 +16,8 @@
 
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
-import { ether } from 'set-protocol-v2/dist/utils/common';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import IssuanceAPI from '@src/api/IssuanceAPI';
 import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';

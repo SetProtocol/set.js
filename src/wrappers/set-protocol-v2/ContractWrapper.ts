@@ -18,22 +18,22 @@
 
 import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Contract, Signer } from 'ethers';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
-import { BasicIssuanceModule } from 'set-protocol-v2/dist/utils/contracts';
-import { BasicIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
-import { Controller } from 'set-protocol-v2/dist/utils/contracts';
-import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
-import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
-import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
-import { ProtocolViewer } from 'set-protocol-v2/dist/utils/contracts';
-import { ProtocolViewerFactory } from 'set-protocol-v2/dist/typechain/ProtocolViewerFactory';
-import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
-import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
-import { SetTokenCreator } from 'set-protocol-v2/dist/utils/contracts';
-import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
-import { StreamingFeeModule } from 'set-protocol-v2/dist/typechain/StreamingFeeModule';
-import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
+import { BasicIssuanceModule } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+import { BasicIssuanceModuleFactory } from '@setprotocol/set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
+import { Controller } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+import { ControllerFactory } from '@setprotocol/set-protocol-v2/dist/typechain/ControllerFactory';
+import { ERC20 } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+import { Erc20Factory } from '@setprotocol/set-protocol-v2/dist/typechain/Erc20Factory';
+import { ProtocolViewer } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+import { ProtocolViewerFactory } from '@setprotocol/set-protocol-v2/dist/typechain/ProtocolViewerFactory';
+import { SetToken } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+import { SetTokenFactory } from '@setprotocol/set-protocol-v2/dist/typechain/SetTokenFactory';
+import { SetTokenCreator } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+import { SetTokenCreatorFactory } from '@setprotocol/set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
+import { StreamingFeeModule } from '@setprotocol/set-protocol-v2/dist/typechain/StreamingFeeModule';
+import { StreamingFeeModuleFactory } from '@setprotocol/set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
 
 /**
  * @title ContractWrapper
