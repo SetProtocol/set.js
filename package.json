@@ -22,7 +22,7 @@
         "test:watch": "jest --watch --runInBand",
         "tslint": "tslint -c tslint.json -p tsconfig.json",
         "precommit": "lint-staged",
-        "prepare": "yarn build",
+        "preinstall": "yarn build",
         "docs": "bash scripts/docs/generate_docs.sh",
         "prepublishOnly": "yarn build"
     },
