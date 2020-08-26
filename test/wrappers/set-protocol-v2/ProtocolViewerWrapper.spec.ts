@@ -21,7 +21,6 @@ describe('ProtocolViewerWrapper', () => {
   let owner: Address;
   let managerOne: Address;
   let managerTwo: Address;
-  let functionCaller: Address;
   let dummyModule: Address;
 
   let protocolViewer: ProtocolViewer;
@@ -40,7 +39,6 @@ describe('ProtocolViewerWrapper', () => {
       managerOne,
       managerTwo,
       dummyModule,
-      functionCaller,
     ] = await provider.listAccounts();
 
     deployer = new DeployHelper(provider.getSigner(owner));
@@ -51,8 +49,9 @@ describe('ProtocolViewerWrapper', () => {
     await blockchain.saveSnapshotAsync();
 
     await setup.initialize();
+    await setup.controller.addModule(dummyModule);
 
-    protocolViewer = await deployer.modules.deployProtocolViewer();
+    protocolViewer = await deployer.viewers.deployProtocolViewer();
     protocolViewerWrapper = new ProtocolViewerWrapper(
       provider,
       protocolViewer.address,
@@ -103,13 +102,15 @@ describe('ProtocolViewerWrapper', () => {
 
   describe('#batchFetchManagers', () => {
     let subjectSetTokens: Address[];
+    let subjectCaller: Address;
 
     beforeEach(async () => {
       subjectSetTokens = [setTokenOne, setTokenTwo];
+      subjectCaller = owner;
     });
 
-    async function subject(): Promise<any> {
-      return protocolViewerWrapper.batchFetchManagers(subjectSetTokens);
+    async function subject(): Promise<Address[]> {
+      return protocolViewerWrapper.batchFetchManagers(subjectSetTokens, subjectCaller);
     }
 
     it('should return the correct managers', async () => {

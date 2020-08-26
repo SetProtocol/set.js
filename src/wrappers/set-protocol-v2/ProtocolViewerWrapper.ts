@@ -57,7 +57,7 @@ export default class ProtocolViewerWrapper {
       (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
 
-    return await protocolViewerInstance.batchFetchManagers.callAsync(tokenAddresses);
+    return await protocolViewerInstance.batchFetchManagers(tokenAddresses);
   }
 
   /**
@@ -75,7 +75,7 @@ export default class ProtocolViewerWrapper {
       (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
 
-    return await protocolViewerInstance.batchFetchStreamingFeeInfo.callAsync(
+    return await protocolViewerInstance.batchFetchStreamingFeeInfo(
       this.streamingFeeModuleAddress,
       tokenAddresses
     );
