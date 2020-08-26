@@ -26,6 +26,8 @@ import { Controller } from 'set-protocol-v2/dist/utils/contracts';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
 import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
 import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
+import { ProtocolViewer } from 'set-protocol-v2/dist/utils/contracts';
+import { ProtocolViewerFactory } from 'set-protocol-v2/dist/typechain/ProtocolViewerFactory';
 import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
 import { SetTokenCreator } from 'set-protocol-v2/dist/utils/contracts';
@@ -206,6 +208,32 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = streamingFeeModuleContract;
       return streamingFeeModuleContract;
+    }
+  }
+
+  /**
+   * Load ProtocolViewer contract
+   *
+   * @param  protocolViewerAddress  Address of the ProtocolViewer contract
+   * @param  signer                 Caller of the methods
+   * @return                        The ProtocolViewer Contract
+   */
+  public async loadProtocolViewerContractAsync(
+    protocolViewerAddress: Address,
+    signer: Signer,
+  ): ProtocolViewer {
+    const cacheKey = `ProtocolViewer_${protocolViewerAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as ProtocolViewer;
+    } else {
+      const protocolViewerContract = ProtocolViewerFactory.connect(
+        protocolViewerAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = protocolViewerContract;
+      return protocolViewerContract;
     }
   }
 }
