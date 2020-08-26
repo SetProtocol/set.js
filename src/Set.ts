@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { provider as Web3Provider } from 'web3-core';
+import { provider as Web3CoreProvider } from 'web3-core';
 
 import { SetJSConfig } from './types';
 import Assertions from './assertions';
@@ -72,7 +72,7 @@ class Set {
   /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
-  constructor(provider: Web3Provider, config: SetJSConfig) {
+  constructor(provider: Web3CoreProvider, config: SetJSConfig) {
     const ethersProvider = new ethersProviders.Web3Provider(provider);
     const assertions = new Assertions(provider);
 
