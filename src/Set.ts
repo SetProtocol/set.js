@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { Provider } from 'ethers/providers';
+import { provider as Web3CoreProvider } from 'web3-core';
 
 import { SetJSConfig } from './types';
 import Assertions from './assertions';
@@ -27,6 +27,8 @@ import {
   SetTokenAPI,
   SystemAPI
 } from '@src/api/index';
+
+const ethersProviders = require('ethers').providers;
 
 /**
  * @title Set
@@ -70,14 +72,15 @@ class Set {
   /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
-  constructor(provider: Provider, config: SetJSConfig) {
+  constructor(provider: Web3CoreProvider, config: SetJSConfig) {
+    const ethersProvider = new ethersProviders.Web3Provider(provider);
     const assertions = new Assertions(provider);
 
-    this.erc20 = new ERC20API(provider, assertions);
-    this.fees = new FeeAPI(provider, config.streamingFeeModuleAddress, assertions);
-    this.issuance = new IssuanceAPI(provider, config.basicIssuanceModuleAddress, assertions);
-    this.setToken = new SetTokenAPI(provider, assertions);
-    this.system = new SystemAPI(provider, config.controllerAddress, assertions);
+    this.erc20 = new ERC20API(ethersProvider, assertions);
+    this.fees = new FeeAPI(ethersProvider, config.streamingFeeModuleAddress, assertions);
+    this.issuance = new IssuanceAPI(ethersProvider, config.basicIssuanceModuleAddress, assertions);
+    this.setToken = new SetTokenAPI(ethersProvider, assertions);
+    this.system = new SystemAPI(ethersProvider, config.controllerAddress, assertions);
   }
 }
 
