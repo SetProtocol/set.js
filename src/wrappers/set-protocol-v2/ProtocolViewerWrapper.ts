@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { Provider } from 'ethers/providers';
+import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Address } from 'set-protocol-v2/utils/types';
 
 import ContractWrapper from './ContractWrapper';
@@ -54,7 +54,7 @@ export default class ProtocolViewerWrapper {
   ): Promise<Address[]> {
     const protocolViewerInstance = await this.contracts.loadProtocolViewerContractAsync(
       this.protocolViewerAddress,
-      this.provider.getSigner(callerAddress)
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
 
     return await protocolViewerInstance.batchFetchManagers.callAsync(tokenAddresses);
@@ -72,7 +72,7 @@ export default class ProtocolViewerWrapper {
   ): Promise<Address[]> {
     const protocolViewerInstance = await this.contracts.loadProtocolViewerContractAsync(
       this.protocolViewerAddress,
-      this.provider.getSigner(callerAddress)
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
 
     return await protocolViewerInstance.batchFetchStreamingFeeInfo.callAsync(
