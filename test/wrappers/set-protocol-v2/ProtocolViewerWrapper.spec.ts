@@ -1,8 +1,9 @@
 import { ethers } from 'ethers';
+import { BigNumber } from 'ethers/utils';
 
 import { Address, StreamingFeeState } from 'set-protocol-v2/utils/types';
-import { ADDRESS_ZERO, ZERO } from 'set-protocol-v2/dist/utils/constants';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
+import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from 'set-protocol-v2/dist/utils/constants';
+import { Blockchain, ether, getStreamingFee } from 'set-protocol-v2/dist/utils/common';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
 import {
@@ -85,14 +86,14 @@ describe('ProtocolViewerWrapper', () => {
       lastStreamingFeeTimestamp: ZERO,
     } as StreamingFeeState;
     await setup.streamingFeeModule.connect(provider.getSigner(managerOne)).initialize(
-      setTokenOne, streamingFeeStateOne
+      setTokenOne.address, streamingFeeStateOne
     );
     await setup.streamingFeeModule.connect(provider.getSigner(managerTwo)).initialize(
-      setTokenTwo, streamingFeeStateTwo
+      setTokenTwo.address, streamingFeeStateTwo
     );
 
     await setup.issuanceModule.connect(provider.getSigner(managerOne)).initialize(
-      setTokenOne, ADDRESS_ZERO
+      setTokenOne.address, ADDRESS_ZERO
     );
   });
 
@@ -105,7 +106,7 @@ describe('ProtocolViewerWrapper', () => {
     let subjectCaller: Address;
 
     beforeEach(async () => {
-      subjectSetTokens = [setTokenOne, setTokenTwo];
+      subjectSetTokens = [setTokenOne.address, setTokenTwo.address];
       subjectCaller = owner;
     });
 
@@ -118,6 +119,53 @@ describe('ProtocolViewerWrapper', () => {
 
       expect(managers[0]).to.eq(managerOne);
       expect(managers[1]).to.eq(managerTwo);
+    });
+  });
+
+  describe('#batchFetchStreamingFeeInfo', () => {
+    let subjectStreamingFeeModule: Address;
+    let subjectSetTokens: Address[];
+
+    let subjectTimeFastForward: BigNumber;
+
+    beforeEach(async () => {
+      subjectStreamingFeeModule = setup.streamingFeeModule.address;
+      subjectSetTokens = [setTokenOne.address, setTokenTwo.address];
+      subjectTimeFastForward = ONE_YEAR_IN_SECONDS;
+    });
+
+    async function subject(): Promise<any> {
+      await blockchain.increaseTimeAsync(subjectTimeFastForward);
+      return protocolViewerWrapper.batchFetchStreamingFeeInfo(subjectSetTokens);
+    }
+
+    it('should return the correct streaming fee info', async () => {
+      const feeStateOne = await setup.streamingFeeModule.feeStates(subjectSetTokens[0]);
+      const feeStateTwo = await setup.streamingFeeModule.feeStates(subjectSetTokens[1]);
+
+      const [setOneFeeInfo, setTwoFeeInfo] = await subject();
+
+      const callTimestamp = new BigNumber((await provider.getBlock('latest')).timestamp);
+
+      const expectedFeePercentOne = await getStreamingFee(
+        setup.streamingFeeModule,
+        subjectSetTokens[0],
+        feeStateOne.lastStreamingFeeTimestamp,
+        callTimestamp
+      );
+      const expectedFeePercentTwo = await getStreamingFee(
+        setup.streamingFeeModule,
+        subjectSetTokens[1],
+        feeStateTwo.lastStreamingFeeTimestamp,
+        callTimestamp
+      );
+
+      expect(setOneFeeInfo.feeRecipient).to.eq(managerOne);
+      expect(setTwoFeeInfo.feeRecipient).to.eq(managerTwo);
+      expect(setOneFeeInfo.streamingFeePercentage.toString()).to.eq(ether(.02).toString());
+      expect(setTwoFeeInfo.streamingFeePercentage.toString()).to.eq(ether(.04).toString());
+      expect(setOneFeeInfo.unaccruedFees.toString()).to.eq(expectedFeePercentOne.toString());
+      expect(setTwoFeeInfo.unaccruedFees.toString()).to.eq(expectedFeePercentTwo.toString());
     });
   });
 });
