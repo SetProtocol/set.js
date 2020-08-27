@@ -24,6 +24,7 @@ import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
 import Assertions from '@src/assertions';
 import { ModuleState } from '@src/types';
+import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
 
 /**
  * @title  SetTokenWrapper
@@ -34,11 +35,34 @@ import { ModuleState } from '@src/types';
  */
 export default class SetTokenAPI {
   private setTokenWrapper: SetTokenWrapper;
+  private protocolViewerWrapper: ProtocolViewerWrapper;
   private assert: Assertions;
 
-  public constructor(provider: Provider, assertions?: Assertions) {
+  public constructor(
+    provider: Provider,
+    protocolViewerAddress: Address,
+    streamingFeeModuleAddress: Address,
+    assertions?: Assertions
+  ) {
     this.setTokenWrapper = new SetTokenWrapper(provider);
+    this.protocolViewerWrapper = new ProtocolViewerWrapper(
+      provider,
+      protocolViewerAddress,
+      streamingFeeModuleAddress
+    );
     this.assert = assertions || new Assertions(provider);
+  }
+
+  /**
+   * Fetches the managers of set tokens
+   *
+   * @param  tokenAddresses Addresses of ERC20 contracts to check balance for
+   * @returns               Addresses of managers of the set tokens
+   */
+  public async batchFetchManagers(
+    tokenAddresses: Address[],
+  ): Promise<Address[]> {
+    return await this.protocolViewerWrapper.batchFetchManagers(tokenAddresses);
   }
 
   /**

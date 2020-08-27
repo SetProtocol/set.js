@@ -79,7 +79,12 @@ class Set {
     this.erc20 = new ERC20API(ethersProvider, assertions);
     this.fees = new FeeAPI(ethersProvider, config.streamingFeeModuleAddress, assertions);
     this.issuance = new IssuanceAPI(ethersProvider, config.basicIssuanceModuleAddress, assertions);
-    this.setToken = new SetTokenAPI(ethersProvider, assertions);
+    this.setToken = new SetTokenAPI(
+      ethersProvider,
+      config.protocolViewerAddress,
+      config.streamingFeeModuleAddress,
+      assertions
+    );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress, assertions);
   }
 }
