@@ -18,12 +18,14 @@
 
 import { ContractTransaction } from 'ethers';
 import { Provider } from 'ethers/providers';
-import { Address, Position } from 'set-protocol-v2/utils/types';
+import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import Assertions from '@src/assertions';
+import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
+import { StreamingFeeInfo } from '../types';
 
 /**
  * @title  FeeAPI
@@ -35,11 +37,34 @@ import Assertions from '@src/assertions';
  */
 export default class FeeAPI {
   private streamingFeeModuleWrapper: StreamingFeeModuleWrapper;
+  private protocolViewerWrapper: ProtocolViewerWrapper;
   private assert: Assertions;
 
-  public constructor(provider: Provider, streamingFeeIssuanceModuleAddress: Address, assertions?: Assertions) {
+  public constructor(
+    provider: Provider,
+    protocolViewerAddress: Address,
+    streamingFeeIssuanceModuleAddress: Address,
+    assertions?: Assertions
+  ) {
+    this.protocolViewerWrapper = new ProtocolViewerWrapper(
+      provider,
+      protocolViewerAddress,
+      streamingFeeIssuanceModuleAddress
+    );
     this.streamingFeeModuleWrapper = new StreamingFeeModuleWrapper(provider, streamingFeeIssuanceModuleAddress);
     this.assert = assertions || new Assertions(provider);
+  }
+
+  /**
+   * Fetches the streaming fee info of set tokens
+   *
+   * @param  tokenAddresses    Addresses of ERC20 contracts to check balance for
+   * @returns                  Array of streaming fee infos
+   */
+  public async batchFetchStreamingFeeInfo(
+    tokenAddresses: Address[],
+  ): Promise<StreamingFeeInfo[]> {
+    return await this.protocolViewerWrapper.batchFetchStreamingFeeInfo(tokenAddresses);
   }
 
   /**
