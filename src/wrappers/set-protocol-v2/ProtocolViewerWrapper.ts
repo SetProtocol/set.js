@@ -16,11 +16,11 @@
 
 'use strict';
 
-import { BigNumber } from 'ethers/utils';
 import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Address } from 'set-protocol-v2/utils/types';
 
 import ContractWrapper from './ContractWrapper';
+import { StreamingFeeInfo } from '@src/types';
 
 /**
  * @title ProtocolViewerWrapper
@@ -70,14 +70,7 @@ export default class ProtocolViewerWrapper {
   public async batchFetchStreamingFeeInfo(
     tokenAddresses: Address[],
     callerAddress?: Address,
-  ): Promise<{
-      feeRecipient: string;
-      streamingFeePercentage: BigNumber;
-      unaccruedFees: BigNumber;
-      0: string;
-      1: BigNumber;
-      2: BigNumber;
-    }[]> {
+  ): Promise<StreamingFeeInfo[]> {
     const protocolViewerInstance = await this.contracts.loadProtocolViewerContractAsync(
       this.protocolViewerAddress,
       (this.provider as JsonRpcProvider).getSigner(callerAddress)

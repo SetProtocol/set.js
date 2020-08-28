@@ -17,38 +17,68 @@
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 import { Address } from 'set-protocol-v2/utils/types';
-import { ether } from 'set-protocol-v2/dist/utils/common';
 
 import FeeAPI from '@src/api/FeeAPI';
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import { expect } from '@test/utils/chai';
+import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
+import { StreamingFeeInfo } from '@src/types';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 jest.mock('@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper');
-
+jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper');
 
 describe('FeeAPI', () => {
   let setAddress: Address;
   let streamingFeeModuleAddress: Address;
+  let protocolViewerAddress: Address;
   let managerAddress: Address;
 
   let streamingFeeModuleWrapper: StreamingFeeModuleWrapper;
+  let protocolViewerWrapper: ProtocolViewerWrapper;
   let feeAPI: FeeAPI;
 
   beforeEach(async () => {
     [
       setAddress,
       streamingFeeModuleAddress,
+      protocolViewerAddress,
       managerAddress,
     ] = await provider.listAccounts();
 
-    feeAPI = new FeeAPI(provider, streamingFeeModuleAddress);
+    feeAPI = new FeeAPI(provider, protocolViewerAddress, streamingFeeModuleAddress);
     streamingFeeModuleWrapper = (StreamingFeeModuleWrapper as any).mock.instances[0];
+    protocolViewerWrapper = (ProtocolViewerWrapper as any).mock.instances[0];
   });
 
   afterEach(async () => {
     (StreamingFeeModuleWrapper as any).mockClear();
+    (ProtocolViewerWrapper as any).mockClear();
+  });
+
+  describe('#batchFetchStreamingFeeInfo', () => {
+    let subjectSetTokenAddress1: Address;
+    let subjectSetTokenAddress2: Address;
+
+    beforeEach(async () => {
+      subjectSetTokenAddress1 = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectSetTokenAddress2 = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B570';
+    });
+
+    async function subject(): Promise<StreamingFeeInfo[]> {
+      return await feeAPI.batchFetchStreamingFeeInfo(
+        [subjectSetTokenAddress1, subjectSetTokenAddress2]
+      );
+    }
+
+    it('should call the ProtocolViewerWrapper with correct params', async () => {
+      await subject();
+
+      expect(protocolViewerWrapper.batchFetchStreamingFeeInfo).to.have.beenCalledWith(
+        [subjectSetTokenAddress1, subjectSetTokenAddress2]
+      );
+    });
   });
 
   describe('#accrueStreamingFeesAsync', () => {
