@@ -18,13 +18,14 @@
 
 import { ContractTransaction } from 'ethers';
 import { Provider } from 'ethers/providers';
-import { Address, Position } from 'set-protocol-v2/utils/types';
+import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import Assertions from '@src/assertions';
 import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
+import { StreamingFeeInfo } from '../types';
 
 /**
  * @title  FeeAPI
@@ -62,14 +63,7 @@ export default class FeeAPI {
    */
   public async batchFetchStreamingFeeInfo(
     tokenAddresses: Address[],
-  ): Promise<{
-    feeRecipient: string;
-    streamingFeePercentage: BigNumber;
-    unaccruedFees: BigNumber;
-    0: string;
-    1: BigNumber;
-    2: BigNumber;
-  }[]> {
+  ): Promise<StreamingFeeInfo[]> {
     return await this.protocolViewerWrapper.batchFetchStreamingFeeInfo(tokenAddresses);
   }
 

@@ -19,34 +19,64 @@ import { Address, ContractTransaction, Position } from 'set-protocol-v2/utils/ty
 
 import SetTokenAPI from '@src/api/SetTokenAPI';
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
+import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
 import { ModuleState } from '@src/types';
 import { expect } from '@test/utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 jest.mock('@src/wrappers/set-protocol-v2/SetTokenWrapper');
-
+jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper');
 
 describe('SetTokenAPI', () => {
   let setAddress: Address;
   let moduleAddress: Address;
   let managerAddress: Address;
+  let streamingFeeModuleAddress: Address;
+  let protocolViewerAddress: Address;
   let setTokenAPI: SetTokenAPI;
   let setTokenWrapper: SetTokenWrapper;
+  let protocolViewerWrapper: ProtocolViewerWrapper;
 
   beforeEach(async () => {
     [
       setAddress,
       moduleAddress,
       managerAddress,
+      streamingFeeModuleAddress,
+      protocolViewerAddress,
     ] = await provider.listAccounts();
 
-    setTokenAPI = new SetTokenAPI(provider);
+    setTokenAPI = new SetTokenAPI(provider, protocolViewerAddress, streamingFeeModuleAddress);
     setTokenWrapper = (SetTokenWrapper as any).mock.instances[0];
+    protocolViewerWrapper = (ProtocolViewerWrapper as any).mock.instances[0];
   });
 
   afterEach(async () => {
     (SetTokenWrapper as any).mockClear();
+    (ProtocolViewerWrapper as any).mockClear();
+  });
+
+  describe('#batchFetchManagers', () => {
+    let subjectSetTokenAddress1: Address;
+    let subjectSetTokenAddress2: Address;
+    let setTokenAddresses: Address[];
+
+    beforeEach(async () => {
+      subjectSetTokenAddress1 = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectSetTokenAddress2 = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B570';
+      setTokenAddresses = [subjectSetTokenAddress1, subjectSetTokenAddress2];
+    });
+
+    async function subject(): Promise<Address[]> {
+      return await setTokenAPI.batchFetchManagers(setTokenAddresses);
+    }
+
+    it('should call the ProtocolViewerWrapper with correct params', async () => {
+      await subject();
+
+      expect(protocolViewerWrapper.batchFetchManagers).to.have.beenCalledWith(setTokenAddresses);
+    });
   });
 
   describe('#getControllerAddressAsync', () => {
