@@ -40,14 +40,14 @@ describe('ERC20Wrapper', () => {
       owner,
       manager,
     ] = await provider.listAccounts();
+
+    deployer = new DeployHelper(provider.getSigner(owner));
   });
 
   beforeEach(async () => {
     await blockchain.saveSnapshotAsync();
 
     erc20Wrapper = new ERC20Wrapper(provider);
-
-    deployer = new DeployHelper(provider.getSigner(owner));
   });
 
   afterEach(async () => {
