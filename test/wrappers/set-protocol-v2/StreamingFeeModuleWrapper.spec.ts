@@ -7,7 +7,8 @@ import {
   Blockchain,
   ether,
   getStreamingFee,
-  getStreamingFeeInflationAmount
+  getStreamingFeeInflationAmount,
+  preciseMul,
 } from 'set-protocol-v2/dist/utils/common';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
@@ -69,6 +70,7 @@ describe('StreamingFeeModuleWrapper', () => {
   describe('#accrueFee', () => {
     let setToken: SetToken;
     let settings: StreamingFeeState;
+    let protocolFee: BigNumber;
 
     let subjectSetToken: Address;
     let subjectTimeFastForward: BigNumber;
@@ -97,6 +99,9 @@ describe('StreamingFeeModuleWrapper', () => {
       await basicIssuanceModule.initialize(setToken.address, ADDRESS_ZERO);
       await setup.weth.approve(basicIssuanceModule.address, ether(1));
       await basicIssuanceModule.connect(provider.getSigner(owner)).issue(setToken.address, ether(1), owner);
+
+      protocolFee = ether(.15);
+      await setup.controller.addFee(streamingFeeModule.address, ZERO, protocolFee);
 
       subjectTimeFastForward = ONE_YEAR_IN_SECONDS.toNumber();
       subjectSetToken = setToken.address;
@@ -127,9 +132,9 @@ describe('StreamingFeeModuleWrapper', () => {
         transactionTimestamp
       );
       const feeInflation = getStreamingFeeInflationAmount(expectedFeeInflation, totalSupply);
-
+      const protocolFeeAmount = preciseMul(feeInflation, protocolFee);
       const feeAmountReceived = await setToken.balanceOf(feeRecipient);
-      expect(feeAmountReceived.toString()).to.eq(feeInflation.toString());
+      expect(feeAmountReceived.toString()).to.eq(feeInflation.sub(protocolFeeAmount).toString());
     });
   });
 

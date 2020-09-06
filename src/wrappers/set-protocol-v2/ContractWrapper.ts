@@ -34,6 +34,8 @@ import { SetTokenCreator } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
 import { StreamingFeeModule } from 'set-protocol-v2/dist/typechain/StreamingFeeModule';
 import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
+import { TradeModule } from 'set-protocol-v2/dist/utils/contracts';
+import { TradeModuleFactory } from 'set-protocol-v2/dist/typechain/TradeModuleFactory';
 
 /**
  * @title ContractWrapper
@@ -116,10 +118,10 @@ export default class ContractWrapper {
     callerAddress?: Address,
   ): BasicIssuanceModule {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
-    const cacheKey = `ERC20_${basicIssuanceModuleAddress}_${await signer.getAddress()}`;
+    const cacheKey = `BasicIssuance_${basicIssuanceModuleAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
-      return this.cache[cacheKey] as ERC20;
+      return this.cache[cacheKey] as BasicIssuanceModule;
     } else {
       const basicIssuanceModuleContract = BasicIssuanceModuleFactory.connect(
         basicIssuanceModuleAddress,
@@ -128,6 +130,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = basicIssuanceModuleContract;
       return basicIssuanceModuleContract;
+    }
+  }
+
+  /**
+   * Load TradeModule contract
+   *
+   * @param  tradeModuleAddress           Address of the trade module
+   * @param  callerAddress                Address of caller, uses first one on node if none provided.
+   * @return                              BasicIssuanceModule contract instance
+   */
+  public async loadTradeModuleAsync(
+    tradeModuleAddress: Address,
+    callerAddress?: Address,
+  ): TradeModule {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `TradeModule_${tradeModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as TradeModule;
+    } else {
+      const tradeModuleContract = TradeModuleFactory.connect(
+        tradeModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = tradeModuleContract;
+      return tradeModuleContract;
     }
   }
 
