@@ -50,7 +50,7 @@ export default class SetTokenAPI {
       protocolViewerAddress,
       streamingFeeModuleAddress
     );
-    this.assert = assertions || new Assertions(provider);
+    this.assert = assertions || new Assertions();
   }
 
   /**

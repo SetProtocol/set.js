@@ -18,7 +18,7 @@
 
 import { ContractTransaction } from 'ethers';
 import { Provider } from 'ethers/providers';
-import { Address, Position } from 'set-protocol-v2/utils/types';
+import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 
@@ -39,7 +39,7 @@ export default class IssuanceAPI {
 
   public constructor(provider: Provider, basicIssuanceModuleAddress: Address, assertions?: Assertions) {
     this.basicIssuanceModuleWrapper = new BasicIssuanceModuleWrapper(provider, basicIssuanceModuleAddress);
-    this.assert = assertions || new Assertions(provider);
+    this.assert = assertions || new Assertions();
   }
 
   /**

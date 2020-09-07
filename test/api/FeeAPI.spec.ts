@@ -30,10 +30,8 @@ jest.mock('@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper');
 jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper');
 
 describe('FeeAPI', () => {
-  let setAddress: Address;
   let streamingFeeModuleAddress: Address;
   let protocolViewerAddress: Address;
-  let managerAddress: Address;
 
   let streamingFeeModuleWrapper: StreamingFeeModuleWrapper;
   let protocolViewerWrapper: ProtocolViewerWrapper;
@@ -41,10 +39,8 @@ describe('FeeAPI', () => {
 
   beforeEach(async () => {
     [
-      setAddress,
       streamingFeeModuleAddress,
       protocolViewerAddress,
-      managerAddress,
     ] = await provider.listAccounts();
 
     feeAPI = new FeeAPI(provider, protocolViewerAddress, streamingFeeModuleAddress);

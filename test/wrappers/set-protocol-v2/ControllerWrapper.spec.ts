@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
 import { Address } from 'set-protocol-v2/utils/types';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
+import { Blockchain } from 'set-protocol-v2/dist/utils/common';
 import { Controller } from 'set-protocol-v2/dist/utils/contracts';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 
@@ -15,7 +15,6 @@ const blockchain = new Blockchain(provider);
 
 describe('ControllerWrapper', () => {
   let owner: Address;
-  let manager: Address;
   let mockSetTokenFactory: Address;
   let mockModule: Address;
   let mockSetTokenAddress: Address;
@@ -30,7 +29,6 @@ describe('ControllerWrapper', () => {
   beforeAll(async () => {
     [
       owner,
-      manager,
       mockSetTokenFactory,
       mockModule,
       mockSetTokenAddress,

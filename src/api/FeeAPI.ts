@@ -52,7 +52,7 @@ export default class FeeAPI {
       streamingFeeIssuanceModuleAddress
     );
     this.streamingFeeModuleWrapper = new StreamingFeeModuleWrapper(provider, streamingFeeIssuanceModuleAddress);
-    this.assert = assertions || new Assertions(provider);
+    this.assert = assertions || new Assertions();
   }
 
   /**

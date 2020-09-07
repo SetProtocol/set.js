@@ -32,11 +32,9 @@ import { generateTxOpts } from '@src/utils/transactions';
  *
  */
 export default class SetTokenWrapper {
-  private provider: Provider;
   private contracts: ContractWrapper;
 
   public constructor(provider: Provider) {
-    this.provider = provider;
     this.contracts = new ContractWrapper(provider);
   }
 

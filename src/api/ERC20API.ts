@@ -37,7 +37,7 @@ export default class ERC20API {
 
   public constructor(provider: Provider, assertions?: Assertions) {
     this.erc20Wrapper = new ERC20Wrapper(provider);
-    this.assert = assertions || new Assertions(provider);
+    this.assert = assertions || new Assertions();
   }
 
   /**

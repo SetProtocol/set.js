@@ -74,7 +74,7 @@ class Set {
    */
   constructor(provider: Web3CoreProvider, config: SetJSConfig) {
     const ethersProvider = new ethersProviders.Web3Provider(provider);
-    const assertions = new Assertions(provider);
+    const assertions = new Assertions();
 
     this.erc20 = new ERC20API(ethersProvider, assertions);
     this.fees = new FeeAPI(ethersProvider, config.protocolViewerAddress, config.streamingFeeModuleAddress, assertions);
@@ -85,7 +85,7 @@ class Set {
       config.streamingFeeModuleAddress,
       assertions
     );
-    this.system = new SystemAPI(ethersProvider, config.controllerAddress, assertions);
+    this.system = new SystemAPI(ethersProvider, config.controllerAddress);
   }
 }
 
