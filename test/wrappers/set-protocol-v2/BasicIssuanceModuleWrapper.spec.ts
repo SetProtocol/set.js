@@ -1,16 +1,14 @@
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
-import { Account, Address, Wallet } from 'set-protocol-v2/utils/types';
+import { Address } from 'set-protocol-v2/utils/types';
 import { ADDRESS_ZERO, ZERO } from 'set-protocol-v2/dist/utils/constants';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
+import { Blockchain, ether, bitcoin } from 'set-protocol-v2/dist/utils/common';
 import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
 import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
 import {
   BasicIssuanceModule,
-  Controller,
   SetToken,
-  StandardTokenMock,
 } from 'set-protocol-v2/dist/utils/contracts';
 
 import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
@@ -22,7 +20,7 @@ const blockchain = new Blockchain(provider);
 
 describe('BasicIssuanceModuleWrapper', () => {
   let owner: Address;
-  let manager: Address;
+  let recipient: Address;
   let functionCaller: Address;
 
   let basicIssuanceModule: BasicIssuanceModule;
@@ -35,7 +33,7 @@ describe('BasicIssuanceModuleWrapper', () => {
   beforeAll(async() => {
     [
       owner,
-      manager,
+      recipient,
       functionCaller,
     ] = await provider.listAccounts();
 
@@ -76,6 +74,10 @@ describe('BasicIssuanceModuleWrapper', () => {
       const preIssueHook = ADDRESS_ZERO;
       await basicIssuanceModule.initialize(setToken.address, preIssueHook);
 
+      // Approve tokens to the issuance module
+      await setup.weth.approve(basicIssuanceModule.address, ether(5));
+      await setup.wbtc.approve(basicIssuanceModule.address, bitcoin(10));
+
       subjectSetTokenAddress = setToken.address;
       subjectIssuanceQuantity = ether(2);
       subjectIssueTo = functionCaller;
@@ -109,16 +111,21 @@ describe('BasicIssuanceModuleWrapper', () => {
     let subjectSetTokenAddress: Address;
     let subjectRedeemQuantity: BigNumber;
     let subjectCaller: Address;
+    let subjectTo: Address;
 
     beforeEach(async () => {
       setToken = await setup.createSetToken(
-        [setup.weth.address],
-        [ether(1)],
+        [setup.weth.address, setup.wbtc.address],
+        [ether(1), bitcoin(2)],
         [basicIssuanceModule.address]
       );
 
       const preIssueHook = ADDRESS_ZERO;
       await basicIssuanceModule.initialize(setToken.address, preIssueHook);
+
+      // Approve tokens to the issuance module
+      await setup.weth.approve(basicIssuanceModule.address, ether(5));
+      await setup.wbtc.approve(basicIssuanceModule.address, bitcoin(10));
 
       issuanceQuantity = ether(2);
       await basicIssuanceModule.issue(setToken.address, issuanceQuantity, functionCaller);
@@ -126,12 +133,14 @@ describe('BasicIssuanceModuleWrapper', () => {
       subjectSetTokenAddress = setToken.address;
       subjectRedeemQuantity = ether(2);
       subjectCaller = functionCaller;
+      subjectTo = recipient;
     });
 
     async function subject(): Promise<ContractTransaction> {
       return basicIssuanceModuleWrapper.redeem(
         subjectSetTokenAddress,
         subjectRedeemQuantity,
+        recipient,
         subjectCaller
       );
     }
