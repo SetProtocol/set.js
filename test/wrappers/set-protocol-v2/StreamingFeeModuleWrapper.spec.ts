@@ -95,6 +95,7 @@ describe('StreamingFeeModuleWrapper', () => {
 
       // Initialize the SetToken to the IssuanceModule and issue some so a streaming fee can be collected
       await basicIssuanceModule.initialize(setToken.address, ADDRESS_ZERO);
+      await setup.weth.approve(basicIssuanceModule.address, ether(1));
       await basicIssuanceModule.connect(provider.getSigner(owner)).issue(setToken.address, ether(1), owner);
 
       subjectTimeFastForward = ONE_YEAR_IN_SECONDS.toNumber();
