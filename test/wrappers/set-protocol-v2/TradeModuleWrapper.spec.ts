@@ -114,7 +114,6 @@ describe('TradeModuleWrapper', () => {
 
   afterEach(async () => {
     await blockchain.revertAsync();
-    console.log('Resetting blockchain');
   });
 
   describe('when there is a deployed SetToken with enabled TradeModule', () => {
@@ -138,8 +137,6 @@ describe('TradeModuleWrapper', () => {
         [setup.issuanceModule.address, tradeModule.address],
         manager
       );
-
-      console.log('ACTUAL SET TOKEN: ' + setToken.address);
     });
 
     describe('#trade', () => {
@@ -295,14 +292,12 @@ describe('TradeModuleWrapper', () => {
 
         describe('when the current validation hook is the zero address', () => {
           beforeEach(async () => {
-            console.log('CHECK HERE: ' + subjectSetToken);
             await tradeModule.updateTradeValidationHook(subjectSetToken, ADDRESS_ZERO);
-            console.log('Done with transaction');
           });
 
-          // it('does not revert from calling to a zero address', async () => {
-          //   await expect(() => subject()).not.to.throw();
-          // });
+          it('does not revert from calling to a zero address', async () => {
+            expect(await subject()).to.have.property('blockHash');
+          });
         });
 
         describe('when there is a protocol fee charged', () => {
