@@ -54,6 +54,8 @@ export default class TradeModuleWrapper {
    * @param receiveTokenAddress         Address of the token that will be received from the exchange
    * @param minReceiveQuantity          Min units of token in SetToken to be received from the exchange
    * @param data                        Arbitrary bytes to be used to construct trade call data
+   *
+   * @return                            Transaction hash of the trade transaction
    */
   public async trade(
     setTokenAddress: Address,

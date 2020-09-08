@@ -6,6 +6,8 @@ export interface SetJSConfig {
   controllerAddress: Address;
   streamingFeeModuleAddress: Address;
   protocolViewerAddress: Address;
+  tradeModuleAddress: Address;
+  oneInchExchangeAdapterAddress: Address;
 }
 
 export type StreamingFeeInfo = {
