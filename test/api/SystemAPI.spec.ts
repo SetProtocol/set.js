@@ -15,11 +15,10 @@
 */
 
 import { ethers } from 'ethers';
-import { Address, ContractTransaction, Position } from 'set-protocol-v2/utils/types';
+import { Address } from 'set-protocol-v2/utils/types';
 
 import SystemAPI from '@src/api/SystemAPI';
 import ControllerWrapper from '@src/wrappers/set-protocol-v2/ControllerWrapper';
-import { ModuleState } from '@src/types';
 import { expect } from '@test/utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
@@ -28,17 +27,13 @@ jest.mock('@src/wrappers/set-protocol-v2/ControllerWrapper');
 
 
 describe('SystemAPI', () => {
-  let setAddress: Address;
   let controllerAddress: Address;
-  let managerAddress: Address;
   let systemAPI: SystemAPI;
   let controllerWrapper: ControllerWrapper;
 
   beforeEach(async () => {
     [
-      setAddress,
       controllerAddress,
-      managerAddress,
     ] = await provider.listAccounts();
 
     systemAPI = new SystemAPI(provider, controllerAddress);

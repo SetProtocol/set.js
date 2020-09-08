@@ -16,8 +16,6 @@
 
 'use strict';
 
-import { Provider } from 'ethers/providers';
-
 import { CommonAssertions } from './CommonAssertions';
 import { SchemaAssertions } from './SchemaAssertions';
 
@@ -25,7 +23,7 @@ export default class Assertions {
   public schema: SchemaAssertions;
   public common: CommonAssertions;
 
-  public constructor(provider: Provider) {
+  public constructor() {
     this.schema = new SchemaAssertions();
     this.common = new CommonAssertions();
   }

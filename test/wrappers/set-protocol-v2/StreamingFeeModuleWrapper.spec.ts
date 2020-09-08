@@ -1,7 +1,7 @@
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 
-import { Account, Address, Wallet, StreamingFeeState } from 'set-protocol-v2/utils/types';
+import { Address, StreamingFeeState } from 'set-protocol-v2/utils/types';
 import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from 'set-protocol-v2/dist/utils/constants';
 import {
   Blockchain,
@@ -15,12 +15,9 @@ import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
 import {
   BasicIssuanceModule,
   StreamingFeeModule,
-  Controller,
   SetToken,
-  StandardTokenMock
 } from 'set-protocol-v2/dist/utils/contracts';
 
-import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import { expect } from '../../utils/chai';
 

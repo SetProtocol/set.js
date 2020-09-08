@@ -17,12 +17,9 @@
 'use strict';
 
 import { Provider } from 'ethers/providers';
-import { Address, Position } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber } from 'ethers/utils';
+import { Address } from 'set-protocol-v2/utils/types';
 
 import ControllerWrapper from '@src/wrappers/set-protocol-v2/ControllerWrapper';
-import Assertions from '@src/assertions';
 
 /**
  * @title  SystemAPI
@@ -34,11 +31,9 @@ import Assertions from '@src/assertions';
  */
 export default class SystemAPI {
   private controllerWrapper: ControllerWrapper;
-  private assert: Assertions;
 
-  public constructor(provider: Provider, controllerWrapperAddress: Address, assertions?: Assertions) {
+  public constructor(provider: Provider, controllerWrapperAddress: Address) {
     this.controllerWrapper = new ControllerWrapper(provider, controllerWrapperAddress);
-    this.assert = assertions || new Assertions(provider);
   }
 
   /**

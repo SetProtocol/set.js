@@ -250,7 +250,7 @@ describe('SetTokenWrapper', () => {
 
       describe('when the module is already added', () => {
         beforeEach(async () => {
-          const moduleState = await setTokenWrapper.moduleStates(setToken.address, mockIssuanceModule);
+          await setTokenWrapper.moduleStates(setToken.address, mockIssuanceModule);
 
           subjectModule = mockIssuanceModule;
         });

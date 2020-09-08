@@ -20,22 +20,26 @@ import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { Contract, Signer } from 'ethers';
 import { Address } from 'set-protocol-v2/utils/types';
 
-import { BasicIssuanceModule } from 'set-protocol-v2/dist/utils/contracts';
+import {
+  BasicIssuanceModule,
+  Controller,
+  ERC20,
+  ProtocolViewer,
+  SetToken,
+  SetTokenCreator,
+  StreamingFeeModule,
+  TradeModule,
+  OneInchExchangeAdapter,
+} from 'set-protocol-v2/dist/utils/contracts';
 import { BasicIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
-import { Controller } from 'set-protocol-v2/dist/utils/contracts';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
-import { ERC20 } from 'set-protocol-v2/dist/utils/contracts';
 import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
-import { ProtocolViewer } from 'set-protocol-v2/dist/utils/contracts';
 import { ProtocolViewerFactory } from 'set-protocol-v2/dist/typechain/ProtocolViewerFactory';
-import { SetToken } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
-import { SetTokenCreator } from 'set-protocol-v2/dist/utils/contracts';
 import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
-import { StreamingFeeModule } from 'set-protocol-v2/dist/typechain/StreamingFeeModule';
 import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
-import { TradeModule } from 'set-protocol-v2/dist/utils/contracts';
 import { TradeModuleFactory } from 'set-protocol-v2/dist/typechain/TradeModuleFactory';
+import { OneInchExchangeAdapterFactory } from 'set-protocol-v2/dist/typechain/OneInchExchangeAdapterFactory';
 
 /**
  * @title ContractWrapper
@@ -138,7 +142,7 @@ export default class ContractWrapper {
    *
    * @param  tradeModuleAddress           Address of the trade module
    * @param  callerAddress                Address of caller, uses first one on node if none provided.
-   * @return                              BasicIssuanceModule contract instance
+   * @return                              TradeModule contract instance
    */
   public async loadTradeModuleAsync(
     tradeModuleAddress: Address,
@@ -157,6 +161,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = tradeModuleContract;
       return tradeModuleContract;
+    }
+  }
+
+  /**
+   * Load OneInchExchangeAdapter contract
+   *
+   * @param  oneInchExchangeAdapterAddress  Address of the one inch exchange adapter
+   * @param  callerAddress                  Address of caller, uses first one on node if none provided.
+   * @return                                OneInchExchangeAdapter contract instance
+   */
+  public async loadOneInchExchangeAdapterAsync(
+    oneInchExchangeAdapterAddress: Address,
+    callerAddress?: Address,
+  ): OneInchExchangeAdapter {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `OneInchExchangeAdapter_${oneInchExchangeAdapterAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as OneInchExchangeAdapter;
+    } else {
+      const oneInchExchangeAdapterContract = OneInchExchangeAdapterFactory.connect(
+        oneInchExchangeAdapterAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = oneInchExchangeAdapterContract;
+      return oneInchExchangeAdapterContract;
     }
   }
 

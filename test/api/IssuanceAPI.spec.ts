@@ -29,18 +29,14 @@ jest.mock('@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper');
 
 
 describe('IssuanceAPI', () => {
-  let setAddress: Address;
   let basicIssuanceModuleAddress: Address;
-  let managerAddress: Address;
 
   let basicIssuanceModuleWrapper: BasicIssuanceModuleWrapper;
   let issuanceAPI: IssuanceAPI;
 
   beforeEach(async () => {
     [
-      setAddress,
       basicIssuanceModuleAddress,
-      managerAddress,
     ] = await provider.listAccounts();
 
     issuanceAPI = new IssuanceAPI(provider, basicIssuanceModuleAddress);

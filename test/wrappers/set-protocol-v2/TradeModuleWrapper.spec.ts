@@ -26,7 +26,6 @@ import { expect } from '../../utils/chai';
 const provider = new ethers.providers.JsonRpcProvider();
 const blockchain = new Blockchain(provider);
 
-
 describe('TradeModuleWrapper', () => {
   let owner: Address;
   let manager: Address;

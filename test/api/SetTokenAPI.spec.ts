@@ -29,9 +29,6 @@ jest.mock('@src/wrappers/set-protocol-v2/SetTokenWrapper');
 jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper');
 
 describe('SetTokenAPI', () => {
-  let setAddress: Address;
-  let moduleAddress: Address;
-  let managerAddress: Address;
   let streamingFeeModuleAddress: Address;
   let protocolViewerAddress: Address;
   let setTokenAPI: SetTokenAPI;
@@ -40,9 +37,6 @@ describe('SetTokenAPI', () => {
 
   beforeEach(async () => {
     [
-      setAddress,
-      moduleAddress,
-      managerAddress,
       streamingFeeModuleAddress,
       protocolViewerAddress,
     ] = await provider.listAccounts();

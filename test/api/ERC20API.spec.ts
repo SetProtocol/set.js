@@ -14,7 +14,7 @@
   limitations under the License.
 */
 
-import { ethers, ContractTransaction } from 'ethers';
+import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 import { ether } from 'set-protocol-v2/dist/utils/common';
 import { Address } from 'set-protocol-v2/utils/types';
@@ -29,21 +29,10 @@ jest.mock('@src/wrappers/set-protocol-v2/ERC20Wrapper');
 
 
 describe('ERC20API', () => {
-  let tokenAddress: Address;
-  let userAddress: Address;
-  let externalAddress: Address;
-  let proxyAddress: Address;
   let erc20API: ERC20API;
   let erc20Wrapper: ERC20Wrapper;
 
   beforeEach(async () => {
-    [
-      tokenAddress,
-      userAddress,
-      externalAddress,
-      proxyAddress,
-    ] = await provider.listAccounts();
-
     erc20API = new ERC20API(provider);
     erc20Wrapper = (ERC20Wrapper as any).mock.instances[0];
   });

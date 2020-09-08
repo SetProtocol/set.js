@@ -123,13 +123,11 @@ describe('ProtocolViewerWrapper', () => {
   });
 
   describe('#batchFetchStreamingFeeInfo', () => {
-    let subjectStreamingFeeModule: Address;
     let subjectSetTokens: Address[];
 
     let subjectTimeFastForward: BigNumber;
 
     beforeEach(async () => {
-      subjectStreamingFeeModule = setup.streamingFeeModule.address;
       subjectSetTokens = [setTokenOne.address, setTokenTwo.address];
       subjectTimeFastForward = ONE_YEAR_IN_SECONDS;
     });

@@ -140,7 +140,7 @@ describe('BasicIssuanceModuleWrapper', () => {
       return basicIssuanceModuleWrapper.redeem(
         subjectSetTokenAddress,
         subjectRedeemQuantity,
-        recipient,
+        subjectTo,
         subjectCaller
       );
     }
