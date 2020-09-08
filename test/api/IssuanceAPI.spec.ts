@@ -108,12 +108,14 @@ describe('IssuanceAPI', () => {
   describe('#redeemAsync', () => {
     let subjectSetTokenAddress: Address;
     let subjectRedemptionQuantity: BigNumber;
+    let subjectSetTokenRecipientAddress: Address;
     let subjectCallerAddress: Address;
     let subjectTransactionOptions: any;
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       subjectRedemptionQuantity = ether(1);
+      subjectSetTokenRecipientAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
       subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
       subjectTransactionOptions = {};
     });
@@ -122,6 +124,7 @@ describe('IssuanceAPI', () => {
       return await issuanceAPI.redeemAsync(
         subjectSetTokenAddress,
         subjectRedemptionQuantity,
+        subjectSetTokenRecipientAddress,
         subjectCallerAddress,
         subjectTransactionOptions
       );
@@ -133,6 +136,7 @@ describe('IssuanceAPI', () => {
       expect(basicIssuanceModuleWrapper.redeem).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectRedemptionQuantity,
+        subjectSetTokenRecipientAddress,
         subjectCallerAddress,
         subjectTransactionOptions
       );
