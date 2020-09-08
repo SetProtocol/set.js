@@ -46,7 +46,7 @@ export default class BasicIssuanceModuleWrapper {
    *
    * @param  setTokenAddress             Address of the SetToken contract to issue
    * @param  quantity                    Quantity to issue
-   * @param  setTokenRecipientAddress    Address of the recipient of the issuance
+   * @param  setTokenRecipientAddress    Address of the recipient of the issued SetToken
    * @param  callerAddress               Address of caller (optional)
    * @return                             Transaction hash of the issuance transaction
    */
@@ -74,16 +74,16 @@ export default class BasicIssuanceModuleWrapper {
   /**
    * Redeem a SetToken into its underlying positions
    *
-   * @param  setTokenAddress  Address of the SetToken contract
-   * @param  quantity         Quantity to issue
-   * @param  recipient        Address of recipient of tokens
-   * @param  callerAddress    Address of caller (optional)
-   * @return                  Transaction hash of the redemption transaction
+   * @param  setTokenAddress           Address of the SetToken contract
+   * @param  quantity                  Quantity to issue
+   * @param  setTokenRecipientAddress  Address of recipient of component tokens from redemption
+   * @param  callerAddress             Address of caller (optional)
+   * @return                           Transaction hash of the redemption transaction
    */
   public async redeem(
     setTokenAddress: Address,
     quantity: BigNumber,
-    recipient: Address,
+    setTokenRecipientAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
@@ -96,7 +96,7 @@ export default class BasicIssuanceModuleWrapper {
     return await issuanceModuleInstance.redeem(
       setTokenAddress,
       quantity,
-      recipient,
+      setTokenRecipientAddress,
       txOptions
     );
   }

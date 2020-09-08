@@ -45,11 +45,11 @@ export default class IssuanceAPI {
   /**
    * Issue SetToken from its Position components. Each token must be approved to the Controller
    *
-   * @param  setAddress      Address of the Set
-   * @param  moduleAddress   Address of the module to be added
-   * @param  callerAddress   Address of caller (optional)
-   * @param  txOpts          Overrides for transaction (optional)
-   * @return                 Transaction hash
+   * @param  setTokenAddress             Address of the SetToken contract to issue
+   * @param  quantity                    Quantity to issue
+   * @param  setTokenRecipientAddress    Address of the recipient of the issuance
+   * @param  callerAddress               Address of caller (optional)
+   * @return                             Transaction hash
    */
   public async issueAsync(
     setTokenAddress: Address,
@@ -73,14 +73,16 @@ export default class IssuanceAPI {
   /**
    * Redeem a SetToken into its underlying positions
    *
-   * @param  setTokenAddress  Address of the SetToken contract
-   * @param  quantity         Quantity to issue
-   * @param  callerAddress    Address of caller (optional)
-   * @return                  Transaction hash of the redemption transaction
+   * @param  setTokenAddress           Address of the SetToken contract
+   * @param  quantity                  Quantity to issue
+   * @param  setTokenRecipientAddress  Address of recipient of component tokens from redemption
+   * @param  callerAddress             Address of caller (optional)
+   * @return                           Transaction hash of the redemption transaction
    */
   public async redeemAsync(
     setTokenAddress: Address,
     quantity: BigNumber,
+    setTokenRecipientAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
@@ -89,6 +91,7 @@ export default class IssuanceAPI {
     return await this.basicIssuanceModuleWrapper.redeem(
       setTokenAddress,
       quantity,
+      setTokenRecipientAddress,
       callerAddress,
       txOpts
     );
