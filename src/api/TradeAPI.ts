@@ -23,7 +23,6 @@ import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber, Arrayish } from 'ethers/utils';
 
 import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
-import OneInchExchangeAdapterWrapper from '@src/wrappers/set-protocol-v2/OneInchExchangeAdapterWrapper';
 import Assertions from '@src/assertions';
 
 /**
@@ -36,17 +35,14 @@ import Assertions from '@src/assertions';
  */
 export default class TradeAPI {
   private tradeModuleWrapper: TradeModuleWrapper;
-  private oneInchExchangeAdapterWrapper: OneInchExchangeAdapterWrapper;
   private assert: Assertions;
 
   public constructor(
     provider: Provider,
     tradeModuleAddress: Address,
-    oneInchExchangeAdapterAddress: Address,
     assertions?: Assertions
   ) {
     this.tradeModuleWrapper = new TradeModuleWrapper(provider, tradeModuleAddress);
-    this.oneInchExchangeAdapterWrapper = new OneInchExchangeAdapterWrapper(provider, oneInchExchangeAdapterAddress);
     this.assert = assertions || new Assertions();
   }
 
@@ -92,44 +88,6 @@ export default class TradeAPI {
       data,
       callerAddress,
       txOpts
-    );
-  }
-
-  /**
-   * Return 1inch calldata which is already generated from the 1inch API
-   *
-   * @param  sourceToken              Address of source token to be sold
-   * @param  destinationToken         Address of destination token to buy
-   * @param  sourceQuantity           Amount of source token to sell
-   * @param  minDestinationQuantity   Min amount of destination token to buy
-   * @param  data                     Arbitrage bytes containing trade call data
-   *
-   * @return address                  Target contract address
-   * @return uint256                  Call value
-   * @return bytes                    Trade calldata
-   */
-  public async getOneInchTradeCalldataAsync(
-    sourceToken: Address,
-    destinationToken: Address,
-    destinationAddress: Address,
-    sourceQuantity: BigNumber,
-    minDestinationQuantity: BigNumber,
-    data: Arrayish,
-    callerAddress?: Address,
-  ): Promise<[Address, BigNumber, Arrayish]> {
-    this.assert.schema.isValidAddress('destinationAddress', destinationAddress);
-    this.assert.schema.isValidAddress('sourceToken', sourceToken);
-    this.assert.schema.isValidAddress('destinationToken', destinationToken);
-    this.assert.common.greaterThanZero(sourceQuantity, 'sourceQuantity needs to be greater than zero');
-
-    return await this.oneInchExchangeAdapterWrapper.getTradeCalldata(
-      sourceToken,
-      destinationToken,
-      destinationAddress,
-      sourceQuantity,
-      minDestinationQuantity,
-      data,
-      callerAddress
     );
   }
 }

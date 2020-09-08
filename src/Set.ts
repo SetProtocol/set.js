@@ -93,7 +93,7 @@ class Set {
       assertions
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
-    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress, config.oneInchExchangeAdapterAddress);
+    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress);
   }
 }
 
