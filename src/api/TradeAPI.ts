@@ -1,9 +1,12 @@
 /*
   Copyright 2020 Set Labs Inc.
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
+
   http://www.apache.org/licenses/LICENSE-2.0
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,32 +16,34 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
 import { ContractTransaction } from 'ethers';
+import { Provider } from 'ethers/providers';
+import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber, Arrayish } from 'ethers/utils';
-import { Provider } from 'ethers/providers';
-import { generateTxOpts } from '@src/utils/transactions';
 
-import ContractWrapper from './ContractWrapper';
+import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
+import Assertions from '@src/assertions';
 
 /**
- * @title  TradeModuleWrapper
+ * @title  TradeAPI
  * @author Set Protocol
  *
- * The TradeModuleWrapper forwards functionality from the TradeModule contract
+ * The TradeAPI exposes methods to generate the calldata needed for 1inch exchange trades
+ * and a simple trade interface for making the actual trades.
  *
  */
-export default class TradeModuleWrapper {
-  private provider: Provider;
-  private contracts: ContractWrapper;
+export default class TradeAPI {
+  private tradeModuleWrapper: TradeModuleWrapper;
+  private assert: Assertions;
 
-  private tradeModuleAddress: Address;
-
-  public constructor(provider: Provider, tradeModuleAddress: Address) {
-    this.provider = provider;
-    this.contracts = new ContractWrapper(this.provider);
-    this.tradeModuleAddress = tradeModuleAddress;
+  public constructor(
+    provider: Provider,
+    tradeModuleAddress: Address,
+    assertions?: Assertions
+  ) {
+    this.tradeModuleWrapper = new TradeModuleWrapper(provider, tradeModuleAddress);
+    this.assert = assertions || new Assertions();
   }
 
   /**
@@ -57,7 +62,7 @@ export default class TradeModuleWrapper {
    *
    * @return                            Transaction hash of the trade transaction
    */
-  public async trade(
+  public async tradeAsync(
     setTokenAddress: Address,
     exchangeName: string,
     sendTokenAddress: Address,
@@ -68,13 +73,12 @@ export default class TradeModuleWrapper {
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const tradeModuleInstance = await this.contracts.loadTradeModuleAsync(
-      this.tradeModuleAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('sendTokenAddress', sendTokenAddress);
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('receiveTokenAddress', receiveTokenAddress);
+    this.assert.common.greaterThanZero(sendQuantity, 'sendQuantity needs to be greater than zero');
 
-    return await tradeModuleInstance.trade(
+    return await this.tradeModuleWrapper.trade(
       setTokenAddress,
       exchangeName,
       sendTokenAddress,
@@ -82,7 +86,8 @@ export default class TradeModuleWrapper {
       receiveTokenAddress,
       minReceivedQuantity,
       data,
-      txOptions
+      callerAddress,
+      txOpts
     );
   }
 }

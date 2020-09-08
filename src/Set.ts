@@ -25,7 +25,8 @@ import {
   FeeAPI,
   IssuanceAPI,
   SetTokenAPI,
-  SystemAPI
+  SystemAPI,
+  TradeAPI,
 } from '@src/api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -70,6 +71,12 @@ class Set {
   public system: SystemAPI;
 
   /**
+   * An instance of the TradeAPI class. Contains interfaces for interacting
+   * with the TradeModule contract and OneInchExchangeAdapter to make trades.
+   */
+  public trade: TradeAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(provider: Web3CoreProvider, config: SetJSConfig) {
@@ -86,6 +93,7 @@ class Set {
       assertions
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
+    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress);
   }
 }
 
