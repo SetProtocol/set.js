@@ -101,7 +101,7 @@
             "/dist/",
             "/_versions/"
         ],
-        "testTimeout": 10000,
+        "testTimeout": 30000,
         "testURL": "http://localhost/",
         "moduleFileExtensions": [
             "ts",
