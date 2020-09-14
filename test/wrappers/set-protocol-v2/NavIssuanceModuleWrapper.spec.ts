@@ -44,7 +44,7 @@ async function reconcileBalances(setToken: SetToken, subject: any, signer: Addre
     const expectedBalance = preciseMul(defaultPositionUnit, currentSetTokenSupply);
     const actualBalance = await component.balanceOf(setToken.address);
 
-    expect(actualBalance.gte(expectedBalance)).to.be(true);
+    expect(actualBalance.gte(expectedBalance)).to.eq(true);
   }
 }
 
