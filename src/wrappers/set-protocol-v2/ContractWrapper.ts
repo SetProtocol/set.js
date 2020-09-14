@@ -30,6 +30,7 @@ import {
   StreamingFeeModule,
   TradeModule,
   OneInchExchangeAdapter,
+  NavIssuanceModule,
 } from 'set-protocol-v2/dist/utils/contracts';
 import { BasicIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
@@ -40,6 +41,7 @@ import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenC
 import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
 import { TradeModuleFactory } from 'set-protocol-v2/dist/typechain/TradeModuleFactory';
 import { OneInchExchangeAdapterFactory } from 'set-protocol-v2/dist/typechain/OneInchExchangeAdapterFactory';
+import { NavIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/NavIssuanceModuleFactory';
 
 /**
  * @title ContractWrapper
@@ -161,6 +163,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = tradeModuleContract;
       return tradeModuleContract;
+    }
+  }
+
+  /**
+   * Load NavIssuanceModule contract
+   *
+   * @param  navIssuanceModuleAddress     Address of the NAV issuance module
+   * @param  callerAddress                Address of caller, uses first one on node if none provided.
+   * @return                              NavIssuanceModule contract instance
+   */
+  public async loadNavIssuanceModuleAsync(
+    navIssuanceModuleAddress: Address,
+    callerAddress?: Address,
+  ): NavIssuanceModule {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `NavIssuanceModule_${navIssuanceModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as NavIssuanceModule;
+    } else {
+      const navIssuanceModuleContract = NavIssuanceModuleFactory.connect(
+        navIssuanceModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = navIssuanceModuleContract;
+      return navIssuanceModuleContract;
     }
   }
 

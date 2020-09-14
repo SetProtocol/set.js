@@ -46,6 +46,8 @@ export default class StreamingFeeModuleWrapper {
    *
    * @param  setTokenAddress    Address of the SetToken contract to issue
    * @param  callerAddress      Address of caller (optional)
+   * @param  txOpts             Overrides for transaction (optional)
+   *
    * @return                    Transaction hash of the issuance transaction
    */
   public async accrueFee(
@@ -71,6 +73,8 @@ export default class StreamingFeeModuleWrapper {
    * @param  setTokenAddress    Address of the SetToken contract to issue
    * @param  newFee             The new streaming fee amount 18 decimal precision
    * @param  callerAddress      Address of caller (optional)
+   * @param  txOpts             Overrides for transaction (optional)
+   *
    * @return                    Transaction hash of the issuance transaction
    */
   public async updateStreamingFee(
@@ -98,6 +102,8 @@ export default class StreamingFeeModuleWrapper {
    * @param  setTokenAddress        Address of the SetToken contract to issue
    * @param  newRecipientAddress    The address of the new fee recipient
    * @param  callerAddress          Address of caller (optional)
+   * @param  txOpts                 Overrides for transaction (optional)
+   *
    * @return                        Transaction hash of the issuance transaction
    */
   public async updateFeeRecipient(

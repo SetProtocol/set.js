@@ -44,12 +44,14 @@ export default class SetTokenCreatorWrapper {
   /**
    * Instantiates and registers a new Set Token.
    *
-   * @param components  List of component addresses that will comprise a Set's initial positions.
-   * @param units       List of units. Each unit is the # of components per 10^18 of this Set Token.
-   * @param modules     List of modules to enable. All modules must be approved by the Controller.
-   * @param manager     Address of the manager.
-   * @param name        The Set Token's name.
-   * @param symbol      The Set Token's symbol identifier.
+   * @param components     List of component addresses that will comprise a Set's initial positions.
+   * @param units          List of units. Each unit is the # of components per 10^18 of this Set Token.
+   * @param modules        List of modules to enable. All modules must be approved by the Controller.
+   * @param manager        Address of the manager.
+   * @param name           The Set Token's name.
+   * @param symbol         The Set Token's symbol identifier.
+   * @param callerAddress  Address of caller (optional)
+   *
    * @return            Address of newly instantiated Set Token.
    */
   public async create(
