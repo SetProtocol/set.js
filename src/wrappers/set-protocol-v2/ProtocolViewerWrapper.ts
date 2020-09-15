@@ -47,7 +47,7 @@ export default class ProtocolViewerWrapper {
    * Fetches the managers of set tokens
    *
    * @param  tokenAddresses    Addresses of ERC20 contracts to check balance for
-   * @param  callerAddress     (Optional) Address to use as the caller
+   * @param  callerAddress     Address to use as the caller (optional)
    */
   public async batchFetchManagers(
     tokenAddresses: Address[],
@@ -65,7 +65,7 @@ export default class ProtocolViewerWrapper {
    * Fetches the streaming fee info of set tokens
    *
    * @param   tokenAddresses    Addresses of ERC20 contracts to check balance for
-   * @param   callerAddress     (Optional) Address to use as the caller
+   * @param   callerAddress     Address to use as the caller (optional)
    */
   public async batchFetchStreamingFeeInfo(
     tokenAddresses: Address[],

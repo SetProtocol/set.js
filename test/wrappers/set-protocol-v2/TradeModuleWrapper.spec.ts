@@ -13,7 +13,6 @@ import {
   KyberExchangeAdapter,
   OneInchExchangeMock,
   OneInchExchangeAdapter,
-  TradeValidationHookMock,
   ManagerIssuanceHookMock,
   SetToken,
   Weth9,
@@ -38,7 +37,6 @@ describe('TradeModuleWrapper', () => {
   let kyberExchangeAdapter: KyberExchangeAdapter;
   let oneInchExchangeMock: OneInchExchangeMock;
   let oneInchExchangeAdapter: OneInchExchangeAdapter;
-  let tradeValidationHook: TradeValidationHookMock;
   let tradeModule: TradeModule;
 
   let deployer: DeployHelper;
@@ -107,8 +105,6 @@ describe('TradeModuleWrapper', () => {
       [kyberAdapterName, oneInchAdapterName],
       [kyberExchangeAdapter.address, oneInchExchangeAdapter.address]
     );
-
-    tradeValidationHook = await deployer.mocks.deployTradeValidationHookMock();
   });
 
   afterEach(async () => {
@@ -165,7 +161,7 @@ describe('TradeModuleWrapper', () => {
           // Initialize module if set to true
           if (isInitialized) {
             tradeModule = tradeModule.connect(provider.getSigner(manager));
-            await tradeModule.initialize(setToken.address, tradeValidationHook.address);
+            await tradeModule.initialize(setToken.address);
           }
 
           sourceTokenQuantity = wbtcUnits.div(2); // Trade 0.5 WBTC
@@ -274,29 +270,6 @@ describe('TradeModuleWrapper', () => {
           expect(newSecondPosition.component).to.eq(destinationToken.address);
           expect(newSecondPosition.unit.toString()).to.eq(destinationTokenQuantity.toString());
           expect(newSecondPosition.module).to.eq(ADDRESS_ZERO);
-        });
-
-        it('should call validateNewHook', async () => {
-          await subject();
-
-          const receivedSetToken = await tradeValidationHook.expectedSetToken();
-          expect(receivedSetToken).to.eq(subjectSetToken);
-
-          const receivedReceiveToken = await tradeValidationHook.expectedReceiveToken();
-          expect(receivedReceiveToken).to.eq(subjectDestinationToken);
-
-          const receivedSendToken = await tradeValidationHook.expectedSendToken();
-          expect(receivedSendToken).to.eq(subjectSourceToken);
-        });
-
-        describe('when the current validation hook is the zero address', () => {
-          beforeEach(async () => {
-            await tradeModule.updateTradeValidationHook(subjectSetToken, ADDRESS_ZERO);
-          });
-
-          it('does not revert from calling to a zero address', async () => {
-            expect(await subject()).to.have.property('blockHash');
-          });
         });
 
         describe('when there is a protocol fee charged', () => {
@@ -482,23 +455,13 @@ describe('TradeModuleWrapper', () => {
           });
         });
 
-        describe('when send token is not tracked on SetToken', () => {
-          beforeEach(async () => {
-            subjectSourceToken = destinationToken.address;
-          });
-
-          it('should revert', async () => {
-            await expect(subject()).to.be.rejectedWith('Target default position must be component');
-          });
-        });
-
         describe('when the exchange is not valid', () => {
           beforeEach(async () => {
             subjectAdapterName = 'UNISWAP';
           });
 
           it('should revert', async () => {
-            await expect(subject()).to.be.rejectedWith('Exchange is not valid');
+            await expect(subject()).to.be.rejectedWith('Must be valid adapter');
           });
         });
 
@@ -586,7 +549,7 @@ describe('TradeModuleWrapper', () => {
           await destinationToken.transfer(oneInchExchangeMock.address, ether(1000));
 
           tradeModule = tradeModule.connect(provider.getSigner(manager));
-          await tradeModule.initialize(setToken.address, tradeValidationHook.address);
+          await tradeModule.initialize(setToken.address);
 
           // Trade 1 WBTC. Note: 1inch mock is hardcoded to trade 1 WBTC unit regardless of Set supply
           sourceTokenQuantity = wbtcUnits;

@@ -99,6 +99,7 @@ export default class SetTokenWrapper {
    * @param  moduleAddress Address of potential module
    * @param  callerAddress Address of caller (optional)
    * @param  txOpts        Overrides for transaction (optional)
+   *
    * @return               Transaction hash
    */
   public async addModule(
@@ -123,6 +124,7 @@ export default class SetTokenWrapper {
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
    * @param  txOpts        Overrides for transaction (optional)
+   *
    * @return               Transaction hash
    */
   public async setManager(
@@ -147,6 +149,7 @@ export default class SetTokenWrapper {
    * @param  setAddress    Address Set to issue
    * @param  callerAddress Address of caller (optional)
    * @param  txOpts        Overrides for transaction (optional)
+   *
    * @return               Contract transaction
    */
   public async initializeModule(
@@ -170,6 +173,7 @@ export default class SetTokenWrapper {
    * @param  setAddress    Address of Set to check
    * @param  moduleAddress Address of potential module
    * @param  callerAddress Address of caller (optional)
+   *
    * @return               boolean
    */
   public async isModule(
@@ -192,6 +196,7 @@ export default class SetTokenWrapper {
    * @param  setAddress    Address of Set to check
    * @param  moduleAddress Address of module
    * @param  callerAddress Address of caller (optional)
+   *
    * @return               boolean
    */
   public async isPendingModule(
@@ -213,6 +218,7 @@ export default class SetTokenWrapper {
    *
    * @param  setAddress    Address of Set to get list of positions for
    * @param  callerAddress Address of caller (optional)
+   *
    * @return               Array of Positions
    */
   public async getPositions(setAddress: Address, callerAddress?: Address): Promise<Position[]> {
@@ -230,6 +236,7 @@ export default class SetTokenWrapper {
    *
    * @param  setAddress     Address of Set to get list of modules for
    * @param  callerAddress  Address of caller (optional)
+   *
    * @return                Array of module addresses
    */
   public async getModules(setAddress: Address, callerAddress?: Address): Promise<Address[]> {
