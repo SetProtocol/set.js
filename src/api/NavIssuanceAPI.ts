@@ -1,9 +1,12 @@
 /*
   Copyright 2020 Set Labs Inc.
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
+
   http://www.apache.org/licenses/LICENSE-2.0
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,32 +16,30 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
 import { ContractTransaction } from 'ethers';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber, BigNumberish } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
-import { generateTxOpts } from '@src/utils/transactions';
+import { Address } from 'set-protocol-v2/utils/types';
+import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/utils';
 
-import ContractWrapper from './ContractWrapper';
+import NavIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/NavIssuanceModuleWrapper';
+import Assertions from '@src/assertions';
 
 /**
- * @title  NavIssuanceModuleWrapper
+ * @title  NavIssuanceAPI
  * @author Set Protocol
  *
- * The NavIssuanceModuleWrapper forwards functionality from the NavIssuanceModule contract
+ * The NavIssuanceAPI exposes issuance and redemption functions of the NavIssuanceModule
+ * to allow minting and redeeming of SetTokens based on the Net Asset Value.
  *
  */
-export default class NavIssuanceModuleWrapper {
-  private provider: Provider;
-  private contracts: ContractWrapper;
+export default class NavIssuanceAPI {
+  private navIssuanceModuleWrapper: NavIssuanceModuleWrapper;
+  private assert: Assertions;
 
-  private navIssuanceModuleAddress: Address;
-
-  public constructor(provider: Provider, navIssuanceModuleAddress: Address) {
-    this.provider = provider;
-    this.contracts = new ContractWrapper(this.provider);
-    this.navIssuanceModuleAddress = navIssuanceModuleAddress;
+  public constructor(provider: Provider, navIssuanceModuleAddress: Address, assertions?: Assertions) {
+    this.navIssuanceModuleWrapper = new NavIssuanceModuleWrapper(provider, navIssuanceModuleAddress);
+    this.assert = assertions || new Assertions();
   }
 
   /**
@@ -55,28 +56,28 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Transaction hash of the trade transaction
    */
-  public async issue(
+  public async issueAsync(
     setTokenAddress: Address,
     reserveAsset: Address,
-    reserveAssetQuantity: BigNumberish,
-    minSetTokenReceiveQuantity: BigNumberish,
+    reserveAssetQuantity: BigNumber,
+    minSetTokenReceiveQuantity: BigNumber,
     to: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
+    this.assert.schema.isValidAddress('to', to);
+    this.assert.common.greaterThanZero(reserveAssetQuantity, 'reserveAssetQuantity needs to be greater than zero');
 
-    return await navIssuanceModuleInstance.issue(
+    return await this.navIssuanceModuleWrapper.issue(
       setTokenAddress,
       reserveAsset,
       reserveAssetQuantity,
       minSetTokenReceiveQuantity,
       to,
-      txOptions
+      callerAddress,
+      txOpts
     );
   }
 
@@ -92,24 +93,24 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Transaction hash of the trade transaction
    */
-  public async issueWithEther(
+  public async issueWithEtherAsync(
     setTokenAddress: Address,
-    minSetTokenReceiveQuantity: BigNumberish,
-    to: Address,
+    quantity: BigNumber,
+    setTokenRecipientAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('setTokenRecipientAddress', setTokenRecipientAddress);
+    this.assert.common.greaterThanZero(quantity, 'quantity needs to be greater than zero');
 
-    return await navIssuanceModuleInstance.issueWithEther(
+
+    return await this.navIssuanceModuleWrapper.issueWithEther(
       setTokenAddress,
-      minSetTokenReceiveQuantity,
-      to,
-      txOptions
+      quantity,
+      setTokenRecipientAddress,
+      callerAddress,
+      txOpts
     );
   }
 
@@ -127,28 +128,28 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Transaction hash of the trade transaction
    */
-  public async redeem(
+  public async redeemAsync(
     setTokenAddress: Address,
     reserveAsset: Address,
-    setTokenQuantity: BigNumberish,
-    minReserveReceiveQuantity: BigNumberish,
+    setTokenQuantity: BigNumber,
+    minReserveReceiveQuantity: BigNumber,
     to: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
+    this.assert.schema.isValidAddress('to', to);
+    this.assert.common.greaterThanZero(setTokenQuantity, 'setTokenQuantity needs to be greater than zero');
 
-    return await navIssuanceModuleInstance.redeem(
+    return await this.navIssuanceModuleWrapper.redeem(
       setTokenAddress,
       reserveAsset,
       setTokenQuantity,
       minReserveReceiveQuantity,
       to,
-      txOptions
+      callerAddress,
+      txOpts
     );
   }
 
@@ -165,26 +166,25 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Transaction hash of the trade transaction
    */
-  public async redeemIntoEther(
+  public async redeemIntoEtherAsync(
     setTokenAddress: Address,
-    setTokenQuantity: BigNumberish,
-    minReserveReceiveQuantity: BigNumberish,
+    setTokenQuantity: BigNumber,
+    minReserveReceiveQuantity: BigNumber,
     to: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress,
-      callerAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('to', to);
+    this.assert.common.greaterThanZero(setTokenQuantity, 'setTokenQuantity needs to be greater than zero');
 
-    return await navIssuanceModuleInstance.redeemIntoEther(
+    return await this.navIssuanceModuleWrapper.redeemIntoEther(
       setTokenAddress,
       setTokenQuantity,
       minReserveReceiveQuantity,
       to,
-      txOptions
+      callerAddress,
+      txOpts
     );
   }
 
@@ -195,14 +195,12 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Returns the reserve asset addresses for token
    */
-  public async getReserveAssets(
+  public async getReserveAssetsAsync(
     setTokenAddress: Address,
   ): Promise<Address[]> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
 
-    return navIssuanceModuleInstance.getReserveAssets(setTokenAddress);
+    return this.navIssuanceModuleWrapper.getReserveAssets(setTokenAddress);
   }
 
   /**
@@ -213,15 +211,14 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Returns true if reserve asset is valid
    */
-  public async isValidReserveAsset(
+  public async isValidReserveAssetAsync(
     setTokenAddress: Address,
     reserveAsset: Address
   ): Promise<boolean> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
 
-    return navIssuanceModuleInstance.isValidReserveAsset(setTokenAddress, reserveAsset);
+    return this.navIssuanceModuleWrapper.isValidReserveAsset(setTokenAddress, reserveAsset);
   }
 
   /**
@@ -233,16 +230,16 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Returns the issue premium amount
    */
-  public async getIssuePremium(
+  public async getIssuePremiumAsync(
     setTokenAddress: Address,
     reserveAsset: Address,
-    reserveAssetQuantity: BigNumberish
+    reserveAssetQuantity: BigNumber
   ): Promise<BigNumber> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
+    this.assert.common.greaterThanZero(reserveAssetQuantity, 'reserveAssetQuantity needs to be greater than zero');
 
-    return navIssuanceModuleInstance.getIssuePremium(
+    return this.navIssuanceModuleWrapper.getIssuePremium(
       setTokenAddress,
       reserveAsset,
       reserveAssetQuantity
@@ -258,16 +255,16 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Returns the redeem premium amount
    */
-  public async getRedeemPremium(
+  public async getRedeemPremiumAsync(
     setTokenAddress: Address,
     reserveAsset: Address,
-    setTokenQuantity: BigNumberish
+    setTokenQuantity: BigNumber
   ): Promise<BigNumber> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
+    this.assert.common.greaterThanZero(setTokenQuantity, 'setTokenQuantity needs to be greater than zero');
 
-    return navIssuanceModuleInstance.getRedeemPremium(
+    return this.navIssuanceModuleWrapper.getRedeemPremium(
       setTokenAddress,
       reserveAsset,
       setTokenQuantity
@@ -282,15 +279,13 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             The manager fee
    */
-  public async getManagerFee(
+  public async getManagerFeeAsync(
     setTokenAddress: Address,
-    managerFeeIndex: BigNumberish
+    managerFeeIndex: BigNumber
   ): Promise<BigNumber> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
 
-    return navIssuanceModuleInstance.getManagerFee(
+    return this.navIssuanceModuleWrapper.getManagerFee(
       setTokenAddress,
       managerFeeIndex
     );
@@ -305,16 +300,16 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                              Expected amount of set tokens minted
    */
-  public async getExpectedSetTokenIssueQuantity(
+  public async getExpectedSetTokenIssueQuantityAsync(
     setTokenAddress: Address,
     reserveAsset: Address,
-    reserveAssetQuantity: BigNumberish
+    reserveAssetQuantity: BigNumber
   ): Promise<BigNumber> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
+    this.assert.common.greaterThanZero(reserveAssetQuantity, 'reserveAssetQuantity needs to be greater than zero');
 
-    return navIssuanceModuleInstance.getExpectedSetTokenIssueQuantity(
+    return this.navIssuanceModuleWrapper.getExpectedSetTokenIssueQuantity(
       setTokenAddress,
       reserveAsset,
       reserveAssetQuantity
@@ -330,16 +325,16 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Expected reserve asset quantity redeemed
    */
-  public async getExpectedReserveRedeemQuantity(
+  public async getExpectedReserveRedeemQuantityAsync(
     setTokenAddress: Address,
     reserveAsset: Address,
-    setTokenQuantity: BigNumberish
+    setTokenQuantity: BigNumber
   ): Promise<BigNumber> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
+    this.assert.common.greaterThanZero(setTokenQuantity, 'setTokenQuantity needs to be greater than zero');
 
-    return navIssuanceModuleInstance.getExpectedReserveRedeemQuantity(
+    return this.navIssuanceModuleWrapper.getExpectedReserveRedeemQuantity(
       setTokenAddress,
       reserveAsset,
       setTokenQuantity
@@ -355,16 +350,16 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Returns true if issue is valid
    */
-  public async isIssueValid(
+  public async isIssueValidAsync(
     setTokenAddress: Address,
     reserveAsset: Address,
-    reserveAssetQuantity: BigNumberish
+    reserveAssetQuantity: BigNumber
   ): Promise<boolean> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
+    this.assert.common.greaterThanZero(reserveAssetQuantity, 'reserveAssetQuantity needs to be greater than zero');
 
-    return navIssuanceModuleInstance.isIssueValid(
+    return this.navIssuanceModuleWrapper.isIssueValid(
       setTokenAddress,
       reserveAsset,
       reserveAssetQuantity
@@ -380,16 +375,16 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Returns true if redeem is valid
    */
-  public async isRedeemValid(
+  public async isRedeemValidAsync(
     setTokenAddress: Address,
     reserveAsset: Address,
-    setTokenQuantity: BigNumberish
+    setTokenQuantity: BigNumber
   ): Promise<boolean> {
-    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
-      this.navIssuanceModuleAddress
-    );
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
+    this.assert.common.greaterThanZero(setTokenQuantity, 'setTokenQuantity needs to be greater than zero');
 
-    return navIssuanceModuleInstance.isRedeemValid(
+    return this.navIssuanceModuleWrapper.isRedeemValid(
       setTokenAddress,
       reserveAsset,
       setTokenQuantity

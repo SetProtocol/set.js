@@ -27,6 +27,7 @@ import {
   SetTokenAPI,
   SystemAPI,
   TradeAPI,
+  NavIssuanceAPI,
 } from '@src/api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -57,6 +58,12 @@ class Set {
    * with Issuance Modules to mint and redeem SetTokens.
    */
   public issuance: IssuanceAPI;
+
+  /**
+   * An instance of the NavIssuanceAPI class. Contains interfaces for interacting
+   * with Net Asset Value Issuance Modules to mint and redeem SetTokens.
+   */
+  public navIssuance: NavIssuanceAPI;
 
   /**
    * An instance of the SetTokenAPI class. Contains interfaces for interacting
@@ -94,6 +101,7 @@ class Set {
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
     this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress);
+    this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
   }
 }
 
