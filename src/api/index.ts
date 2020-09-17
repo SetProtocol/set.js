@@ -4,6 +4,7 @@ import IssuanceAPI from './IssuanceAPI';
 import SetTokenAPI from './SetTokenAPI';
 import SystemAPI from './SystemAPI';
 import TradeAPI from './TradeAPI';
+import NavIssuanceAPI from './NavIssuanceAPI';
 
 export {
   ERC20API,
@@ -12,4 +13,5 @@ export {
   SetTokenAPI,
   SystemAPI,
   TradeAPI,
+  NavIssuanceAPI,
 };

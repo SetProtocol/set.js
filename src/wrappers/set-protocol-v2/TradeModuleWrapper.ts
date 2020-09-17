@@ -47,7 +47,7 @@ export default class TradeModuleWrapper {
    * @dev Although the SetToken units are passed in for the send and receive quantities, the total quantity
    * sent and received is the quantity of SetToken units multiplied by the SetToken totalSupply.
    *
-   * @param setTokenAddress             Instance of the SetToken to trade
+   * @param setTokenAddress             Address of the SetToken to trade
    * @param exchangeName                Human readable name of the exchange in the integrations registry
    * @param sendTokenAddress            Address of the token to be sent to the exchange
    * @param sendQuantity                Units of token in SetToken sent to the exchange
