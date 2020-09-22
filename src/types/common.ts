@@ -1,5 +1,6 @@
 import { Address } from 'set-protocol-v2/utils/types';
 import { BigNumber } from 'ethers/utils';
+import { Address } from 'cluster';
 
 export interface SetJSConfig {
   basicIssuanceModuleAddress: Address;
@@ -8,6 +9,7 @@ export interface SetJSConfig {
   protocolViewerAddress: Address;
   tradeModuleAddress: Address;
   navIssuanceModuleAddress: Address;
+  masterOracleAddress: Address;
 }
 
 export type StreamingFeeInfo = {

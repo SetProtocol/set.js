@@ -5,6 +5,7 @@ import SetTokenAPI from './SetTokenAPI';
 import SystemAPI from './SystemAPI';
 import TradeAPI from './TradeAPI';
 import NavIssuanceAPI from './NavIssuanceAPI';
+import PriceOracleAPI from './PriceOracleAPI';
 
 export {
   ERC20API,
@@ -14,4 +15,5 @@ export {
   SystemAPI,
   TradeAPI,
   NavIssuanceAPI,
+  PriceOracleAPI,
 };
