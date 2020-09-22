@@ -28,7 +28,8 @@ import {
   SystemAPI,
   TradeAPI,
   NavIssuanceAPI,
-} from '@src/api/index';
+  PriceOracleAPI,
+} from './api/index';
 
 const ethersProviders = require('ethers').providers;
 
@@ -84,6 +85,12 @@ class Set {
   public trade: TradeAPI;
 
   /**
+   * An instance of the PriceOracleAPI class. Contains interfaces for interacting
+   * with the PriceOracle contract
+   */
+  public priceOracle: PriceOracleAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(provider: Web3CoreProvider, config: SetJSConfig) {
@@ -102,6 +109,7 @@ class Set {
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
     this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress);
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
+    this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
   }
 }
 
