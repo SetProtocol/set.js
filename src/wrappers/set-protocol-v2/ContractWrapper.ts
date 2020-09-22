@@ -31,6 +31,7 @@ import {
   TradeModule,
   OneInchExchangeAdapter,
   NavIssuanceModule,
+  PriceOracle,
 } from 'set-protocol-v2/dist/utils/contracts';
 import { BasicIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
 import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
@@ -42,6 +43,7 @@ import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/Stream
 import { TradeModuleFactory } from 'set-protocol-v2/dist/typechain/TradeModuleFactory';
 import { OneInchExchangeAdapterFactory } from 'set-protocol-v2/dist/typechain/OneInchExchangeAdapterFactory';
 import { NavIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/NavIssuanceModuleFactory';
+import { PriceOracleFactory } from 'set-protocol-v2/dist/typechain/PriceOracleFactory';
 
 /**
  * @title ContractWrapper
@@ -190,6 +192,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = navIssuanceModuleContract;
       return navIssuanceModuleContract;
+    }
+  }
+
+  /**
+   * Load PriceOracle contract
+   *
+   * @param  navIssuanceModuleAddress     Address of the NAV issuance module
+   * @param  callerAddress                Address of caller, uses first one on node if none provided.
+   * @return                              PriceOracle contract instance
+   */
+  public async loadMasterPriceOracleAsync(
+    masterOracleAddress: Address,
+    callerAddress?: Address,
+  ): PriceOracle {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `MasterPriceOracle_${masterOracleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as PriceOracle;
+    } else {
+      const masterPriceOracleContract = PriceOracleFactory.connect(
+        masterOracleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = masterPriceOracleContract;
+      return masterPriceOracleContract;
     }
   }
 
