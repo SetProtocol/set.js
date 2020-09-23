@@ -198,7 +198,7 @@ export default class ContractWrapper {
   /**
    * Load PriceOracle contract
    *
-   * @param  navIssuanceModuleAddress     Address of the NAV issuance module
+   * @param  masterOracleAddress          Address of the master price oracle
    * @param  callerAddress                Address of caller, uses first one on node if none provided.
    * @return                              PriceOracle contract instance
    */
