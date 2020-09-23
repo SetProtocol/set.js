@@ -54,7 +54,7 @@ export default class PriceOracleWrapper {
   public async getPrice(
     assetOne: Address,
     assetTwo: Address,
-    callerAddress: Address = undefined
+    callerAddress: Address
   ): Promise<BigNumber> {
     const masterOracleInstance = await this.contracts.loadMasterPriceOracleAsync(
       this.masterOracleAddress,
