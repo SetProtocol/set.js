@@ -10,8 +10,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "resolveJsonModule": true,
-    // "declaration": true,
-    // "declarationDir": "./dist/types",
+    "declaration": true,
+    "declarationDir": "./dist/types",
     "paths": {
       "@src/*": [ "src/*" ],
       "@test/*": [ "test/*" ]

@@ -53,7 +53,7 @@ describe('FeeAPI', () => {
     (ProtocolViewerWrapper as any).mockClear();
   });
 
-  describe('#batchFetchStreamingFeeInfo', () => {
+  describe('#batchFetchStreamingFeeInfoAsync', () => {
     let subjectSetTokenAddress1: Address;
     let subjectSetTokenAddress2: Address;
 
@@ -63,7 +63,7 @@ describe('FeeAPI', () => {
     });
 
     async function subject(): Promise<StreamingFeeInfo[]> {
-      return await feeAPI.batchFetchStreamingFeeInfo(
+      return await feeAPI.batchFetchStreamingFeeInfoAsync(
         [subjectSetTokenAddress1, subjectSetTokenAddress2]
       );
     }

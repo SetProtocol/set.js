@@ -21,8 +21,8 @@ import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 import { Provider } from 'ethers/providers';
 
-import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
-import Assertions from '@src/assertions';
+import ERC20Wrapper from '../wrappers/set-protocol-v2/ERC20Wrapper';
+import Assertions from '../assertions';
 
 /**
  * @title  ERC20Wrapper

@@ -22,8 +22,8 @@ import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 
-import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
-import Assertions from '@src/assertions';
+import BasicIssuanceModuleWrapper from '../wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
+import Assertions from '../assertions';
 
 /**
  * @title  IssuanceAPI

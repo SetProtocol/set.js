@@ -22,8 +22,8 @@ import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber, Arrayish } from 'ethers/utils';
 
-import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
-import Assertions from '@src/assertions';
+import TradeModuleWrapper from '../wrappers/set-protocol-v2/TradeModuleWrapper';
+import Assertions from '../assertions';
 
 /**
  * @title  TradeAPI

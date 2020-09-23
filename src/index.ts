@@ -3,6 +3,6 @@ export { BigNumber } from 'ethers/utils';
 export {
   SetJSConfig,
   ModuleState,
-} from '@src/types/index';
+} from './types/index';
 
 export default Set;

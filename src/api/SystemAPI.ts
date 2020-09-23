@@ -19,7 +19,7 @@
 import { Provider } from 'ethers/providers';
 import { Address } from 'set-protocol-v2/utils/types';
 
-import ControllerWrapper from '@src/wrappers/set-protocol-v2/ControllerWrapper';
+import ControllerWrapper from '../wrappers/set-protocol-v2/ControllerWrapper';
 
 /**
  * @title  SystemAPI
