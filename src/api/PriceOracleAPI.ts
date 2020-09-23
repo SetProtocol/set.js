@@ -20,8 +20,8 @@ import { Provider } from 'ethers/providers';
 import { Address } from 'set-protocol-v2/utils/types';
 import { BigNumber } from 'ethers/utils';
 
-import PriceOracleWrapper from '../../src/wrappers/set-protocol-v2/PriceOracleWrapper';
-import Assertions from '../../src/assertions';
+import PriceOracleWrapper from '../wrappers/set-protocol-v2/PriceOracleWrapper';
+import Assertions from '../assertions';
 
 /**
  * @title  PriceOracleAPI

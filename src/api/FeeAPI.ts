@@ -22,9 +22,9 @@ import { Address } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/utils';
 
-import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
-import Assertions from '@src/assertions';
-import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
+import StreamingFeeModuleWrapper from '../wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
+import Assertions from '../assertions';
+import ProtocolViewerWrapper from '../wrappers/set-protocol-v2/ProtocolViewerWrapper';
 import { StreamingFeeInfo } from '../types';
 
 /**
@@ -61,7 +61,7 @@ export default class FeeAPI {
    * @param  tokenAddresses    Addresses of ERC20 contracts to check balance for
    * @returns                  Array of streaming fee infos
    */
-  public async batchFetchStreamingFeeInfo(
+  public async batchFetchStreamingFeeInfoAsync(
     tokenAddresses: Address[],
   ): Promise<StreamingFeeInfo[]> {
     return await this.protocolViewerWrapper.batchFetchStreamingFeeInfo(tokenAddresses);

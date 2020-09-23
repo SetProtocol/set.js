@@ -29,7 +29,6 @@ import {
   SetTokenCreator,
   StreamingFeeModule,
   TradeModule,
-  OneInchExchangeAdapter,
   NavIssuanceModule,
   PriceOracle,
 } from 'set-protocol-v2/dist/utils/contracts';
@@ -41,7 +40,6 @@ import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory'
 import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
 import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
 import { TradeModuleFactory } from 'set-protocol-v2/dist/typechain/TradeModuleFactory';
-import { OneInchExchangeAdapterFactory } from 'set-protocol-v2/dist/typechain/OneInchExchangeAdapterFactory';
 import { NavIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/NavIssuanceModuleFactory';
 import { PriceOracleFactory } from 'set-protocol-v2/dist/typechain/PriceOracleFactory';
 
@@ -219,33 +217,6 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = masterPriceOracleContract;
       return masterPriceOracleContract;
-    }
-  }
-
-  /**
-   * Load OneInchExchangeAdapter contract
-   *
-   * @param  oneInchExchangeAdapterAddress  Address of the one inch exchange adapter
-   * @param  callerAddress                  Address of caller, uses first one on node if none provided.
-   * @return                                OneInchExchangeAdapter contract instance
-   */
-  public async loadOneInchExchangeAdapterAsync(
-    oneInchExchangeAdapterAddress: Address,
-    callerAddress?: Address,
-  ): OneInchExchangeAdapter {
-    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
-    const cacheKey = `OneInchExchangeAdapter_${oneInchExchangeAdapterAddress}_${await signer.getAddress()}`;
-
-    if (cacheKey in this.cache) {
-      return this.cache[cacheKey] as OneInchExchangeAdapter;
-    } else {
-      const oneInchExchangeAdapterContract = OneInchExchangeAdapterFactory.connect(
-        oneInchExchangeAdapterAddress,
-        signer
-      );
-
-      this.cache[cacheKey] = oneInchExchangeAdapterContract;
-      return oneInchExchangeAdapterContract;
     }
   }
 

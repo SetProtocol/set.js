@@ -21,10 +21,10 @@ import { Provider } from 'ethers/providers';
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
-import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
-import Assertions from '@src/assertions';
-import { ModuleState } from '@src/types';
-import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
+import SetTokenWrapper from '../wrappers/set-protocol-v2/SetTokenWrapper';
+import Assertions from '../assertions';
+import { ModuleState } from '../types';
+import ProtocolViewerWrapper from '../wrappers/set-protocol-v2/ProtocolViewerWrapper';
 
 /**
  * @title  SetTokenWrapper
@@ -59,7 +59,7 @@ export default class SetTokenAPI {
    * @param  tokenAddresses Addresses of ERC20 contracts to check balance for
    * @returns               Addresses of managers of the set tokens
    */
-  public async batchFetchManagers(
+  public async batchFetchManagersAsync(
     tokenAddresses: Address[],
   ): Promise<Address[]> {
     return await this.protocolViewerWrapper.batchFetchManagers(tokenAddresses);

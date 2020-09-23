@@ -22,7 +22,7 @@ import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
 import ContractWrapper from './ContractWrapper';
-import { generateTxOpts } from '@src/utils/transactions';
+import { generateTxOpts } from '../../utils/transactions';
 
 /**
  * @title  SetTokenWrapper
