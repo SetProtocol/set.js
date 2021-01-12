@@ -42,6 +42,33 @@ export default class BasicIssuanceModuleWrapper {
   }
 
   /**
+   * Initializes this module to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param preIssuanceHook             Address of the preIssuanceHook
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   */
+  public async initialize(
+    setTokenAddress: Address,
+    preIssuanceHook: Address,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    const txOptions = await generateTxOpts(txOpts);
+    const basicIssuanceModuleInstance = await this.contracts.loadBasicIssuanceModuleAsync(
+      this.basicIssuanceModuleAddress,
+      callerAddress
+    );
+
+    return await basicIssuanceModuleInstance.initialize(
+      setTokenAddress,
+      preIssuanceHook,
+      txOptions,
+    );
+  }
+
+  /**
    * Issue a SetToken from its underlying positions
    *
    * @param  setTokenAddress             Address of the SetToken contract to issue
