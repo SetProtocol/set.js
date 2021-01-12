@@ -134,6 +134,64 @@ describe('TradeModuleWrapper', () => {
       );
     });
 
+    describe('#initialize', () => {
+      let subjectSetToken: Address;
+      let subjectCaller: Address;
+
+      beforeEach(async () => {
+        subjectSetToken = setToken.address;
+        subjectCaller = manager;
+      });
+
+      async function subject(): Promise<any> {
+        tradeModule = tradeModule.connect(provider.getSigner(subjectCaller));
+        return tradeModuleWrapper.initialize(subjectSetToken, subjectCaller);
+      }
+
+      it('should enable the Module on the SetToken', async () => {
+        await subject();
+        const isModuleEnabled = await setToken.isInitializedModule(tradeModule.address);
+        expect(isModuleEnabled).to.eq(true);
+      });
+
+      describe('when the caller is not the SetToken manager', () => {
+        beforeEach(async () => {
+          subjectCaller = randomAccount;
+        });
+
+        it('should revert', async () => {
+          await expect(subject()).to.be.rejectedWith('Must be the SetToken manager');
+        });
+      });
+
+      describe('when the module is not pending', () => {
+        beforeEach(async () => {
+          await subject();
+        });
+
+        it('should revert', async () => {
+          await expect(subject()).to.be.rejectedWith('Must be pending initialization');
+        });
+      });
+
+      describe('when the SetToken is not enabled on the controller', () => {
+        beforeEach(async () => {
+          const nonEnabledSetToken = await setup.createNonControllerEnabledSetToken(
+            [setup.dai.address],
+            [ether(1)],
+            [tradeModule.address],
+            manager
+          );
+
+          subjectSetToken = nonEnabledSetToken.address;
+        });
+
+        it('should revert', async () => {
+          await expect(subject()).to.be.rejectedWith('Must be controller-enabled SetToken');
+        });
+      });
+    });
+
     describe('#trade', () => {
       let sourceTokenQuantity: BigNumber;
       let destinationTokenQuantity: BigNumber;
