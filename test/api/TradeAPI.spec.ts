@@ -15,10 +15,10 @@
 */
 
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber, Arrayish } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
-import { EMPTY_BYTES } from 'set-protocol-v2/dist/utils/constants';
-import { ether } from 'set-protocol-v2/dist/utils/common';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { EMPTY_BYTES } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import TradeAPI from '@src/api/TradeAPI';
 import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
@@ -55,7 +55,7 @@ describe('TradeAPI', () => {
     let subjectSendQuantity: BigNumber;
     let subjectReceiveTokenAddress: Address;
     let subjectMinReceivedQuantity: BigNumber;
-    let subjectData: Arrayish;
+    let subjectData: string;
     let subjectCallerAddress: Address;
     let subjectTransactionOptions: any;
 

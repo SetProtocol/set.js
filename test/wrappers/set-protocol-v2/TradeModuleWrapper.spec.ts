@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 import Web3 from 'web3';
 
-import { Address, Bytes } from 'set-protocol-v2/utils/types';
-import { ADDRESS_ZERO, ZERO, EMPTY_BYTES } from 'set-protocol-v2/dist/utils/constants';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
+import { Address, Bytes } from '@setprotocol/set-protocol-v2/utils/types';
+import { ADDRESS_ZERO, ZERO, EMPTY_BYTES } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import { Blockchain, ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
 import {
   TradeModule,
   KyberNetworkProxyMock,
@@ -17,7 +17,7 @@ import {
   SetToken,
   Weth9,
   StandardTokenMock,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
 import { expect } from '../../utils/chai';
@@ -78,7 +78,7 @@ describe('TradeModuleWrapper', () => {
     oneInchExchangeMock = await deployer.mocks.deployOneInchExchangeMock(
       setup.wbtc.address,
       setup.weth.address,
-      new BigNumber(100000000), // 1 WBTC
+      BigNumber.from(100000000), // 1 WBTC
       wbtcRate,                 // Trades for 33 WETH
     );
 
@@ -123,7 +123,7 @@ describe('TradeModuleWrapper', () => {
       // Selling WBTC
       sourceToken = setup.wbtc;
       destinationToken = setup.weth;
-      wbtcUnits = new BigNumber(100000000); // 1 WBTC in base units 1 * 10 ** 8
+      wbtcUnits = BigNumber.from(100000000); // 1 WBTC in base units 1 * 10 ** 8
 
       // Create Set token
       setToken = await setup.createSetToken(

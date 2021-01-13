@@ -1,5 +1,5 @@
 import Set from './Set';
-export { BigNumber } from 'ethers/utils';
+export { BigNumber } from 'ethers/lib/ethers';
 export {
   SetJSConfig,
   ModuleState,

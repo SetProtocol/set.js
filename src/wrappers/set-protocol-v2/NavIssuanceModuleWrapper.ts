@@ -13,11 +13,11 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address, NAVIssuanceSettings } from '@setprotocol/set-protocol-v2/utils/types';
 import { ContractTransaction } from 'ethers';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber, BigNumberish } from 'ethers/utils';
-import { Provider } from 'ethers/providers';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber, BigNumberish } from 'ethers/lib/ethers';
+import { Provider } from '@ethersproject/providers';
 import { generateTxOpts } from '../../utils/transactions';
 
 import ContractWrapper from './ContractWrapper';
@@ -39,6 +39,33 @@ export default class NavIssuanceModuleWrapper {
     this.provider = provider;
     this.contracts = new ContractWrapper(this.provider);
     this.navIssuanceModuleAddress = navIssuanceModuleAddress;
+  }
+
+  /**
+   * Initializes the NavIssuanceModule on the SetToken
+   *
+   * @param setTokenAddress              Address of the SetToken contract
+   * @param navIssuanceSettings          Settings for the NavIssuanceModule
+   * @param callerAddress                Address of caller (optional)
+   * @param txOpts                       Overrides for transaction (optional)
+   */
+  public async initialize(
+    setTokenAddress: Address,
+    navIssuanceSettings: NAVIssuanceSettings,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ) {
+    const txOptions = await generateTxOpts(txOpts);
+    const navIssuanceModuleInstance = await this.contracts.loadNavIssuanceModuleAsync(
+      this.navIssuanceModuleAddress,
+      callerAddress
+    );
+
+    return await navIssuanceModuleInstance.initialize(
+      setTokenAddress,
+      navIssuanceSettings,
+      txOptions,
+    );
   }
 
   /**

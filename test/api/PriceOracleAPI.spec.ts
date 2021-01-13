@@ -15,8 +15,8 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import PriceOracleAPI from '../../src/api/PriceOracleAPI';
 import PriceOracleWrapper from '../../src/wrappers/set-protocol-v2/PriceOracleWrapper';

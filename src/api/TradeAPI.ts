@@ -17,10 +17,10 @@
 'use strict';
 
 import { ContractTransaction } from 'ethers';
-import { Provider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber, Arrayish } from 'ethers/utils';
+import { Provider } from '@ethersproject/providers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/lib/ethers';
 
 import TradeModuleWrapper from '../wrappers/set-protocol-v2/TradeModuleWrapper';
 import Assertions from '../assertions';
@@ -69,7 +69,7 @@ export default class TradeAPI {
     sendQuantity: BigNumber,
     receiveTokenAddress: Address,
     minReceivedQuantity: BigNumber,
-    data: Arrayish,
+    data: string,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {

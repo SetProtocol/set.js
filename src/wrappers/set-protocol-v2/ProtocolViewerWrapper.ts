@@ -16,8 +16,8 @@
 
 'use strict';
 
-import { Provider, JsonRpcProvider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Provider, JsonRpcProvider } from '@ethersproject/providers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import ContractWrapper from './ContractWrapper';
 import { StreamingFeeInfo } from '../../types';

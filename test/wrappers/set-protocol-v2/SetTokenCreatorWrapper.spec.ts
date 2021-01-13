@@ -15,18 +15,18 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 
-import { ADDRESS_ZERO, ZERO, ONE } from 'set-protocol-v2/dist/utils/constants';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { ProtocolUtils as CreateProtocolUtils } from 'set-protocol-v2/dist/utils/common/protocolUtils';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import { Address } from 'set-protocol-v2/dist/utils/types';
+import { ADDRESS_ZERO, ZERO, ONE } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { ProtocolUtils as CreateProtocolUtils } from '@setprotocol/set-protocol-v2/dist/utils/common/protocolUtils';
+import { Blockchain, ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import { Address } from '@setprotocol/set-protocol-v2/dist/utils/types';
 import {
   Controller,
   SetTokenCreator,
   StandardTokenMock,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import { expect } from '@test/utils/chai';
 

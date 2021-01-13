@@ -13,11 +13,11 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { ContractTransaction } from 'ethers';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber, Arrayish } from 'ethers/utils';
-import { Provider } from 'ethers/providers';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Provider } from '@ethersproject/providers';
 import { generateTxOpts } from '../../utils/transactions';
 
 import ContractWrapper from './ContractWrapper';
@@ -90,7 +90,7 @@ export default class TradeModuleWrapper {
     sendQuantity: BigNumber,
     receiveTokenAddress: Address,
     minReceivedQuantity: BigNumber,
-    data: Arrayish,
+    data: string,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {

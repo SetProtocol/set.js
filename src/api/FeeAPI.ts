@@ -17,10 +17,10 @@
 'use strict';
 
 import { ContractTransaction } from 'ethers';
-import { Provider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber } from 'ethers/utils';
+import { Provider } from '@ethersproject/providers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/lib/ethers';
 
 import StreamingFeeModuleWrapper from '../wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import Assertions from '../assertions';
@@ -106,7 +106,7 @@ export default class FeeAPI {
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
 
-    const streamingFeeScale = new BigNumber(10).pow(16);
+    const streamingFeeScale = BigNumber.from(10).pow(16);
     const newStreamingFee = newFee.mul(streamingFeeScale);
 
     return await this.streamingFeeModuleWrapper.updateStreamingFee(

@@ -15,8 +15,8 @@
 */
 
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import FeeAPI from '@src/api/FeeAPI';
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
@@ -125,7 +125,7 @@ describe('FeeAPI', () => {
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
-      subjectNewFeePercentage = new BigNumber(2);
+      subjectNewFeePercentage = BigNumber.from(2);
       subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
       subjectTransactionOptions = {};
     });
@@ -142,7 +142,7 @@ describe('FeeAPI', () => {
     it('should call the StreamingFeeModuleWrapper with correct params', async () => {
       await subject();
 
-      const streamingFeeScale = new BigNumber(10).pow(16);
+      const streamingFeeScale = BigNumber.from(10).pow(16);
       const expectedNewFeeParameter = subjectNewFeePercentage.mul(streamingFeeScale);
       expect(streamingFeeModuleWrapper.updateStreamingFee).to.have.beenCalledWith(
         subjectSetTokenAddress,

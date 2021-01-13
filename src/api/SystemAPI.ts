@@ -16,8 +16,8 @@
 
 'use strict';
 
-import { Provider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Provider } from '@ethersproject/providers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import ControllerWrapper from '../wrappers/set-protocol-v2/ControllerWrapper';
 

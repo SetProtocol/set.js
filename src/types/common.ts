@@ -1,5 +1,5 @@
-import { Address } from 'set-protocol-v2/utils/types';
-import { BigNumber } from 'ethers/utils';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { BigNumber } from 'ethers/lib/ethers';
 
 export interface SetJSConfig {
   basicIssuanceModuleAddress: Address;

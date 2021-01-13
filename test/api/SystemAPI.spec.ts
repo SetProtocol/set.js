@@ -15,7 +15,7 @@
 */
 
 import { ethers } from 'ethers';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import SystemAPI from '@src/api/SystemAPI';
 import ControllerWrapper from '@src/wrappers/set-protocol-v2/ControllerWrapper';

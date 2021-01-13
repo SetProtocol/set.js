@@ -15,9 +15,9 @@
 */
 
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
-import { ether } from 'set-protocol-v2/dist/utils/common';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import NavIssuanceAPI from '@src/api/NavIssuanceAPI';
 import NavIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/NavIssuanceModuleWrapper';
@@ -517,7 +517,7 @@ describe('NavIssuanceAPI', () => {
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
-      subjectManagerFeeIndex = new BigNumber(0);
+      subjectManagerFeeIndex = BigNumber.from(0);
     });
 
     async function subject(): Promise<BigNumber> {

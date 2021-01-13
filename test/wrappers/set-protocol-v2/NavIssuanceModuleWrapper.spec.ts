@@ -1,8 +1,9 @@
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 
-import { Address, NAVIssuanceSettings } from 'set-protocol-v2/utils/types';
-import { ONE, TWO, THREE, ZERO, ADDRESS_ZERO } from 'set-protocol-v2/dist/utils/constants';
+
+import { Address, NAVIssuanceSettings } from '@setprotocol/set-protocol-v2/utils/types';
+import { ONE, TWO, THREE, ZERO, ADDRESS_ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import {
   Blockchain,
   ether,
@@ -16,15 +17,15 @@ import {
   getExpectedReserveRedeemQuantity,
   getExpectedRedeemPositionMultiplier,
   getExpectedRedeemPositionUnit
-} from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
-import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
+} from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
+import { ERC20__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ERC20__factory';
 import {
   NAVIssuanceModule,
   ManagerIssuanceHookMock,
   SetToken,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import NAVIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/NavIssuanceModuleWrapper';
 import { expect } from '../../utils/chai';
@@ -38,7 +39,7 @@ async function reconcileBalances(setToken: SetToken, subject: any, signer: Addre
   const currentSetTokenSupply = await setToken.totalSupply();
   const components = await setToken.getComponents();
   for (let i = 0; i < components.length; i++) {
-    const component = Erc20Factory.connect(components[i], provider.getSigner(signer));
+    const component = ERC20__factory.connect(components[i], provider.getSigner(signer));
     const defaultPositionUnit = await setToken.getDefaultPositionRealUnit(component.address);
 
     const expectedBalance = preciseMul(defaultPositionUnit, currentSetTokenSupply);
@@ -88,6 +89,243 @@ describe('NAVIssuanceModuleWrapper', () => {
 
   afterEach(async () => {
     await blockchain.revertAsync();
+  });
+
+  describe('#initialize', () => {
+    let setToken: SetToken;
+    let managerIssuanceHook: Address;
+    let managerRedemptionHook: Address;
+    let reserveAssets: Address[];
+    let managerFeeRecipient: Address;
+    let managerFees: [BigNumber, BigNumber];
+    let maxManagerFee: BigNumber;
+    let premiumPercentage: BigNumber;
+    let maxPremiumPercentage: BigNumber;
+    let minSetTokenSupply: BigNumber;
+
+    let subjectNAVIssuanceSettings: NAVIssuanceSettings;
+    let subjectSetToken: Address;
+    let subjectCaller: Address;
+
+    beforeEach(async () => {
+      setToken = await setup.createSetToken(
+        [setup.weth.address],
+        [ether(1)],
+        [navIssuanceModule.address]
+      );
+      managerIssuanceHook = randomAddress;
+      managerRedemptionHook = randomAddress2;
+      reserveAssets = [setup.usdc.address, setup.weth.address];
+      managerFeeRecipient = feeRecipient;
+      // Set manager issue fee to 0.1% and redeem to 0.2%
+      managerFees = [ether(0.001), ether(0.002)];
+      // Set max managerFee to 2%
+      maxManagerFee = ether(0.02);
+      // Set premium to 1%
+      premiumPercentage = ether(0.01);
+      // Set max premium to 10%
+      maxPremiumPercentage = ether(0.1);
+      // Set min SetToken supply to 100 units
+      minSetTokenSupply = ether(100);
+
+      subjectSetToken = setToken.address;
+      subjectNAVIssuanceSettings = {
+        managerIssuanceHook,
+        managerRedemptionHook,
+        reserveAssets,
+        feeRecipient: managerFeeRecipient,
+        managerFees,
+        maxManagerFee,
+        premiumPercentage,
+        maxPremiumPercentage,
+        minSetTokenSupply,
+      } as NAVIssuanceSettings;
+      subjectCaller = owner;
+    });
+
+    async function subject(): Promise<any> {
+      navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+
+      return navIssuanceModuleWrapper.initialize(
+        subjectSetToken,
+        subjectNAVIssuanceSettings,
+        subjectCaller
+      );
+    }
+
+    it('should set the correct NAV issuance settings', async () => {
+      await subject();
+
+      const navIssuanceSettings: any = await navIssuanceModule.navIssuanceSettings(subjectSetToken);
+      const retrievedReserveAssets = await navIssuanceModule.getReserveAssets(subjectSetToken);
+      const managerIssueFee = await navIssuanceModule.getManagerFee(subjectSetToken, ZERO);
+      const managerRedeemFee = await navIssuanceModule.getManagerFee(subjectSetToken, ONE);
+
+      expect(JSON.stringify(retrievedReserveAssets)).to.eq(JSON.stringify(reserveAssets));
+      expect(navIssuanceSettings.managerIssuanceHook).to.eq(managerIssuanceHook);
+      expect(navIssuanceSettings.managerRedemptionHook).to.eq(managerRedemptionHook);
+      expect(navIssuanceSettings.feeRecipient).to.eq(managerFeeRecipient);
+      expect(managerIssueFee.toString()).to.eq(managerFees[0].toString());
+      expect(managerRedeemFee.toString()).to.eq(managerFees[1].toString());
+      expect(navIssuanceSettings.maxManagerFee.toString()).to.eq(maxManagerFee.toString());
+      expect(navIssuanceSettings.premiumPercentage.toString()).to.eq(premiumPercentage.toString());
+      expect(navIssuanceSettings.maxPremiumPercentage.toString()).to.eq(maxPremiumPercentage.toString());
+      expect(navIssuanceSettings.minSetTokenSupply.toString()).to.eq(minSetTokenSupply.toString());
+    });
+
+    it('should enable the Module on the SetToken', async () => {
+      await subject();
+      const isModuleEnabled = await setToken.isInitializedModule(navIssuanceModule.address);
+      expect(isModuleEnabled).to.eq(true);
+    });
+
+    it('should properly set reserve assets mapping', async () => {
+      await subject();
+      const isUsdcReserveAsset = await navIssuanceModule.isReserveAsset(subjectSetToken, setup.usdc.address);
+      const isWethReserveAsset = await navIssuanceModule.isReserveAsset(subjectSetToken, setup.weth.address);
+      expect(isUsdcReserveAsset).to.eq(true);
+      expect(isWethReserveAsset).to.eq(true);
+    });
+
+    describe('when the caller is not the SetToken manager', () => {
+      beforeEach(async () => {
+        subjectCaller = randomAddress3;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be the SetToken manager');
+      });
+    });
+
+    describe('when SetToken is not in pending state', () => {
+      beforeEach(async () => {
+        const newModule = randomAddress3;
+        await setup.controller.addModule(newModule);
+
+        const navIssuanceModuleNotPendingSetToken = await setup.createSetToken(
+          [setup.weth.address],
+          [ether(1)],
+          [newModule]
+        );
+
+        subjectSetToken = navIssuanceModuleNotPendingSetToken.address;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be pending initialization');
+      });
+    });
+
+    describe('when the SetToken is not enabled on the controller', () => {
+      beforeEach(async () => {
+        const nonEnabledSetToken = await setup.createNonControllerEnabledSetToken(
+          [setup.weth.address],
+          [ether(1)],
+          [navIssuanceModule.address]
+        );
+
+        subjectSetToken = nonEnabledSetToken.address;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be controller-enabled SetToken');
+      });
+    });
+
+    describe('when no reserve assets are specified', () => {
+      beforeEach(async () => {
+        subjectNAVIssuanceSettings.reserveAssets = [];
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Reserve assets must be greater than 0');
+      });
+    });
+
+    describe('when reserve asset is duplicated', () => {
+      beforeEach(async () => {
+        subjectNAVIssuanceSettings.reserveAssets = [setup.weth.address, setup.weth.address];
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Reserve assets must be unique');
+      });
+    });
+
+    describe('when manager issue fee is greater than max', () => {
+      beforeEach(async () => {
+        // Set to 100%
+        subjectNAVIssuanceSettings.managerFees = [ether(1), ether(0.002)];
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Manager issue fee must be less than max');
+      });
+    });
+
+    describe('when manager redeem fee is greater than max', () => {
+      beforeEach(async () => {
+        // Set to 100%
+        subjectNAVIssuanceSettings.managerFees = [ether(0.001), ether(1)];
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Manager redeem fee must be less than max');
+      });
+    });
+
+    describe('when max manager fee is greater than 100%', () => {
+      beforeEach(async () => {
+        // Set to 200%
+        subjectNAVIssuanceSettings.maxManagerFee = ether(2);
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Max manager fee must be less than 100%');
+      });
+    });
+
+    describe('when premium is greater than max', () => {
+      beforeEach(async () => {
+        // Set to 100%
+        subjectNAVIssuanceSettings.premiumPercentage = ether(1);
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Premium must be less than max');
+      });
+    });
+
+    describe('when premium is greater than 100%', () => {
+      beforeEach(async () => {
+        // Set to 100%
+        subjectNAVIssuanceSettings.maxPremiumPercentage = ether(2);
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Max premium percentage must be less than 100%');
+      });
+    });
+
+    describe('when feeRecipient is zero address', () => {
+      beforeEach(async () => {
+        subjectNAVIssuanceSettings.feeRecipient = ADDRESS_ZERO;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Fee Recipient must be non-zero address.');
+      });
+    });
+
+    describe('when min SetToken supply is 0', () => {
+      beforeEach(async () => {
+        subjectNAVIssuanceSettings.minSetTokenSupply = ZERO;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Min SetToken supply must be greater than 0');
+      });
+    });
   });
 
   describe('#getReserveAssets', () => {
