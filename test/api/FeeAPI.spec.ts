@@ -66,6 +66,7 @@ describe('FeeAPI', () => {
     let feeRecipient: Address;
     let maxStreamingFeePercentage: BigNumber;
     let streamingFeePercentage: BigNumber;
+    let lastStreamingFeeTimestamp: BigNumber;
 
     let subjectSetToken: Address;
     let subjectSettings: StreamingFeeState;
@@ -76,20 +77,27 @@ describe('FeeAPI', () => {
       feeRecipient = randomAddress;
       maxStreamingFeePercentage = ether(.1);
       streamingFeePercentage = ether(.02);
+      lastStreamingFeeTimestamp = BigNumber.from(0);
 
       subjectSetToken = setTokenAddress;
       subjectSettings = {
         feeRecipient,
         maxStreamingFeePercentage,
         streamingFeePercentage,
-        lastStreamingFeeTimestamp: BigNumber.from(0),
+        lastStreamingFeeTimestamp,
       } as StreamingFeeState;
       subjectCaller = owner;
       subjectTransactionOptions = {};
     });
 
     async function subject(): Promise<ContractTransaction> {
-      return feeAPI.initializeAsync(subjectSetToken, subjectSettings, subjectCaller);
+      return feeAPI.initializeAsync(
+        subjectSetToken,
+        feeRecipient,
+        streamingFeePercentage,
+        maxStreamingFeePercentage,
+        lastStreamingFeeTimestamp,
+        subjectCaller);
     }
 
     it('should call initialize on the StreamingFeeModuleWrapper', async () => {

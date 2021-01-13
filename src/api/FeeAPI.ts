@@ -59,7 +59,10 @@ export default class FeeAPI {
    * Initializes the StreamingFeeModule to the SetToken. Only callable by the SetToken's manager.
    *
    * @param setTokenAddress             Address of the SetToken to initialize
-   * @param streamingFeeState           Settings for the StreamingFeeModule
+   * @param feeRecipient                Address of the recipient of the fee
+   * @param streamingFeePercentage      Percentage of the fee to receive
+   * @param maxStreamingFeePercentage   Max streaming fee percentage
+   * @param lastStreamingFeeTimestamp   Last timestamp of the streaming fee
    * @param callerAddress               Address of caller (optional)
    * @param txOpts                      Overrides for transaction (optional)
    *
@@ -67,11 +70,21 @@ export default class FeeAPI {
    */
   public async initializeAsync(
     setTokenAddress: Address,
-    streamingFeeState: StreamingFeeState,
+    feeRecipient: Address,
+    streamingFeePercentage: BigNumber,
+    maxStreamingFeePercentage: BigNumber,
+    lastStreamingFeeTimestamp: BigNumber,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+
+    const streamingFeeState: StreamingFeeState = {
+      feeRecipient,
+      streamingFeePercentage,
+      maxStreamingFeePercentage,
+      lastStreamingFeeTimestamp,
+    };
 
     return await this.streamingFeeModuleWrapper.initialize(
       setTokenAddress,
