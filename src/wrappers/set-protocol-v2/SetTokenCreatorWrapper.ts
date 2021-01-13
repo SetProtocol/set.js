@@ -19,6 +19,7 @@
 import { Provider, JsonRpcProvider } from 'ethers/providers';
 import { BigNumber } from 'ethers/utils';
 import { Address } from 'set-protocol-v2/utils/types';
+import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
 import ContractWrapper from './ContractWrapper';
 
@@ -62,12 +63,20 @@ export default class SetTokenCreatorWrapper {
     name: string,
     symbol: string,
     callerAddress?: Address,
+    txOpts: TransactionOverrides = {}
   ): Promise<Address[]> {
     const setTokenCreator = await this.contracts.loadSetTokenCreatorAsync(
       this.setTokenCreatorAddress,
       (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
 
-    return setTokenCreator.create(components, units, modules, manager, name, symbol);
+    return setTokenCreator.create(
+      components,
+      units,
+      modules,
+      manager,
+      name,
+      symbol,
+      txOpts);
   }
 }

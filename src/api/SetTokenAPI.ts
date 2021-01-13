@@ -18,13 +18,15 @@
 
 import { ContractTransaction } from 'ethers';
 import { Provider } from 'ethers/providers';
+import { BigNumber } from 'ethers/utils';
 import { Address, Position } from 'set-protocol-v2/utils/types';
 import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
 
-import SetTokenWrapper from '../wrappers/set-protocol-v2/SetTokenWrapper';
 import Assertions from '../assertions';
 import { ModuleState } from '../types';
 import ProtocolViewerWrapper from '../wrappers/set-protocol-v2/ProtocolViewerWrapper';
+import SetTokenCreatorWrapper from '../wrappers/set-protocol-v2/SetTokenCreatorWrapper';
+import SetTokenWrapper from '../wrappers/set-protocol-v2/SetTokenWrapper';
 
 /**
  * @title  SetTokenWrapper
@@ -35,6 +37,7 @@ import ProtocolViewerWrapper from '../wrappers/set-protocol-v2/ProtocolViewerWra
  */
 export default class SetTokenAPI {
   private setTokenWrapper: SetTokenWrapper;
+  private setTokenCreatorWrapper: SetTokenCreatorWrapper;
   private protocolViewerWrapper: ProtocolViewerWrapper;
   private assert: Assertions;
 
@@ -42,15 +45,58 @@ export default class SetTokenAPI {
     provider: Provider,
     protocolViewerAddress: Address,
     streamingFeeModuleAddress: Address,
+    setTokenCreatorAddress: Address,
     assertions?: Assertions
   ) {
     this.setTokenWrapper = new SetTokenWrapper(provider);
+    this.setTokenCreatorWrapper = new SetTokenCreatorWrapper(provider, setTokenCreatorAddress);
     this.protocolViewerWrapper = new ProtocolViewerWrapper(
       provider,
       protocolViewerAddress,
       streamingFeeModuleAddress
     );
     this.assert = assertions || new Assertions();
+  }
+
+  /**
+   * Instantiates and registers a new Set Token.
+   *
+   * @param componentAddresses    List of component addresses that will comprise a Set's initial positions.
+   * @param units                 List of units. Each unit is the # of components per 10^18 of this Set Token.
+   * @param moduleAddresses       List of modules to enable. All modules must be approved by the Controller.
+   * @param managerAddress        Address of the manager.
+   * @param name                  The Set Token's name.
+   * @param symbol                The Set Token's symbol identifier.
+   * @param callerAddress         Address of caller (optional)
+   *
+   * @return            Address of newly instantiated Set Token.
+   */
+  public async create(
+    componentAddresses: Address[],
+    units: BigNumber[],
+    moduleAddresses: Address[],
+    managerAddress: Address,
+    name: string,
+    symbol: string,
+    callerAddress?: Address,
+    txOpts: TransactionOverrides = {}
+  ): Promise<Address[]> {
+    this.assert.common.isNotEmptyArray(componentAddresses, 'Component addresses must contain at least one component.');
+    this.assert.common.isEqualLength(componentAddresses, units, 'Component addresses and units must be equal length.');
+    this.assert.schema.isValidAddressList('componentAddresses', componentAddresses);
+    this.assert.schema.isValidAddressList('moduleAddresses', moduleAddresses);
+    this.assert.schema.isValidAddress('managerAddress', managerAddress);
+
+    return this.setTokenCreatorWrapper.create(
+      componentAddresses,
+      units,
+      moduleAddresses,
+      managerAddress,
+      name,
+      symbol,
+      callerAddress,
+      txOpts
+    );
   }
 
   /**

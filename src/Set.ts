@@ -104,6 +104,7 @@ class Set {
       ethersProvider,
       config.protocolViewerAddress,
       config.streamingFeeModuleAddress,
+      config.setTokenCreatorAddress,
       assertions
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);

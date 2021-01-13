@@ -40,6 +40,18 @@ export class SchemaAssertions {
   }
 
   /**
+   * Throws if a given array of inputs is not a valid Ethereum Address.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param value           Value being validated.
+   */
+  public isValidAddressList(variableName: string, values: string[]) {
+    for (const value of values) {
+      this.isValidAddress(variableName, value);
+    }
+  }
+
+  /**
    * Throws if a given input is not a valid 32 Byte String.
    *
    * @param variableName    Variable name being validated. Used for displaying error messages.

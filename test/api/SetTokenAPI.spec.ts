@@ -15,40 +15,151 @@
 */
 
 import { ethers } from 'ethers';
+import { BigNumber } from 'ethers/utils';
 import { Address, ContractTransaction, Position } from 'set-protocol-v2/utils/types';
+import { ether } from 'set-protocol-v2/dist/utils/common';
 
 import SetTokenAPI from '@src/api/SetTokenAPI';
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
 import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
+import SetTokenCreatorWrapper from '@src/wrappers/set-protocol-v2/SetTokenCreatorWrapper';
 import { ModuleState } from '@src/types';
 import { expect } from '@test/utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
-jest.mock('@src/wrappers/set-protocol-v2/SetTokenWrapper');
 jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper');
+jest.mock('@src/wrappers/set-protocol-v2/SetTokenCreatorWrapper');
+jest.mock('@src/wrappers/set-protocol-v2/SetTokenWrapper');
+
 
 describe('SetTokenAPI', () => {
   let streamingFeeModuleAddress: Address;
   let protocolViewerAddress: Address;
+  let setTokenCreatorAddress: Address;
   let setTokenAPI: SetTokenAPI;
   let setTokenWrapper: SetTokenWrapper;
+  let setTokenCreatorWrapper: SetTokenCreatorWrapper;
   let protocolViewerWrapper: ProtocolViewerWrapper;
 
   beforeEach(async () => {
     [
       streamingFeeModuleAddress,
       protocolViewerAddress,
+      setTokenCreatorAddress,
     ] = await provider.listAccounts();
 
-    setTokenAPI = new SetTokenAPI(provider, protocolViewerAddress, streamingFeeModuleAddress);
+    setTokenAPI = new SetTokenAPI(provider, protocolViewerAddress, streamingFeeModuleAddress, setTokenCreatorAddress);
+
     setTokenWrapper = (SetTokenWrapper as any).mock.instances[0];
     protocolViewerWrapper = (ProtocolViewerWrapper as any).mock.instances[0];
+    setTokenCreatorWrapper = (SetTokenCreatorWrapper as any).mock.instances[0];
   });
 
   afterEach(async () => {
     (SetTokenWrapper as any).mockClear();
     (ProtocolViewerWrapper as any).mockClear();
+  });
+
+  describe('#create', () => {
+    let subjectComponentAddresses: Address[];
+    let subjectUnits: BigNumber[];
+    let subjectModuleAddress: Address[];
+    let subjectManagerAddress: Address;
+    let subjectName: string;
+    let subjectSymbol: string;
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      subjectComponentAddresses = ['0x5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c', '0x5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c'];
+      subjectUnits = [ether(33), ether(5)];
+      subjectModuleAddress = ['0x8fD00f170FDf3772C5ebdCD90bF257316c69BA45'];
+      subjectManagerAddress = '0x8fD00f170FDf3772C5ebdCD90bF257316c69BA45';
+      subjectName = 'DPI Set';
+      subjectSymbol = 'DPI';
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<Address[]> {
+      return await setTokenAPI.create(
+        subjectComponentAddresses,
+        subjectUnits,
+        subjectModuleAddress,
+        subjectManagerAddress,
+        subjectName,
+        subjectSymbol,
+        subjectCallerAddress,
+        subjectTransactionOptions,
+      );
+    }
+
+    it('should call the SetTokenCreatorWrapper with correct params', async () => {
+      await subject();
+
+      expect(setTokenCreatorWrapper.create).to.have.beenCalledWith(
+        subjectComponentAddresses,
+        subjectUnits,
+        subjectModuleAddress,
+        subjectManagerAddress,
+        subjectName,
+        subjectSymbol,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    });
+
+    describe('when the component addresses are empty', () => {
+      beforeEach(async () => {
+        subjectComponentAddresses = [];
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Component addresses must contain at least one component.');
+      });
+    });
+
+    describe('when the component addresses and units are not the same length', () => {
+      beforeEach(async () => {
+        subjectComponentAddresses = ['0x5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c', '0x5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c'];
+        subjectUnits = [ether(5)];
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Component addresses and units must be equal length.');
+      });
+    });
+
+    describe('when the component addresses contains an invalid address', () => {
+      beforeEach(async () => {
+        subjectComponentAddresses = ['0x5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c', '0xInvalidAddress'];
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the module addresses contains an invalid address', () => {
+      beforeEach(async () => {
+        subjectModuleAddress = ['0x5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c', '0xInvalidAddress'];
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the manager address is invalid', () => {
+      beforeEach(async () => {
+        subjectManagerAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
   });
 
   describe('#batchFetchManagersAsync', () => {
