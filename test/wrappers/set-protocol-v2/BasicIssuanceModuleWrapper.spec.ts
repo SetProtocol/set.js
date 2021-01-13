@@ -251,7 +251,7 @@ describe('BasicIssuanceModuleWrapper', () => {
         try {
           await subject();
         } catch (err) {
-          expect(err.responseText).to.include(
+          expect(err.body).to.include(
             'ERC20: burn amount exceeds balance'
           );
         }

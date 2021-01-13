@@ -169,7 +169,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include(
+            expect(err.body).to.include(
               'Must have at least 1 component'
             );
           }
@@ -185,7 +185,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include(
+            expect(err.body).to.include(
               'Component and unit lengths must be the same'
             );
           }
@@ -201,7 +201,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Must be enabled module');
+            expect(err.body).to.include('Must be enabled module');
           }
         });
       });
@@ -215,7 +215,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Must have at least 1 module');
+            expect(err.body).to.include('Must have at least 1 module');
           }
         });
       });
@@ -229,7 +229,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Manager must not be empty');
+            expect(err.body).to.include('Manager must not be empty');
           }
         });
       });
@@ -243,7 +243,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include(
+            expect(err.body).to.include(
               'Component must not be null address'
             );
           }
@@ -259,7 +259,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Units must be greater than 0');
+            expect(err.body).to.include('Units must be greater than 0');
           }
         });
       });
