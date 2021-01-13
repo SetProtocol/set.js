@@ -243,7 +243,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Only manager can call');
+            expect(err.body).to.include('Only manager can call');
           }
         });
       });
@@ -259,7 +259,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Module must not be added');
+            expect(err.body).to.include('Module must not be added');
           }
         });
       });
@@ -273,7 +273,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Must be enabled on Controller');
+            expect(err.body).to.include('Must be enabled on Controller');
           }
         });
       });
@@ -307,7 +307,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Only manager can call');
+            expect(err.body).to.include('Only manager can call');
           }
         });
       });
@@ -352,7 +352,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Module must be pending');
+            expect(err.body).to.include('Module must be pending');
           }
         });
       });
@@ -366,7 +366,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Module must be pending');
+            expect(err.body).to.include('Module must be pending');
           }
         });
       });
@@ -383,7 +383,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Only when unlocked');
+            expect(err.body).to.include('Only when unlocked');
           }
         });
       });
