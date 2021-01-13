@@ -18,7 +18,7 @@
 
 import { ContractTransaction } from 'ethers';
 import { Provider } from '@ethersproject/providers';
-import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/lib/ethers';
 
@@ -53,6 +53,32 @@ export default class FeeAPI {
     );
     this.streamingFeeModuleWrapper = new StreamingFeeModuleWrapper(provider, streamingFeeIssuanceModuleAddress);
     this.assert = assertions || new Assertions();
+  }
+
+  /**
+   * Initializes the StreamingFeeModule to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param streamingFeeState           Settings for the StreamingFeeModule
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   *
+   * @return                            Transaction hash of the initialize transaction
+   */
+  public async initializeAsync(
+    setTokenAddress: Address,
+    streamingFeeState: StreamingFeeState,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+
+    return await this.streamingFeeModuleWrapper.initialize(
+      setTokenAddress,
+      streamingFeeState,
+      callerAddress,
+      txOpts,
+    );
   }
 
   /**

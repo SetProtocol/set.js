@@ -43,6 +43,33 @@ export default class IssuanceAPI {
   }
 
   /**
+   * Initializes the BasicIssuanceModule to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param preIssuanceHook             Address of the preIssuanceHook
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   *
+   * @return                            Transaction hash of the initialize transaction
+   */
+  public async initializeAsync(
+    setTokenAddress: Address,
+    preIssuanceHook: Address,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('preIssuanceHook', preIssuanceHook);
+
+    return await this.basicIssuanceModuleWrapper.initialize(
+      setTokenAddress,
+      preIssuanceHook,
+      callerAddress,
+      txOpts,
+    );
+  }
+
+  /**
    * Issue SetToken from its Position components. Each token must be approved to the Controller
    *
    * @param  setTokenAddress             Address of the SetToken contract to issue

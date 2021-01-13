@@ -30,13 +30,19 @@ jest.mock('@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper');
 
 describe('IssuanceAPI', () => {
   let basicIssuanceModuleAddress: Address;
+  let preIssuanceHook: Address;
+  let setTokenAddress: Address;
+  let owner: Address;
 
   let basicIssuanceModuleWrapper: BasicIssuanceModuleWrapper;
   let issuanceAPI: IssuanceAPI;
 
   beforeEach(async () => {
     [
+      owner,
       basicIssuanceModuleAddress,
+      preIssuanceHook,
+      setTokenAddress,
     ] = await provider.listAccounts();
 
     issuanceAPI = new IssuanceAPI(provider, basicIssuanceModuleAddress);
@@ -45,6 +51,41 @@ describe('IssuanceAPI', () => {
 
   afterEach(async () => {
     (BasicIssuanceModuleWrapper as any).mockClear();
+  });
+
+  describe('#initializeAsync', () => {
+    let subjectSetToken: Address;
+    let subjectPreIssuanceHook: Address;
+    let subjectCaller: Address;
+
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      subjectSetToken = setTokenAddress;
+      subjectPreIssuanceHook = preIssuanceHook;
+      subjectCaller = owner;
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<any> {
+      return issuanceAPI.initializeAsync(
+        subjectSetToken,
+        subjectPreIssuanceHook,
+        subjectCaller,
+        subjectTransactionOptions
+      );
+    }
+
+    it('should call initialize on the BasicIssuanceModuleWrapper', async () => {
+      await subject();
+
+      expect(basicIssuanceModuleWrapper.initialize).to.have.beenCalledWith(
+        subjectSetToken,
+        preIssuanceHook,
+        subjectCaller,
+        subjectTransactionOptions
+      );
+    });
   });
 
   describe('#issueAsync', () => {

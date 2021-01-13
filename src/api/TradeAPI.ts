@@ -47,6 +47,29 @@ export default class TradeAPI {
   }
 
   /**
+   * Initializes this TradeModule to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   *
+   * @return                            Transaction hash of the initialize transaction
+   */
+  public async initializeAsync(
+    setTokenAddress: Address,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+
+    return await this.tradeModuleWrapper.initialize(
+      setTokenAddress,
+      callerAddress,
+      txOpts
+    );
+  }
+
+  /**
    * Executes a trade on a supported DEX. Only callable by the SetToken's manager.
    *
    * @dev Although the SetToken units are passed in for the send and receive quantities, the total quantity

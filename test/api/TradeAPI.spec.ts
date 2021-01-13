@@ -30,6 +30,8 @@ jest.mock('@src/wrappers/set-protocol-v2/TradeModuleWrapper');
 
 describe('TradeAPI', () => {
   let tradeModuleAddress: Address;
+  let setTokenAddress: Address;
+  let owner: Address;
 
   let tradeModuleWrapper: TradeModuleWrapper;
 
@@ -37,6 +39,8 @@ describe('TradeAPI', () => {
 
   beforeEach(async () => {
     [
+      owner,
+      setTokenAddress,
       tradeModuleAddress,
     ] = await provider.listAccounts();
 
@@ -46,6 +50,36 @@ describe('TradeAPI', () => {
 
   afterEach(async () => {
     (TradeModuleWrapper as any).mockClear();
+  });
+
+  describe('#initializeAsync', () => {
+    let subjectSetToken: Address;
+    let subjectCaller: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      subjectSetToken = setTokenAddress;
+      subjectTransactionOptions = {};
+      subjectCaller = owner;
+    });
+
+    async function subject(): Promise<any> {
+      return tradeAPI.initializeAsync(
+        subjectSetToken,
+        subjectCaller,
+        subjectTransactionOptions
+      );
+    }
+
+    it('should call initialize on the TradeModuleWrapper', async () => {
+      await subject();
+
+      expect(tradeModuleWrapper.initialize).to.have.beenCalledWith(
+        subjectSetToken,
+        subjectCaller,
+        subjectTransactionOptions
+      );
+    });
   });
 
   describe('#tradeAsync', () => {

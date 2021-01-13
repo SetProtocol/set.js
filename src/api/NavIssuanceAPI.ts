@@ -18,7 +18,7 @@
 
 import { ContractTransaction } from 'ethers';
 import { Provider } from '@ethersproject/providers';
-import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { Address, NAVIssuanceSettings } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/lib/ethers';
 
@@ -40,6 +40,32 @@ export default class NavIssuanceAPI {
   public constructor(provider: Provider, navIssuanceModuleAddress: Address, assertions?: Assertions) {
     this.navIssuanceModuleWrapper = new NavIssuanceModuleWrapper(provider, navIssuanceModuleAddress);
     this.assert = assertions || new Assertions();
+  }
+
+  /**
+   * Initializes the NavIssuanceModule to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param navIssuanceSettings         Settings for the NavIssuanceModule
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   *
+   * @return                            Transaction hash of the initialize transaction
+   */
+  public async initializeAsync(
+    setTokenAddress: Address,
+    navIssuanceSettings: NAVIssuanceSettings,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+
+    return await this.navIssuanceModuleWrapper.initialize(
+      setTokenAddress,
+      navIssuanceSettings,
+      callerAddress,
+      txOpts,
+    );
   }
 
   /**

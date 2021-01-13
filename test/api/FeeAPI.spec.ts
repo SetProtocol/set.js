@@ -16,13 +16,16 @@
 
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/lib/ethers';
-import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
 
 import FeeAPI from '@src/api/FeeAPI';
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import { expect } from '@test/utils/chai';
 import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
 import { StreamingFeeInfo } from '@src/types';
+import {
+  ether,
+} from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
@@ -30,8 +33,11 @@ jest.mock('@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper');
 jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper');
 
 describe('FeeAPI', () => {
+  let owner: Address;
   let streamingFeeModuleAddress: Address;
   let protocolViewerAddress: Address;
+  let setTokenAddress: Address;
+  let randomAddress: Address;
 
   let streamingFeeModuleWrapper: StreamingFeeModuleWrapper;
   let protocolViewerWrapper: ProtocolViewerWrapper;
@@ -39,8 +45,11 @@ describe('FeeAPI', () => {
 
   beforeEach(async () => {
     [
+      owner,
       streamingFeeModuleAddress,
       protocolViewerAddress,
+      setTokenAddress,
+      randomAddress,
     ] = await provider.listAccounts();
 
     feeAPI = new FeeAPI(provider, protocolViewerAddress, streamingFeeModuleAddress);
@@ -51,6 +60,48 @@ describe('FeeAPI', () => {
   afterEach(async () => {
     (StreamingFeeModuleWrapper as any).mockClear();
     (ProtocolViewerWrapper as any).mockClear();
+  });
+
+  describe('#initializeAsync', () => {
+    let feeRecipient: Address;
+    let maxStreamingFeePercentage: BigNumber;
+    let streamingFeePercentage: BigNumber;
+
+    let subjectSetToken: Address;
+    let subjectSettings: StreamingFeeState;
+    let subjectCaller: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      feeRecipient = randomAddress;
+      maxStreamingFeePercentage = ether(.1);
+      streamingFeePercentage = ether(.02);
+
+      subjectSetToken = setTokenAddress;
+      subjectSettings = {
+        feeRecipient,
+        maxStreamingFeePercentage,
+        streamingFeePercentage,
+        lastStreamingFeeTimestamp: BigNumber.from(0),
+      } as StreamingFeeState;
+      subjectCaller = owner;
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<ContractTransaction> {
+      return feeAPI.initializeAsync(subjectSetToken, subjectSettings, subjectCaller);
+    }
+
+    it('should call initialize on the StreamingFeeModuleWrapper', async () => {
+      await subject();
+
+      expect(streamingFeeModuleWrapper.initialize).to.have.beenCalledWith(
+        subjectSetToken,
+        subjectSettings,
+        subjectCaller,
+        subjectTransactionOptions
+      );
+    });
   });
 
   describe('#batchFetchStreamingFeeInfoAsync', () => {
