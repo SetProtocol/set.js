@@ -4,11 +4,12 @@ import { BigNumber } from 'ethers/utils';
 export interface SetJSConfig {
   basicIssuanceModuleAddress: Address;
   controllerAddress: Address;
-  streamingFeeModuleAddress: Address;
-  protocolViewerAddress: Address;
-  tradeModuleAddress: Address;
-  navIssuanceModuleAddress: Address;
   masterOracleAddress: Address;
+  navIssuanceModuleAddress: Address;
+  protocolViewerAddress: Address;
+  setTokenCreatorAddress: Address;
+  streamingFeeModuleAddress: Address;
+  tradeModuleAddress: Address;
 }
 
 export type StreamingFeeInfo = {
