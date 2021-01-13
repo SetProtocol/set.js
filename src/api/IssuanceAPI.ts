@@ -19,6 +19,7 @@
 import { ContractTransaction } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { ADDRESS_ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/lib/ethers';
 
@@ -54,7 +55,7 @@ export default class IssuanceAPI {
    */
   public async initializeAsync(
     setTokenAddress: Address,
-    preIssuanceHook: Address,
+    preIssuanceHook: Address = ADDRESS_ZERO,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
