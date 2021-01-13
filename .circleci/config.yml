@@ -23,7 +23,7 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
       - run:
           name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/set-v2-deployments/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/set.js/.npmrc
       - run:
           name: Inject Truffle
           command: yarn global add truffle
