@@ -637,7 +637,7 @@ describe('TradeModuleWrapper', () => {
           subjectSetToken = setToken.address;
           subjectAdapterName = oneInchAdapterName;
           // Encode function data. Inputs are unused in the mock One Inch contract
-          subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+          subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
             sourceToken.address, // Send token
             destinationToken.address, // Receive token
             sourceTokenQuantity, // Send quantity
@@ -729,7 +729,7 @@ describe('TradeModuleWrapper', () => {
         describe('when function signature does not match 1inch', () => {
           beforeEach(async () => {
             // Encode random function
-            subjectData = oneInchExchangeMock.interface.functions.addSetTokenAddress.encode([ADDRESS_ZERO]);
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('addSetTokenAddress', [ADDRESS_ZERO]);
           });
 
           // it('should revert', async () => {
@@ -741,7 +741,7 @@ describe('TradeModuleWrapper', () => {
           beforeEach(async () => {
             // Get random source token
             const randomToken = randomAccount;
-            subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
               randomToken, // Send token
               destinationToken.address, // Receive token
               sourceTokenQuantity, // Send quantity
@@ -764,7 +764,7 @@ describe('TradeModuleWrapper', () => {
           beforeEach(async () => {
             // Get random source token
             const randomToken = randomAccount;
-            subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
               sourceToken.address, // Send token
               randomToken, // Receive token
               sourceTokenQuantity, // Send quantity
@@ -785,7 +785,7 @@ describe('TradeModuleWrapper', () => {
 
         describe('when send token quantity does not match calldata', () => {
           beforeEach(async () => {
-            subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
               sourceToken.address, // Send token
               destinationToken.address, // Receive token
               ZERO, // Send quantity
@@ -806,7 +806,7 @@ describe('TradeModuleWrapper', () => {
 
         describe('when min receive token quantity does not match calldata', () => {
           beforeEach(async () => {
-            subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
               sourceToken.address, // Send token
               destinationToken.address, // Receive token
               sourceTokenQuantity, // Send quantity

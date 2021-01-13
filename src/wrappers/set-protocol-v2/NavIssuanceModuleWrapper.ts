@@ -240,7 +240,7 @@ export default class NavIssuanceModuleWrapper {
    *
    * @return                             Returns true if reserve asset is valid
    */
-  public async isValidReserveAsset(
+  public async isReserveAsset(
     setTokenAddress: Address,
     reserveAsset: Address
   ): Promise<boolean> {
@@ -248,7 +248,7 @@ export default class NavIssuanceModuleWrapper {
       this.navIssuanceModuleAddress
     );
 
-    return navIssuanceModuleInstance.isValidReserveAsset(setTokenAddress, reserveAsset);
+    return navIssuanceModuleInstance.isReserveAsset(setTokenAddress, reserveAsset);
   }
 
   /**

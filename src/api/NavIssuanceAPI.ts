@@ -237,14 +237,14 @@ export default class NavIssuanceAPI {
    *
    * @return                             Returns true if reserve asset is valid
    */
-  public async isValidReserveAssetAsync(
+  public async isReserveAssetAsync(
     setTokenAddress: Address,
     reserveAsset: Address
   ): Promise<boolean> {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
     this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
 
-    return this.navIssuanceModuleWrapper.isValidReserveAsset(setTokenAddress, reserveAsset);
+    return this.navIssuanceModuleWrapper.isReserveAsset(setTokenAddress, reserveAsset);
   }
 
   /**

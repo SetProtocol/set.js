@@ -384,7 +384,7 @@ describe('NAVIssuanceModuleWrapper', () => {
     });
   });
 
-  describe('#isValidReserveAsset', () => {
+  describe('#isReserveAsset', () => {
     let reserveAssets: Address[];
     let subjectSetToken: Address;
     let subjectReserveAsset: Address;
@@ -432,7 +432,7 @@ describe('NAVIssuanceModuleWrapper', () => {
     });
 
     async function subject(): Promise<boolean> {
-      return navIssuanceModuleWrapper.isValidReserveAsset(subjectSetToken, subjectReserveAsset);
+      return navIssuanceModuleWrapper.isReserveAsset(subjectSetToken, subjectReserveAsset);
     }
 
     it('should return if reserve asset is valid', async () => {
