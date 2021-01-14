@@ -15,9 +15,9 @@
 */
 
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
-import { ether } from 'set-protocol-v2/dist/utils/common';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address, NAVIssuanceSettings } from '@setprotocol/set-protocol-v2/utils/types';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import NavIssuanceAPI from '@src/api/NavIssuanceAPI';
 import NavIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/NavIssuanceModuleWrapper';
@@ -29,13 +29,27 @@ jest.mock('@src/wrappers/set-protocol-v2/NavIssuanceModuleWrapper');
 
 describe('NavIssuanceAPI', () => {
   let navIssuanceModuleAddress: Address;
+  let randomAddress: Address;
+  let randomAddress2: Address;
+  let owner: Address;
+  let setTokenAddress: Address;
+  let usdcAddress: Address;
+  let wethAddress: Address;
+  let feeRecipient: Address;
 
   let navIssuanceModuleWrapper: NavIssuanceModuleWrapper;
   let navIssuanceAPI: NavIssuanceAPI;
 
   beforeEach(async () => {
     [
+      owner,
+      setTokenAddress,
+      randomAddress,
+      randomAddress2,
+      feeRecipient,
       navIssuanceModuleAddress,
+      usdcAddress,
+      wethAddress,
     ] = await provider.listAccounts();
 
     navIssuanceAPI = new NavIssuanceAPI(provider, navIssuanceModuleAddress);
@@ -44,6 +58,75 @@ describe('NavIssuanceAPI', () => {
 
   afterEach(async () => {
     (NavIssuanceModuleWrapper as any).mockClear();
+  });
+
+  describe('#initializeAsync', () => {
+    let managerIssuanceHook: Address;
+    let managerRedemptionHook: Address;
+    let reserveAssets: Address[];
+    let managerFeeRecipient: Address;
+    let managerFees: [BigNumber, BigNumber];
+    let maxManagerFee: BigNumber;
+    let premiumPercentage: BigNumber;
+    let maxPremiumPercentage: BigNumber;
+    let minSetTokenSupply: BigNumber;
+
+    let subjectNAVIssuanceSettings: NAVIssuanceSettings;
+    let subjectSetToken: Address;
+    let subjectCaller: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      managerIssuanceHook = randomAddress;
+      managerRedemptionHook = randomAddress2;
+      reserveAssets = [usdcAddress, wethAddress];
+      managerFeeRecipient = feeRecipient;
+      // Set manager issue fee to 0.1% and redeem to 0.2%
+      managerFees = [ether(0.001), ether(0.002)];
+      // Set max managerFee to 2%
+      maxManagerFee = ether(0.02);
+      // Set premium to 1%
+      premiumPercentage = ether(0.01);
+      // Set max premium to 10%
+      maxPremiumPercentage = ether(0.1);
+      // Set min SetToken supply to 100 units
+      minSetTokenSupply = ether(100);
+
+      subjectSetToken = setTokenAddress;
+      subjectNAVIssuanceSettings = {
+        managerIssuanceHook,
+        managerRedemptionHook,
+        reserveAssets,
+        feeRecipient: managerFeeRecipient,
+        managerFees,
+        maxManagerFee,
+        premiumPercentage,
+        maxPremiumPercentage,
+        minSetTokenSupply,
+      } as NAVIssuanceSettings;
+      subjectTransactionOptions = {};
+      subjectCaller = owner;
+    });
+
+    async function subject(): Promise<any> {
+      return navIssuanceAPI.initializeAsync(
+        subjectSetToken,
+        subjectNAVIssuanceSettings,
+        subjectCaller,
+        subjectTransactionOptions
+      );
+    }
+
+    it('should call initialize on the NavIssuanceModuleWrapper', async () => {
+      await subject();
+
+      expect(navIssuanceModuleWrapper.initialize).to.have.beenCalledWith(
+        subjectSetToken,
+        subjectNAVIssuanceSettings,
+        subjectCaller,
+        subjectTransactionOptions
+      );
+    });
   });
 
   describe('#issueAsync', () => {
@@ -517,7 +600,7 @@ describe('NavIssuanceAPI', () => {
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
-      subjectManagerFeeIndex = new BigNumber(0);
+      subjectManagerFeeIndex = BigNumber.from(0);
     });
 
     async function subject(): Promise<BigNumber> {

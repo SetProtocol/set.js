@@ -15,18 +15,18 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 
-import { ADDRESS_ZERO, ZERO, ONE } from 'set-protocol-v2/dist/utils/constants';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { ProtocolUtils as CreateProtocolUtils } from 'set-protocol-v2/dist/utils/common/protocolUtils';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import { Address } from 'set-protocol-v2/dist/utils/types';
+import { ADDRESS_ZERO, ZERO, ONE } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { ProtocolUtils as CreateProtocolUtils } from '@setprotocol/set-protocol-v2/dist/utils/common/protocolUtils';
+import { Blockchain, ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import { Address } from '@setprotocol/set-protocol-v2/dist/utils/types';
 import {
   Controller,
   SetTokenCreator,
   StandardTokenMock,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import { expect } from '@test/utils/chai';
 
@@ -169,7 +169,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include(
+            expect(err.body).to.include(
               'Must have at least 1 component'
             );
           }
@@ -185,7 +185,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include(
+            expect(err.body).to.include(
               'Component and unit lengths must be the same'
             );
           }
@@ -201,7 +201,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Must be enabled module');
+            expect(err.body).to.include('Must be enabled module');
           }
         });
       });
@@ -215,7 +215,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Must have at least 1 module');
+            expect(err.body).to.include('Must have at least 1 module');
           }
         });
       });
@@ -229,7 +229,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Manager must not be empty');
+            expect(err.body).to.include('Manager must not be empty');
           }
         });
       });
@@ -243,7 +243,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include(
+            expect(err.body).to.include(
               'Component must not be null address'
             );
           }
@@ -259,7 +259,7 @@ describe('SetTokenCreatorWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Units must be greater than 0');
+            expect(err.body).to.include('Units must be greater than 0');
           }
         });
       });

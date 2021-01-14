@@ -16,6 +16,15 @@ jobs:
       - restore_cache:
           key: module-cache-{{ checksum "yarn.lock" }}
       - run:
+          name: Set Up Environment Variables
+          command: cp .env.default .env
+      - run:
+          name: Test npm token
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/set.js/.npmrc
+      - run:
           name: Inject Truffle
           command: yarn global add truffle
       - run:

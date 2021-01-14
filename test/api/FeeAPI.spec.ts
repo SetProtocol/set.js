@@ -15,14 +15,17 @@
 */
 
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
 
 import FeeAPI from '@src/api/FeeAPI';
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import { expect } from '@test/utils/chai';
 import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
 import { StreamingFeeInfo } from '@src/types';
+import {
+  ether,
+} from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
@@ -30,8 +33,11 @@ jest.mock('@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper');
 jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper');
 
 describe('FeeAPI', () => {
+  let owner: Address;
   let streamingFeeModuleAddress: Address;
   let protocolViewerAddress: Address;
+  let setTokenAddress: Address;
+  let randomAddress: Address;
 
   let streamingFeeModuleWrapper: StreamingFeeModuleWrapper;
   let protocolViewerWrapper: ProtocolViewerWrapper;
@@ -39,8 +45,11 @@ describe('FeeAPI', () => {
 
   beforeEach(async () => {
     [
+      owner,
       streamingFeeModuleAddress,
       protocolViewerAddress,
+      setTokenAddress,
+      randomAddress,
     ] = await provider.listAccounts();
 
     feeAPI = new FeeAPI(provider, protocolViewerAddress, streamingFeeModuleAddress);
@@ -51,6 +60,56 @@ describe('FeeAPI', () => {
   afterEach(async () => {
     (StreamingFeeModuleWrapper as any).mockClear();
     (ProtocolViewerWrapper as any).mockClear();
+  });
+
+  describe('#initializeAsync', () => {
+    let feeRecipient: Address;
+    let maxStreamingFeePercentage: BigNumber;
+    let streamingFeePercentage: BigNumber;
+    let lastStreamingFeeTimestamp: BigNumber;
+
+    let subjectSetToken: Address;
+    let subjectSettings: StreamingFeeState;
+    let subjectCaller: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      feeRecipient = randomAddress;
+      maxStreamingFeePercentage = ether(.1);
+      streamingFeePercentage = ether(.02);
+      lastStreamingFeeTimestamp = BigNumber.from(0);
+
+      subjectSetToken = setTokenAddress;
+      subjectSettings = {
+        feeRecipient,
+        maxStreamingFeePercentage,
+        streamingFeePercentage,
+        lastStreamingFeeTimestamp,
+      } as StreamingFeeState;
+      subjectCaller = owner;
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<ContractTransaction> {
+      return feeAPI.initializeAsync(
+        subjectSetToken,
+        feeRecipient,
+        streamingFeePercentage,
+        maxStreamingFeePercentage,
+        lastStreamingFeeTimestamp,
+        subjectCaller);
+    }
+
+    it('should call initialize on the StreamingFeeModuleWrapper', async () => {
+      await subject();
+
+      expect(streamingFeeModuleWrapper.initialize).to.have.beenCalledWith(
+        subjectSetToken,
+        subjectSettings,
+        subjectCaller,
+        subjectTransactionOptions
+      );
+    });
   });
 
   describe('#batchFetchStreamingFeeInfoAsync', () => {
@@ -125,7 +184,7 @@ describe('FeeAPI', () => {
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
-      subjectNewFeePercentage = new BigNumber(2);
+      subjectNewFeePercentage = BigNumber.from(2);
       subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
       subjectTransactionOptions = {};
     });
@@ -142,7 +201,7 @@ describe('FeeAPI', () => {
     it('should call the StreamingFeeModuleWrapper with correct params', async () => {
       await subject();
 
-      const streamingFeeScale = new BigNumber(10).pow(16);
+      const streamingFeeScale = BigNumber.from(10).pow(16);
       const expectedNewFeeParameter = subjectNewFeePercentage.mul(streamingFeeScale);
       expect(streamingFeeModuleWrapper.updateStreamingFee).to.have.beenCalledWith(
         subjectSetTokenAddress,

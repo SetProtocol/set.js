@@ -13,11 +13,11 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
 import { ContractTransaction } from 'ethers';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber } from 'ethers/utils';
-import { Provider } from 'ethers/providers';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Provider } from '@ethersproject/providers';
 import { generateTxOpts } from '../../utils/transactions';
 
 import ContractWrapper from './ContractWrapper';
@@ -39,6 +39,33 @@ export default class StreamingFeeModuleWrapper {
     this.provider = provider;
     this.contracts = new ContractWrapper(this.provider);
     this.streamingFeeModuleAddress = streamingFeeModuleAddress;
+  }
+
+  /**
+   * Initializes this module to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param streamingFeeState           Settings for the StreamingFeeModule
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   */
+  public async initialize(
+    setTokenAddress: Address,
+    streamingFeeState: StreamingFeeState,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    const txOptions = await generateTxOpts(txOpts);
+    const streamingFeeModuleInstance = await this.contracts.loadStreamingFeeModuleAsync(
+      this.streamingFeeModuleAddress,
+      callerAddress
+    );
+
+    return await streamingFeeModuleInstance.initialize(
+      setTokenAddress,
+      streamingFeeState,
+      txOptions,
+    );
   }
 
   /**

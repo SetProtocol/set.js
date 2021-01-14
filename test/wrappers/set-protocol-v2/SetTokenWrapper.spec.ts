@@ -1,20 +1,20 @@
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 
-import { Address, Position } from 'set-protocol-v2/utils/types';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
+import { Address, Position } from '@setprotocol/set-protocol-v2/utils/types';
+import { Blockchain, ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
 import {
   Controller,
   SetToken,
   StandardTokenMock,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 import {
   ADDRESS_ZERO,
   EMPTY_BYTES,
   POSITION_STATE,
   MODULE_STATE,
-} from 'set-protocol-v2/dist/utils/constants';
+} from '@setprotocol/set-protocol-v2/dist/utils/constants';
 
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
 import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
@@ -243,7 +243,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Only manager can call');
+            expect(err.body).to.include('Only manager can call');
           }
         });
       });
@@ -259,7 +259,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Module must not be added');
+            expect(err.body).to.include('Module must not be added');
           }
         });
       });
@@ -273,7 +273,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Must be enabled on Controller');
+            expect(err.body).to.include('Must be enabled on Controller');
           }
         });
       });
@@ -307,7 +307,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Only manager can call');
+            expect(err.body).to.include('Only manager can call');
           }
         });
       });
@@ -352,7 +352,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Module must be pending');
+            expect(err.body).to.include('Module must be pending');
           }
         });
       });
@@ -366,7 +366,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Module must be pending');
+            expect(err.body).to.include('Module must be pending');
           }
         });
       });
@@ -383,7 +383,7 @@ describe('SetTokenWrapper', () => {
           try {
             await subject();
           } catch (err) {
-            expect(err.responseText).to.include('Only when unlocked');
+            expect(err.body).to.include('Only when unlocked');
           }
         });
       });

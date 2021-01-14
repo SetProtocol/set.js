@@ -13,11 +13,11 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { ContractTransaction } from 'ethers';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber, Arrayish } from 'ethers/utils';
-import { Provider } from 'ethers/providers';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Provider } from '@ethersproject/providers';
 import { generateTxOpts } from '../../utils/transactions';
 
 import ContractWrapper from './ContractWrapper';
@@ -42,6 +42,30 @@ export default class TradeModuleWrapper {
   }
 
   /**
+   * Initializes this module to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   */
+  public async initialize(
+    setTokenAddress: Address,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    const txOptions = await generateTxOpts(txOpts);
+    const tradeModuleInstance = await this.contracts.loadTradeModuleAsync(
+      this.tradeModuleAddress,
+      callerAddress
+    );
+
+    return await tradeModuleInstance.initialize(
+      setTokenAddress,
+      txOptions,
+    );
+  }
+
+  /**
    * Executes a trade on a supported DEX. Only callable by the SetToken's manager.
    *
    * @dev Although the SetToken units are passed in for the send and receive quantities, the total quantity
@@ -54,8 +78,8 @@ export default class TradeModuleWrapper {
    * @param receiveTokenAddress         Address of the token that will be received from the exchange
    * @param minReceiveQuantity          Min units of token in SetToken to be received from the exchange
    * @param data                        Arbitrary bytes to be used to construct trade call data
-   * @param  callerAddress              Address of caller (optional)
-   * @param  txOpts                     Overrides for transaction (optional)
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
    *
    * @return                            Transaction hash of the trade transaction
    */
@@ -66,7 +90,7 @@ export default class TradeModuleWrapper {
     sendQuantity: BigNumber,
     receiveTokenAddress: Address,
     minReceivedQuantity: BigNumber,
-    data: Arrayish,
+    data: string,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {

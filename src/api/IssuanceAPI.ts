@@ -17,10 +17,11 @@
 'use strict';
 
 import { ContractTransaction } from 'ethers';
-import { Provider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber } from 'ethers/utils';
+import { Provider } from '@ethersproject/providers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { ADDRESS_ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/lib/ethers';
 
 import BasicIssuanceModuleWrapper from '../wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
 import Assertions from '../assertions';
@@ -40,6 +41,33 @@ export default class IssuanceAPI {
   public constructor(provider: Provider, basicIssuanceModuleAddress: Address, assertions?: Assertions) {
     this.basicIssuanceModuleWrapper = new BasicIssuanceModuleWrapper(provider, basicIssuanceModuleAddress);
     this.assert = assertions || new Assertions();
+  }
+
+  /**
+   * Initializes the BasicIssuanceModule to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param preIssuanceHook             Address of the preIssuanceHook
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   *
+   * @return                            Transaction hash of the initialize transaction
+   */
+  public async initializeAsync(
+    setTokenAddress: Address,
+    preIssuanceHook: Address = ADDRESS_ZERO,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('preIssuanceHook', preIssuanceHook);
+
+    return await this.basicIssuanceModuleWrapper.initialize(
+      setTokenAddress,
+      preIssuanceHook,
+      callerAddress,
+      txOpts,
+    );
   }
 
   /**

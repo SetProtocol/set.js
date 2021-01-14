@@ -15,9 +15,10 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
-import { Address, ContractTransaction, Position } from 'set-protocol-v2/utils/types';
-import { ether } from 'set-protocol-v2/dist/utils/common';
+
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address, ContractTransaction, Position } from '@setprotocol/set-protocol-v2/utils/types';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import SetTokenAPI from '@src/api/SetTokenAPI';
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';

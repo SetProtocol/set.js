@@ -16,10 +16,10 @@
 
 'use strict';
 
-import { Provider, JsonRpcProvider } from 'ethers/providers';
-import { BigNumber } from 'ethers/utils';
-import { Address } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
+import { Provider, JsonRpcProvider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 
 import ContractWrapper from './ContractWrapper';
 

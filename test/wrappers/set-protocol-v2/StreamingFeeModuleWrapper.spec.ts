@@ -1,22 +1,22 @@
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 
-import { Address, StreamingFeeState } from 'set-protocol-v2/utils/types';
-import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from 'set-protocol-v2/dist/utils/constants';
+import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
+import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import {
   Blockchain,
   ether,
   getStreamingFee,
   getStreamingFeeInflationAmount,
   preciseMul,
-} from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
+} from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
 import {
   BasicIssuanceModule,
   StreamingFeeModule,
   SetToken,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import StreamingFeeModuleWrapper from '@src/wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import { expect } from '../../utils/chai';
@@ -28,6 +28,7 @@ const blockchain = new Blockchain(provider);
 describe('StreamingFeeModuleWrapper', () => {
   let owner: Address;
   let feeRecipient: Address;
+  let randomAddress: Address;
   let deployer: DeployHelper;
 
   let setup: SystemFixture;
@@ -40,6 +41,7 @@ describe('StreamingFeeModuleWrapper', () => {
     [
       owner,
       feeRecipient,
+      randomAddress,
     ] = await provider.listAccounts();
 
     deployer = new DeployHelper(provider.getSigner(owner));
@@ -62,6 +64,137 @@ describe('StreamingFeeModuleWrapper', () => {
 
   afterEach(async () => {
     await blockchain.revertAsync();
+  });
+
+  describe('#initialize', () => {
+    let setToken: SetToken;
+    let feeRecipient: Address;
+    let maxStreamingFeePercentage: BigNumber;
+    let streamingFeePercentage: BigNumber;
+
+    let subjectSetToken: Address;
+    let subjectSettings: StreamingFeeState;
+    let subjectCaller: Address;
+
+    beforeEach(async () => {
+      setToken = await setup.createSetToken(
+        [setup.weth.address],
+        [ether(1)],
+        [streamingFeeModule.address]
+      );
+
+      feeRecipient = randomAddress;
+      maxStreamingFeePercentage = ether(.1);
+      streamingFeePercentage = ether(.02);
+
+      subjectSetToken = setToken.address;
+      subjectSettings = {
+        feeRecipient,
+        maxStreamingFeePercentage,
+        streamingFeePercentage,
+        lastStreamingFeeTimestamp: ZERO,
+      } as StreamingFeeState;
+      subjectCaller = owner;
+    });
+
+    async function subject(): Promise<ContractTransaction> {
+      streamingFeeModule = streamingFeeModule.connect(provider.getSigner(subjectCaller));
+      return streamingFeeModuleWrapper.initialize(subjectSetToken, subjectSettings, subjectCaller);
+    }
+
+    it('should enable the Module on the SetToken', async () => {
+      await subject();
+      const isModuleEnabled = await setToken.isInitializedModule(streamingFeeModule.address);
+      expect(isModuleEnabled).to.eq(true);
+    });
+
+    it('should set all the fields in FeeState correctly', async () => {
+      const txTimestamp = BigNumber.from((await provider.getBlock((await subject()).blockHash)).timestamp);
+
+      const feeState: StreamingFeeState = await streamingFeeModule.feeStates(setToken.address);
+
+      expect(feeState.feeRecipient).to.eq(subjectSettings.feeRecipient);
+      expect(feeState.maxStreamingFeePercentage.toString()).to.eq(subjectSettings.maxStreamingFeePercentage.toString());
+      expect(feeState.streamingFeePercentage.toString()).to.eq(subjectSettings.streamingFeePercentage.toString());
+      expect(feeState.lastStreamingFeeTimestamp.toString()).to.eq(txTimestamp.toString());
+    });
+
+    describe('when the caller is not the SetToken manager', () => {
+      beforeEach(async () => {
+        subjectCaller = randomAddress;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be the SetToken manager');
+      });
+    });
+
+    describe('when module is in NONE state', () => {
+      beforeEach(async () => {
+        await subject();
+        await setToken.removeModule(streamingFeeModule.address);
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be pending initialization');
+      });
+    });
+
+    describe('when module is in INITIALIZED state', () => {
+      beforeEach(async () => {
+        await subject();
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be pending initialization');
+      });
+    });
+
+    describe('when the SetToken is not enabled on the controller', () => {
+      beforeEach(async () => {
+        const nonEnabledSetToken = await setup.createNonControllerEnabledSetToken(
+          [setup.weth.address],
+          [ether(1)],
+          [streamingFeeModule.address]
+        );
+
+        subjectSetToken = nonEnabledSetToken.address;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be controller-enabled SetToken');
+      });
+    });
+
+    describe('when passed max fee is greater than 100%', () => {
+      beforeEach(async () => {
+        subjectSettings.maxStreamingFeePercentage = ether(1.1);
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Max fee must be < 100%.');
+      });
+    });
+
+    describe('when passed fee is greater than max fee', () => {
+      beforeEach(async () => {
+        subjectSettings.streamingFeePercentage = ether(.11);
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Fee must be <= max.');
+      });
+    });
+
+    describe('when feeRecipient is zero address', () => {
+      beforeEach(async () => {
+        subjectSettings.feeRecipient = ADDRESS_ZERO;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Fee Recipient must be non-zero address.');
+      });
+    });
   });
 
   describe('#accrueFee', () => {
@@ -121,7 +254,7 @@ describe('StreamingFeeModuleWrapper', () => {
       const transactionHash = await subject();
 
       const block = (await provider.getBlock(transactionHash.blockNumber)).timestamp;
-      const transactionTimestamp = new BigNumber(block);
+      const transactionTimestamp = BigNumber.from(block);
       const expectedFeeInflation = await getStreamingFee(
         streamingFeeModule,
         subjectSetToken,

@@ -17,10 +17,10 @@
 'use strict';
 
 import { ContractTransaction } from 'ethers';
-import { Provider } from 'ethers/providers';
-import { BigNumber } from 'ethers/utils';
-import { Address, Position } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
+import { Provider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Address, Position } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 
 import Assertions from '../assertions';
 import { ModuleState } from '../types';

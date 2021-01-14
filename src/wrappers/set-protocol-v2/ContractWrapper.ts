@@ -16,9 +16,9 @@
 
 'use strict';
 
-import { Provider, JsonRpcProvider } from 'ethers/providers';
+import { Provider, JsonRpcProvider } from '@ethersproject/providers';
 import { Contract, Signer } from 'ethers';
-import { Address } from 'set-protocol-v2/utils/types';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import {
   BasicIssuanceModule,
@@ -31,17 +31,17 @@ import {
   TradeModule,
   NavIssuanceModule,
   PriceOracle,
-} from 'set-protocol-v2/dist/utils/contracts';
-import { BasicIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/BasicIssuanceModuleFactory';
-import { ControllerFactory } from 'set-protocol-v2/dist/typechain/ControllerFactory';
-import { Erc20Factory } from 'set-protocol-v2/dist/typechain/Erc20Factory';
-import { ProtocolViewerFactory } from 'set-protocol-v2/dist/typechain/ProtocolViewerFactory';
-import { SetTokenFactory } from 'set-protocol-v2/dist/typechain/SetTokenFactory';
-import { SetTokenCreatorFactory } from 'set-protocol-v2/dist/typechain/SetTokenCreatorFactory';
-import { StreamingFeeModuleFactory } from 'set-protocol-v2/dist/typechain/StreamingFeeModuleFactory';
-import { TradeModuleFactory } from 'set-protocol-v2/dist/typechain/TradeModuleFactory';
-import { NavIssuanceModuleFactory } from 'set-protocol-v2/dist/typechain/NavIssuanceModuleFactory';
-import { PriceOracleFactory } from 'set-protocol-v2/dist/typechain/PriceOracleFactory';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
+import { Controller__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/Controller__factory';
+import { ERC20__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ERC20__factory';
+import { ProtocolViewer__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ProtocolViewer__factory';
+import { SetToken__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/SetToken__factory';
+import { SetTokenCreator__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/SetTokenCreator__factory';
+import { StreamingFeeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/StreamingFeeModule__factory';
+import { TradeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/TradeModule__factory';
+import { NavIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/NavIssuanceModule__factory';
+import { PriceOracle__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PriceOracle__factory';
 
 /**
  * @title ContractWrapper
@@ -75,7 +75,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as Controller;
     } else {
-      const controllerContract = ControllerFactory.connect(
+      const controllerContract = Controller__factory.connect(
         controllerAddress,
         signer
       );
@@ -102,7 +102,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as ERC20;
     } else {
-      const tokenContract = Erc20Factory.connect(
+      const tokenContract = ERC20__factory.connect(
         tokenAddress,
         signer
       );
@@ -129,7 +129,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as BasicIssuanceModule;
     } else {
-      const basicIssuanceModuleContract = BasicIssuanceModuleFactory.connect(
+      const basicIssuanceModuleContract = BasicIssuanceModule__factory.connect(
         basicIssuanceModuleAddress,
         signer
       );
@@ -156,7 +156,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as TradeModule;
     } else {
-      const tradeModuleContract = TradeModuleFactory.connect(
+      const tradeModuleContract = TradeModule__factory.connect(
         tradeModuleAddress,
         signer
       );
@@ -183,7 +183,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as NavIssuanceModule;
     } else {
-      const navIssuanceModuleContract = NavIssuanceModuleFactory.connect(
+      const navIssuanceModuleContract = NavIssuanceModule__factory.connect(
         navIssuanceModuleAddress,
         signer
       );
@@ -210,7 +210,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as PriceOracle;
     } else {
-      const masterPriceOracleContract = PriceOracleFactory.connect(
+      const masterPriceOracleContract = PriceOracle__factory.connect(
         masterOracleAddress,
         signer
       );
@@ -237,7 +237,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as SetToken;
     } else {
-      const setTokenContract = SetTokenFactory.connect(
+      const setTokenContract = SetToken__factory.connect(
         setTokenAddress,
         signer
       );
@@ -263,7 +263,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as SetTokenCreator;
     } else {
-      const setTokenCreator = SetTokenCreatorFactory.connect(
+      const setTokenCreator = SetTokenCreator__factory.connect(
         setTokenCreatorAddress,
         signer
       );
@@ -290,7 +290,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as StreamingFeeModule;
     } else {
-      const streamingFeeModuleContract = StreamingFeeModuleFactory.connect(
+      const streamingFeeModuleContract = StreamingFeeModule__factory.connect(
         streamingFeeModuleAddress,
         signer
       );
@@ -316,7 +316,7 @@ export default class ContractWrapper {
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as ProtocolViewer;
     } else {
-      const protocolViewerContract = ProtocolViewerFactory.connect(
+      const protocolViewerContract = ProtocolViewer__factory.connect(
         protocolViewerAddress,
         signer
       );

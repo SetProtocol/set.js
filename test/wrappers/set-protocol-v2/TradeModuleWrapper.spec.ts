@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 import Web3 from 'web3';
 
-import { Address, Bytes } from 'set-protocol-v2/utils/types';
-import { ADDRESS_ZERO, ZERO, EMPTY_BYTES } from 'set-protocol-v2/dist/utils/constants';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
+import { Address, Bytes } from '@setprotocol/set-protocol-v2/utils/types';
+import { ADDRESS_ZERO, ZERO, EMPTY_BYTES } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import { Blockchain, ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
 import {
   TradeModule,
   KyberNetworkProxyMock,
@@ -17,7 +17,7 @@ import {
   SetToken,
   Weth9,
   StandardTokenMock,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
 import { expect } from '../../utils/chai';
@@ -78,7 +78,7 @@ describe('TradeModuleWrapper', () => {
     oneInchExchangeMock = await deployer.mocks.deployOneInchExchangeMock(
       setup.wbtc.address,
       setup.weth.address,
-      new BigNumber(100000000), // 1 WBTC
+      BigNumber.from(100000000), // 1 WBTC
       wbtcRate,                 // Trades for 33 WETH
     );
 
@@ -123,7 +123,7 @@ describe('TradeModuleWrapper', () => {
       // Selling WBTC
       sourceToken = setup.wbtc;
       destinationToken = setup.weth;
-      wbtcUnits = new BigNumber(100000000); // 1 WBTC in base units 1 * 10 ** 8
+      wbtcUnits = BigNumber.from(100000000); // 1 WBTC in base units 1 * 10 ** 8
 
       // Create Set token
       setToken = await setup.createSetToken(
@@ -132,6 +132,64 @@ describe('TradeModuleWrapper', () => {
         [setup.issuanceModule.address, tradeModule.address],
         manager
       );
+    });
+
+    describe('#initialize', () => {
+      let subjectSetToken: Address;
+      let subjectCaller: Address;
+
+      beforeEach(async () => {
+        subjectSetToken = setToken.address;
+        subjectCaller = manager;
+      });
+
+      async function subject(): Promise<any> {
+        tradeModule = tradeModule.connect(provider.getSigner(subjectCaller));
+        return tradeModuleWrapper.initialize(subjectSetToken, subjectCaller);
+      }
+
+      it('should enable the Module on the SetToken', async () => {
+        await subject();
+        const isModuleEnabled = await setToken.isInitializedModule(tradeModule.address);
+        expect(isModuleEnabled).to.eq(true);
+      });
+
+      describe('when the caller is not the SetToken manager', () => {
+        beforeEach(async () => {
+          subjectCaller = randomAccount;
+        });
+
+        it('should revert', async () => {
+          await expect(subject()).to.be.rejectedWith('Must be the SetToken manager');
+        });
+      });
+
+      describe('when the module is not pending', () => {
+        beforeEach(async () => {
+          await subject();
+        });
+
+        it('should revert', async () => {
+          await expect(subject()).to.be.rejectedWith('Must be pending initialization');
+        });
+      });
+
+      describe('when the SetToken is not enabled on the controller', () => {
+        beforeEach(async () => {
+          const nonEnabledSetToken = await setup.createNonControllerEnabledSetToken(
+            [setup.dai.address],
+            [ether(1)],
+            [tradeModule.address],
+            manager
+          );
+
+          subjectSetToken = nonEnabledSetToken.address;
+        });
+
+        it('should revert', async () => {
+          await expect(subject()).to.be.rejectedWith('Must be controller-enabled SetToken');
+        });
+      });
     });
 
     describe('#trade', () => {
@@ -579,7 +637,7 @@ describe('TradeModuleWrapper', () => {
           subjectSetToken = setToken.address;
           subjectAdapterName = oneInchAdapterName;
           // Encode function data. Inputs are unused in the mock One Inch contract
-          subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+          subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
             sourceToken.address, // Send token
             destinationToken.address, // Receive token
             sourceTokenQuantity, // Send quantity
@@ -671,7 +729,7 @@ describe('TradeModuleWrapper', () => {
         describe('when function signature does not match 1inch', () => {
           beforeEach(async () => {
             // Encode random function
-            subjectData = oneInchExchangeMock.interface.functions.addSetTokenAddress.encode([ADDRESS_ZERO]);
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('addSetTokenAddress', [ADDRESS_ZERO]);
           });
 
           // it('should revert', async () => {
@@ -683,7 +741,7 @@ describe('TradeModuleWrapper', () => {
           beforeEach(async () => {
             // Get random source token
             const randomToken = randomAccount;
-            subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
               randomToken, // Send token
               destinationToken.address, // Receive token
               sourceTokenQuantity, // Send quantity
@@ -706,7 +764,7 @@ describe('TradeModuleWrapper', () => {
           beforeEach(async () => {
             // Get random source token
             const randomToken = randomAccount;
-            subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
               sourceToken.address, // Send token
               randomToken, // Receive token
               sourceTokenQuantity, // Send quantity
@@ -727,7 +785,7 @@ describe('TradeModuleWrapper', () => {
 
         describe('when send token quantity does not match calldata', () => {
           beforeEach(async () => {
-            subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
               sourceToken.address, // Send token
               destinationToken.address, // Receive token
               ZERO, // Send quantity
@@ -748,7 +806,7 @@ describe('TradeModuleWrapper', () => {
 
         describe('when min receive token quantity does not match calldata', () => {
           beforeEach(async () => {
-            subjectData = oneInchExchangeMock.interface.functions.swap.encode([
+            subjectData = oneInchExchangeMock.interface.encodeFunctionData('swap', [
               sourceToken.address, // Send token
               destinationToken.address, // Receive token
               sourceTokenQuantity, // Send quantity

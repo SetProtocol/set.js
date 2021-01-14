@@ -17,10 +17,10 @@
 'use strict';
 
 import { ContractTransaction } from 'ethers';
-import { Provider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber } from 'ethers/utils';
+import { Provider } from '@ethersproject/providers';
+import { Address, NAVIssuanceSettings } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/lib/ethers';
 
 import NavIssuanceModuleWrapper from '../wrappers/set-protocol-v2/NavIssuanceModuleWrapper';
 import Assertions from '../assertions';
@@ -40,6 +40,32 @@ export default class NavIssuanceAPI {
   public constructor(provider: Provider, navIssuanceModuleAddress: Address, assertions?: Assertions) {
     this.navIssuanceModuleWrapper = new NavIssuanceModuleWrapper(provider, navIssuanceModuleAddress);
     this.assert = assertions || new Assertions();
+  }
+
+  /**
+   * Initializes the NavIssuanceModule to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param navIssuanceSettings         Settings for the NavIssuanceModule
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   *
+   * @return                            Transaction hash of the initialize transaction
+   */
+  public async initializeAsync(
+    setTokenAddress: Address,
+    navIssuanceSettings: NAVIssuanceSettings,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+
+    return await this.navIssuanceModuleWrapper.initialize(
+      setTokenAddress,
+      navIssuanceSettings,
+      callerAddress,
+      txOpts,
+    );
   }
 
   /**
@@ -211,14 +237,14 @@ export default class NavIssuanceAPI {
    *
    * @return                             Returns true if reserve asset is valid
    */
-  public async isValidReserveAssetAsync(
+  public async isReserveAssetAsync(
     setTokenAddress: Address,
     reserveAsset: Address
   ): Promise<boolean> {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
     this.assert.schema.isValidAddress('reserveAsset', reserveAsset);
 
-    return this.navIssuanceModuleWrapper.isValidReserveAsset(setTokenAddress, reserveAsset);
+    return this.navIssuanceModuleWrapper.isReserveAsset(setTokenAddress, reserveAsset);
   }
 
   /**

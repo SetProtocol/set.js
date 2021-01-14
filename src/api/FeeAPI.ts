@@ -17,10 +17,10 @@
 'use strict';
 
 import { ContractTransaction } from 'ethers';
-import { Provider } from 'ethers/providers';
-import { Address } from 'set-protocol-v2/utils/types';
-import { TransactionOverrides } from 'set-protocol-v2/dist/typechain';
-import { BigNumber } from 'ethers/utils';
+import { Provider } from '@ethersproject/providers';
+import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers/lib/ethers';
 
 import StreamingFeeModuleWrapper from '../wrappers/set-protocol-v2/StreamingFeeModuleWrapper';
 import Assertions from '../assertions';
@@ -53,6 +53,45 @@ export default class FeeAPI {
     );
     this.streamingFeeModuleWrapper = new StreamingFeeModuleWrapper(provider, streamingFeeIssuanceModuleAddress);
     this.assert = assertions || new Assertions();
+  }
+
+  /**
+   * Initializes the StreamingFeeModule to the SetToken. Only callable by the SetToken's manager.
+   *
+   * @param setTokenAddress             Address of the SetToken to initialize
+   * @param feeRecipient                Address of the recipient of the fee
+   * @param streamingFeePercentage      Percentage of the fee to receive
+   * @param maxStreamingFeePercentage   Max streaming fee percentage
+   * @param lastStreamingFeeTimestamp   Last timestamp of the streaming fee
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
+   *
+   * @return                            Transaction hash of the initialize transaction
+   */
+  public async initializeAsync(
+    setTokenAddress: Address,
+    feeRecipient: Address,
+    streamingFeePercentage: BigNumber,
+    maxStreamingFeePercentage: BigNumber,
+    lastStreamingFeeTimestamp: BigNumber,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+
+    const streamingFeeState: StreamingFeeState = {
+      feeRecipient,
+      streamingFeePercentage,
+      maxStreamingFeePercentage,
+      lastStreamingFeeTimestamp,
+    };
+
+    return await this.streamingFeeModuleWrapper.initialize(
+      setTokenAddress,
+      streamingFeeState,
+      callerAddress,
+      txOpts,
+    );
   }
 
   /**
@@ -106,7 +145,7 @@ export default class FeeAPI {
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
 
-    const streamingFeeScale = new BigNumber(10).pow(16);
+    const streamingFeeScale = BigNumber.from(10).pow(16);
     const newStreamingFee = newFee.mul(streamingFeeScale);
 
     return await this.streamingFeeModuleWrapper.updateStreamingFee(

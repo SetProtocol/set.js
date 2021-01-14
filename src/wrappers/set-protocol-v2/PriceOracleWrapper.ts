@@ -13,9 +13,9 @@
 
 'use strict';
 
-import { Address } from 'set-protocol-v2/utils/types';
-import { BigNumber } from 'ethers/utils';
-import { Provider } from 'ethers/providers';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { BigNumber } from 'ethers/lib/ethers';
+import { Provider } from '@ethersproject/providers';
 
 import ContractWrapper from './ContractWrapper';
 

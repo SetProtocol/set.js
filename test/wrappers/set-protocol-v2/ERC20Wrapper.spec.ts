@@ -15,11 +15,11 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 
-import { Address } from 'set-protocol-v2/utils/types';
-import { Blockchain, ether } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { Blockchain, ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
 
 import ERC20Wrapper from '@src/wrappers/set-protocol-v2/ERC20Wrapper';
 import { expect } from '../../utils/chai';
@@ -58,7 +58,7 @@ describe('ERC20Wrapper', () => {
     const tokenSupply: BigNumber = ether(1000000000);
     const tokenName: string = 'Token';
     const tokenSymbol: string = 'Symbol';
-    const tokenDecimals: BigNumber = new BigNumber(18);
+    const tokenDecimals: BigNumber = BigNumber.from(18);
 
     let subjectTokenAddress: Address;
 
@@ -125,7 +125,7 @@ describe('ERC20Wrapper', () => {
     let subjectSpenderAddress: Address;
 
     beforeEach(async () => {
-      approveAllowance = new BigNumber(1000);
+      approveAllowance = BigNumber.from(1000);
       const deployedToken = await deployer.mocks.deployTokenMock(owner);
       subjectTokenAddress = deployedToken.address;
 
@@ -165,7 +165,7 @@ describe('ERC20Wrapper', () => {
       const deployedToken = await deployer.mocks.deployTokenMock(owner);
       subjectTokenAddress = deployedToken.address;
       subjectSpenderAddress = manager;
-      subjectApproveAllowance = new BigNumber(100);
+      subjectApproveAllowance = BigNumber.from(100);
       subjectCaller = owner;
     });
 
@@ -198,7 +198,7 @@ describe('ERC20Wrapper', () => {
     let subjectTransferAmount: BigNumber;
 
     beforeEach(async () => {
-      approveAllowance = new BigNumber(1000);
+      approveAllowance = BigNumber.from(1000);
       const deployedToken = await deployer.mocks.deployTokenMock(owner);
 
       subjectOwnerAddress = owner;
@@ -246,7 +246,7 @@ describe('ERC20Wrapper', () => {
       subjectTokenAddress = deployedToken.address;
       subjectOwnerAddress = owner;
       subjectTokenReceiver = manager;
-      subjectTransferAmount = new BigNumber(1000);
+      subjectTransferAmount = BigNumber.from(1000);
     });
 
     async function subject(): Promise<string> {

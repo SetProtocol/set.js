@@ -1,15 +1,15 @@
 import { ethers, ContractTransaction } from 'ethers';
-import { BigNumber } from 'ethers/utils';
+import { BigNumber } from 'ethers/lib/ethers';
 
-import { Address } from 'set-protocol-v2/utils/types';
-import { ADDRESS_ZERO, ZERO } from 'set-protocol-v2/dist/utils/constants';
-import { Blockchain, ether, bitcoin } from 'set-protocol-v2/dist/utils/common';
-import DeployHelper from 'set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from 'set-protocol-v2/dist/utils/fixtures';
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { ADDRESS_ZERO, ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
+import { Blockchain, ether, bitcoin } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
 import {
   BasicIssuanceModule,
   SetToken,
-} from 'set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import BasicIssuanceModuleWrapper from '@src/wrappers/set-protocol-v2/BasicIssuanceModuleWrapper';
 import { expect } from '../../utils/chai';
@@ -22,6 +22,7 @@ describe('BasicIssuanceModuleWrapper', () => {
   let owner: Address;
   let recipient: Address;
   let functionCaller: Address;
+  let randomAddress: Address;
 
   let basicIssuanceModule: BasicIssuanceModule;
 
@@ -35,6 +36,7 @@ describe('BasicIssuanceModuleWrapper', () => {
       owner,
       recipient,
       functionCaller,
+      randomAddress,
     ] = await provider.listAccounts();
 
     deployer = new DeployHelper(provider.getSigner(owner));
@@ -54,6 +56,90 @@ describe('BasicIssuanceModuleWrapper', () => {
 
   afterEach(async () => {
     await blockchain.revertAsync();
+  });
+
+  describe('#initialize', () => {
+    let setToken: SetToken;
+    let subjectSetToken: Address;
+    let subjectPreIssuanceHook: Address;
+    let subjectCaller: Address;
+
+    beforeEach(async () => {
+      setToken = await setup.createSetToken(
+        [setup.weth.address],
+        [ether(1)],
+        [basicIssuanceModule.address]
+      );
+      subjectSetToken = setToken.address;
+      subjectPreIssuanceHook = randomAddress;
+      subjectCaller = owner;
+    });
+
+    async function subject(): Promise<any> {
+      basicIssuanceModule = basicIssuanceModule.connect(provider.getSigner(subjectCaller));
+      return basicIssuanceModuleWrapper.initialize(
+        subjectSetToken,
+        subjectPreIssuanceHook,
+        subjectCaller
+      );
+    }
+
+    it('should enable the Module on the SetToken', async () => {
+      await subject();
+      const isModuleEnabled = await setToken.isInitializedModule(basicIssuanceModule.address);
+      expect(isModuleEnabled).to.eq(true);
+    });
+
+    it('should properly set the issuance hooks', async () => {
+      await subject();
+      const preIssuanceHooks = await basicIssuanceModule.managerIssuanceHook(subjectSetToken);
+      expect(preIssuanceHooks).to.eq(subjectPreIssuanceHook);
+    });
+
+    describe('when the caller is not the SetToken manager', () => {
+      beforeEach(async () => {
+        subjectCaller = randomAddress;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be the SetToken manager');
+      });
+    });
+
+    describe('when SetToken is not in pending state', () => {
+      beforeEach(async () => {
+        const newModule = randomAddress;
+        await setup.controller.addModule(newModule);
+
+        const issuanceModuleNotPendingSetToken = await setup.createSetToken(
+          [setup.weth.address],
+          [ether(1)],
+          [newModule]
+        );
+
+        subjectSetToken = issuanceModuleNotPendingSetToken.address;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be pending initialization');
+      });
+    });
+
+    describe('when the SetToken is not enabled on the controller', () => {
+      beforeEach(async () => {
+        const nonEnabledSetToken = await setup.createNonControllerEnabledSetToken(
+          [setup.weth.address],
+          [ether(1)],
+          [basicIssuanceModule.address]
+        );
+
+        subjectSetToken = nonEnabledSetToken.address;
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith('Must be controller-enabled SetToken');
+      });
+    });
   });
 
   describe('#issue', () => {
@@ -165,7 +251,7 @@ describe('BasicIssuanceModuleWrapper', () => {
         try {
           await subject();
         } catch (err) {
-          expect(err.responseText).to.include(
+          expect(err.body).to.include(
             'ERC20: burn amount exceeds balance'
           );
         }

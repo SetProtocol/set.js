@@ -16,8 +16,8 @@
 
 'use strict';
 
-import { BigNumber } from 'ethers/utils';
-import { ZERO } from 'set-protocol-v2/dist/utils/constants';
+import { BigNumber } from 'ethers/lib/ethers';
+import { ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 
 export class CommonAssertions {
   public greaterThanZero(quantity: BigNumber, errorMessage: string) {
