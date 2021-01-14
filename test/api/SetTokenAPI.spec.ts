@@ -62,7 +62,7 @@ describe('SetTokenAPI', () => {
     (ProtocolViewerWrapper as any).mockClear();
   });
 
-  describe('#create', () => {
+  describe('#createAsync', () => {
     let subjectComponentAddresses: Address[];
     let subjectUnits: BigNumber[];
     let subjectModuleAddress: Address[];
@@ -84,7 +84,7 @@ describe('SetTokenAPI', () => {
     });
 
     async function subject(): Promise<Address[]> {
-      return await setTokenAPI.create(
+      return await setTokenAPI.createAsync(
         subjectComponentAddresses,
         subjectUnits,
         subjectModuleAddress,
@@ -164,9 +164,10 @@ describe('SetTokenAPI', () => {
   });
 
   describe('#batchFetchManagersAsync', () => {
+    let setTokenAddresses: Address[];
+
     let subjectSetTokenAddress1: Address;
     let subjectSetTokenAddress2: Address;
-    let setTokenAddresses: Address[];
 
     beforeEach(async () => {
       subjectSetTokenAddress1 = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
