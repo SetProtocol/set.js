@@ -19,6 +19,7 @@
 import { ContractTransaction } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers/lib/ethers';
+import { ProtocolUtils } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import { Address, Position } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 
@@ -39,6 +40,7 @@ export default class SetTokenAPI {
   private setTokenWrapper: SetTokenWrapper;
   private setTokenCreatorWrapper: SetTokenCreatorWrapper;
   private protocolViewerWrapper: ProtocolViewerWrapper;
+  private protocolUtils: ProtocolUtils;
   private assert: Assertions;
 
   public constructor(
@@ -55,6 +57,7 @@ export default class SetTokenAPI {
       protocolViewerAddress,
       streamingFeeModuleAddress
     );
+    this.protocolUtils = new ProtocolUtils(provider);
     this.assert = assertions || new Assertions();
   }
 
@@ -71,7 +74,7 @@ export default class SetTokenAPI {
    *
    * @return            Address of newly instantiated Set Token.
    */
-  public async create(
+  public async createAsync(
     componentAddresses: Address[],
     units: BigNumber[],
     moduleAddresses: Address[],
@@ -97,6 +100,19 @@ export default class SetTokenAPI {
       callerAddress,
       txOpts
     );
+  }
+
+  /*
+   * Fetch a Set Token address from a createAsync transaction hash by looking at logs and retrieving
+   * the created Set address
+   *
+   * @param  txHash    Transaction hash of the createAsync transaction
+   * @return           Address of the newly created Set
+   */
+  public async getSetAddressFromCreateHash(txHash: string): Promise<Address> {
+    this.assert.schema.isValidBytes32('txHash', txHash);
+
+    return await this.protocolUtils.getCreatedSetTokenAddress(txHash);
   }
 
   /**
