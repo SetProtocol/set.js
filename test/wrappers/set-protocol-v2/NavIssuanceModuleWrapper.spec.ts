@@ -24,6 +24,7 @@ import { ERC20__factory } from '@setprotocol/set-protocol-v2/dist/typechain/fact
 import {
   NAVIssuanceModule,
   ManagerIssuanceHookMock,
+  NAVIssuanceHookMock,
   SetToken,
 } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
@@ -1485,10 +1486,10 @@ describe('NAVIssuanceModuleWrapper', () => {
       });
 
       describe('when there are fees, premiums and an issuance hooks', () => {
-        let issuanceHookContract: ManagerIssuanceHookMock;
+        let issuanceHookContract: NAVIssuanceHookMock;
 
         beforeAll(async () => {
-          issuanceHookContract = await deployer.mocks.deployManagerIssuanceHookMock();
+          issuanceHookContract = await deployer.mocks.deployNavIssuanceHookMock();
           managerIssuanceHook = issuanceHookContract.address;
         });
 
@@ -1503,7 +1504,7 @@ describe('NAVIssuanceModuleWrapper', () => {
           );
         }
 
-        it.only('should properly call the pre-issue hooks', async () => {
+        it('should properly call the pre-issue hooks', async () => {
           await subject();
           const retrievedSetToken = await issuanceHookContract.retrievedSetToken();
           const retrievedReserveAsset = await issuanceHookContract.retrievedReserveAsset();
@@ -1513,7 +1514,7 @@ describe('NAVIssuanceModuleWrapper', () => {
 
           expect(retrievedSetToken).to.eq(subjectSetToken);
           expect(retrievedReserveAsset).to.eq(subjectReserveAsset);
-          expect(retrievedReserveAssetQuantity).to.eq(subjectReserveQuantity);
+          expect(retrievedReserveAssetQuantity.toString()).to.eq(subjectReserveQuantity.toString());
           expect(retrievedSender).to.eq(owner);
           expect(retrievedTo).to.eq(subjectTo);
         });
