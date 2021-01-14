@@ -857,7 +857,7 @@ describe('NAVIssuanceModuleWrapper', () => {
     });
 
     async function subject(): Promise<boolean> {
-      return navIssuanceModule.isIssueValid(subjectSetToken, subjectReserveAsset, subjectReserveQuantity);
+      return navIssuanceModuleWrapper.isIssueValid(subjectSetToken, subjectReserveAsset, subjectReserveQuantity);
     }
 
     it('should return true', async () => {
@@ -1401,12 +1401,14 @@ describe('NAVIssuanceModuleWrapper', () => {
         });
 
         async function subject(): Promise<ContractTransaction> {
-          return navIssuanceModule.connect(provider.getSigner(subjectCaller)).issue(
+          navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+          return navIssuanceModuleWrapper.issue(
             subjectSetToken,
             subjectReserveAsset,
             subjectReserveQuantity,
             subjectMinSetTokenReceived,
-            subjectTo
+            subjectTo,
+            subjectCaller
           );
         }
 
@@ -1487,29 +1489,32 @@ describe('NAVIssuanceModuleWrapper', () => {
 
         beforeAll(async () => {
           issuanceHookContract = await deployer.mocks.deployManagerIssuanceHookMock();
-
+          console.log(issuanceHookContract);
           managerIssuanceHook = issuanceHookContract.address;
         });
 
         async function subject(): Promise<ContractTransaction> {
-          return navIssuanceModule.issue(
+          return navIssuanceModuleWrapper.issue(
             subjectSetToken,
             subjectReserveAsset,
             subjectReserveQuantity,
             subjectMinSetTokenReceived,
-            subjectTo
+            subjectTo,
+            subjectCaller
           );
         }
 
-        it('should properly call the pre-issue hooks', async () => {
+        it.only('should properly call the pre-issue hooks', async () => {
           await subject();
           const retrievedSetToken = await issuanceHookContract.retrievedSetToken();
-          const retrievedIssueQuantity = await issuanceHookContract.retrievedIssueQuantity();
+          const retrievedReserveAsset = await issuanceHookContract.retrievedReserveAsset();
+          const retrievedReserveAssetQuantity = await issuanceHookContract.retrievedReserveAssetQuantity();
           const retrievedSender = await issuanceHookContract.retrievedSender();
           const retrievedTo = await issuanceHookContract.retrievedTo();
 
           expect(retrievedSetToken).to.eq(subjectSetToken);
-          expect(retrievedIssueQuantity.toString()).to.eq(subjectMinSetTokenReceived.toString());
+          expect(retrievedReserveAsset).to.eq(subjectReserveAsset);
+          expect(retrievedReserveAssetQuantity).to.eq(subjectReserveQuantity);
           expect(retrievedSender).to.eq(owner);
           expect(retrievedTo).to.eq(subjectTo);
         });
@@ -1594,10 +1599,12 @@ describe('NAVIssuanceModuleWrapper', () => {
         });
 
         async function subject(): Promise<ContractTransaction> {
-          return navIssuanceModule.connect(provider.getSigner(subjectCaller)).issueWithEther(
+          navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+          return navIssuanceModuleWrapper.issueWithEther(
             subjectSetToken,
             subjectMinSetTokenReceived,
             subjectTo,
+            subjectCaller,
             {
               value: subjectValue,
             }
@@ -1795,10 +1802,12 @@ describe('NAVIssuanceModuleWrapper', () => {
         });
 
         async function subject(): Promise<ContractTransaction> {
-          return navIssuanceModule.connect(provider.getSigner(subjectCaller)).issueWithEther(
+          navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+          return navIssuanceModuleWrapper.issueWithEther(
             subjectSetToken,
             subjectMinSetTokenReceived,
             subjectTo,
+            subjectCaller,
             {
               value: subjectValue,
             }
@@ -1959,12 +1968,14 @@ describe('NAVIssuanceModuleWrapper', () => {
         });
 
         async function subject(): Promise<ContractTransaction> {
-          return navIssuanceModule.connect(provider.getSigner(subjectCaller)).redeem(
+          navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+          return navIssuanceModuleWrapper.redeem(
             subjectSetToken,
             subjectReserveAsset,
             subjectSetTokenQuantity,
             subjectMinReserveQuantityReceived,
-            subjectTo
+            subjectTo,
+            subjectCaller
           );
         }
 
@@ -2294,12 +2305,14 @@ describe('NAVIssuanceModuleWrapper', () => {
         });
 
         async function subject(): Promise<ContractTransaction> {
-          return navIssuanceModule.connect(provider.getSigner(subjectCaller)).redeem(
+          navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+          return navIssuanceModuleWrapper.redeem(
             subjectSetToken,
             subjectReserveAsset,
             subjectSetTokenQuantity,
             subjectMinReserveQuantityReceived,
-            subjectTo
+            subjectTo,
+            subjectCaller
           );
         }
 
@@ -2391,12 +2404,14 @@ describe('NAVIssuanceModuleWrapper', () => {
         });
 
         async function subject(): Promise<any> {
-          return navIssuanceModule.connect(provider.getSigner(subjectCaller)).redeem(
+          navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+          return navIssuanceModuleWrapper.redeem(
             subjectSetToken,
             subjectReserveAsset,
             subjectSetTokenQuantity,
             subjectMinReserveQuantityReceived,
-            subjectTo
+            subjectTo,
+            subjectCaller
           );
         }
 
@@ -2494,11 +2509,13 @@ describe('NAVIssuanceModuleWrapper', () => {
         });
 
         async function subject(): Promise<any> {
-          return navIssuanceModule.connect(provider.getSigner(subjectCaller)).redeemIntoEther(
+          navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+          return navIssuanceModuleWrapper.redeemIntoEther(
             subjectSetToken,
             subjectSetTokenQuantity,
             subjectMinReserveQuantityReceived,
             subjectTo,
+            subjectCaller
           );
         }
 
@@ -2672,11 +2689,13 @@ describe('NAVIssuanceModuleWrapper', () => {
         });
 
         async function subject(): Promise<any> {
-          return navIssuanceModule.connect(provider.getSigner(subjectCaller)).redeemIntoEther(
+          navIssuanceModule = navIssuanceModule.connect(provider.getSigner(subjectCaller));
+          return navIssuanceModuleWrapper.redeemIntoEther(
             subjectSetToken,
             subjectSetTokenQuantity,
             subjectMinReserveQuantityReceived,
             subjectTo,
+            subjectCaller
           );
         }
 
