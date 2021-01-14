@@ -16,6 +16,7 @@
 import { Address } from '@setprotocol/set-protocol-v2/dist/utils/types';
 import { ContractTransaction } from 'ethers';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { ADDRESS_ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import { BigNumber } from 'ethers/lib/ethers';
 import { Provider } from '@ethersproject/providers';
 import { generateTxOpts } from '../../utils/transactions';
@@ -51,7 +52,7 @@ export default class BasicIssuanceModuleWrapper {
    */
   public async initialize(
     setTokenAddress: Address,
-    preIssuanceHook: Address,
+    preIssuanceHook: Address = ADDRESS_ZERO,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {

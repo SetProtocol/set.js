@@ -1489,7 +1489,6 @@ describe('NAVIssuanceModuleWrapper', () => {
 
         beforeAll(async () => {
           issuanceHookContract = await deployer.mocks.deployManagerIssuanceHookMock();
-          console.log(issuanceHookContract);
           managerIssuanceHook = issuanceHookContract.address;
         });
 
