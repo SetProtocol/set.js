@@ -41,8 +41,8 @@ export default class SystemAPI {
    *
    * @return    Array of factory addresses
    */
-  public async getFactoriesAsync(): Promise<Address[]> {
-    return await this.controllerWrapper.getFactories();
+  public async getFactoriesAsync(callerAddress?: Address): Promise<Address[]> {
+    return await this.controllerWrapper.getFactories(callerAddress);
   }
 
   /**
@@ -50,8 +50,8 @@ export default class SystemAPI {
    *
    * @return    Array of module addresses
    */
-  public async getModulesAsync(): Promise<Address[]> {
-    return await this.controllerWrapper.getModules();
+  public async getModulesAsync(callerAddress?: Address): Promise<Address[]> {
+    return await this.controllerWrapper.getModules(callerAddress);
   }
 
   /**
@@ -59,8 +59,8 @@ export default class SystemAPI {
    *
    * @return    Array of resource addresses
    */
-  public async getResourcesAsync(): Promise<Address[]> {
-    return await this.controllerWrapper.getResources();
+  public async getResourcesAsync(callerAddress?: Address): Promise<Address[]> {
+    return await this.controllerWrapper.getResources(callerAddress);
   }
 
   /**
@@ -68,7 +68,7 @@ export default class SystemAPI {
    *
    * @return    Array of SetToken addresses
    */
-  public async getSetsAsync(): Promise<Address[]> {
-    return await this.controllerWrapper.getSets();
+  public async getSetsAsync(callerAddress?: Address): Promise<Address[]> {
+    return await this.controllerWrapper.getSets(callerAddress);
   }
 }
