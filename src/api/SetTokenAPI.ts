@@ -24,7 +24,7 @@ import { Address, Position } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 
 import Assertions from '../assertions';
-import { ModuleState } from '../types';
+import { ModuleState, SetDetailsWithStreamingInfo } from '../types';
 import ProtocolViewerWrapper from '../wrappers/set-protocol-v2/ProtocolViewerWrapper';
 import SetTokenCreatorWrapper from '../wrappers/set-protocol-v2/SetTokenCreatorWrapper';
 import SetTokenWrapper from '../wrappers/set-protocol-v2/SetTokenWrapper';
@@ -113,6 +113,43 @@ export default class SetTokenAPI {
     this.assert.schema.isValidBytes32('txHash', txHash);
 
     return await this.protocolUtils.getCreatedSetTokenAddress(txHash);
+  }
+
+  /**
+   * Fetches the details of the SetToken. Accepts an array of module addresses and returns
+   * the initialization statuses of each of the modules for the SetToken
+   *
+   * @param  setTokenAddress    Address of SetToken to fetch details for
+   * @param  moduleAddresses    Addresses of ERC20 contracts to check balance for
+   * @param  callerAddress      Address to use as the caller (optional)
+   */
+  public async fetchSetDetailsAsync(
+    setTokenAddress: Address,
+    moduleAddresses: Address[],
+    callerAddress?: Address,
+  ): Promise<SetDetailsWithStreamingInfo> {
+    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+    this.assert.schema.isValidAddressList('moduleAddresses', moduleAddresses);
+
+    const setDetails = await this.protocolViewerWrapper.getSetDetails(setTokenAddress, moduleAddresses, callerAddress);
+
+
+    const streamingFeeInfo = await this.protocolViewerWrapper.batchFetchStreamingFeeInfo(
+      [setTokenAddress],
+      callerAddress
+    )[0];
+
+    return {
+      name: setDetails.name,
+      symbol: setDetails.symbol,
+      manager: setDetails.manager,
+      modules: setDetails.modules,
+      moduleStatuses: setDetails.moduleStatuses,
+      positions: setDetails.positions,
+      feeRecipient: streamingFeeInfo.feeRecipient,
+      streamingFeePercentage: streamingFeeInfo.streamingFeePercentage,
+      unaccruedFees: streamingFeeInfo.unaccruedFees,
+    } as SetDetailsWithStreamingInfo;
   }
 
   /**

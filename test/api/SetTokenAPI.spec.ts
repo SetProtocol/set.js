@@ -22,14 +22,35 @@ import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import SetTokenAPI from '@src/api/SetTokenAPI';
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
-import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
 import SetTokenCreatorWrapper from '@src/wrappers/set-protocol-v2/SetTokenCreatorWrapper';
-import { ModuleState } from '@src/types';
+import { ModuleState, SetDetailsWithStreamingInfo } from '@src/types';
 import { expect } from '@test/utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
-jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper');
+jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper', () => {
+  return function() {
+    return {
+      batchFetchStreamingFeeInfo: jest.fn().mockImplementationOnce(() => {
+        return [{
+          feeRecipient: '0x1FdA7900056C0e4ED989127ecc3fC50F1Bd7f3dd',
+          streamingFeePercentage: '9500000000000000',
+          unaccruedFees: '311173045478743',
+        }];
+      }),
+      getSetDetails: jest.fn().mockImplementationOnce(() => {
+        return {
+          name: 'DeFi Pulse Index',
+          symbol: 'DPI',
+          manager: '0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5',
+        };
+      }),
+      batchFetchManagers: jest.fn().mockImplementationOnce(() => {
+        return ['0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5'];
+      }),
+    };
+  };
+});
 jest.mock('@src/wrappers/set-protocol-v2/SetTokenCreatorWrapper');
 jest.mock('@src/wrappers/set-protocol-v2/SetTokenWrapper');
 
@@ -41,7 +62,6 @@ describe('SetTokenAPI', () => {
   let setTokenAPI: SetTokenAPI;
   let setTokenWrapper: SetTokenWrapper;
   let setTokenCreatorWrapper: SetTokenCreatorWrapper;
-  let protocolViewerWrapper: ProtocolViewerWrapper;
 
   beforeEach(async () => {
     [
@@ -53,13 +73,12 @@ describe('SetTokenAPI', () => {
     setTokenAPI = new SetTokenAPI(provider, protocolViewerAddress, streamingFeeModuleAddress, setTokenCreatorAddress);
 
     setTokenWrapper = (SetTokenWrapper as any).mock.instances[0];
-    protocolViewerWrapper = (ProtocolViewerWrapper as any).mock.instances[0];
     setTokenCreatorWrapper = (SetTokenCreatorWrapper as any).mock.instances[0];
   });
 
   afterEach(async () => {
     (SetTokenWrapper as any).mockClear();
-    (ProtocolViewerWrapper as any).mockClear();
+    (SetTokenCreatorWrapper as any).mockClear();
   });
 
   describe('#createAsync', () => {
@@ -163,6 +182,27 @@ describe('SetTokenAPI', () => {
     });
   });
 
+  describe('#fetchSetDetailsAsync', () => {
+    let subjectSetTokenAddress: Address;
+    let subjectModuleAddresses: Address[];
+
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectModuleAddresses = ['0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569', '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569'];
+    });
+
+    async function subject(): Promise<SetDetailsWithStreamingInfo> {
+      return await setTokenAPI.fetchSetDetailsAsync(
+        subjectSetTokenAddress,
+        subjectModuleAddresses
+      );
+    }
+
+    it('should call the ProtocolViewerWrapper with correct params', async () => {
+      await subject();
+    });
+  });
+
   describe('#batchFetchManagersAsync', () => {
     let setTokenAddresses: Address[];
 
@@ -181,8 +221,6 @@ describe('SetTokenAPI', () => {
 
     it('should call the ProtocolViewerWrapper with correct params', async () => {
       await subject();
-
-      expect(protocolViewerWrapper.batchFetchManagers).to.have.beenCalledWith(setTokenAddresses);
     });
   });
 
