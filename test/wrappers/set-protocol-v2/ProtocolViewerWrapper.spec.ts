@@ -78,15 +78,16 @@ describe('ProtocolViewerWrapper', () => {
       streamingFeePercentage: ether(.02),
       lastStreamingFeeTimestamp: ZERO,
     } as StreamingFeeState;
+    await setup.streamingFeeModule.connect(provider.getSigner(managerOne)).initialize(
+      setTokenOne.address, streamingFeeStateOne
+    );
+
     const streamingFeeStateTwo = {
       feeRecipient: managerTwo,
       maxStreamingFeePercentage: ether(.1),
       streamingFeePercentage: ether(.04),
       lastStreamingFeeTimestamp: ZERO,
     } as StreamingFeeState;
-    await setup.streamingFeeModule.connect(provider.getSigner(managerOne)).initialize(
-      setTokenOne.address, streamingFeeStateOne
-    );
     await setup.streamingFeeModule.connect(provider.getSigner(managerTwo)).initialize(
       setTokenTwo.address, streamingFeeStateTwo
     );
@@ -163,6 +164,45 @@ describe('ProtocolViewerWrapper', () => {
       expect(setTwoFeeInfo.streamingFeePercentage.toString()).to.eq(ether(.04).toString());
       expect(setOneFeeInfo.unaccruedFees.toString()).to.eq(expectedFeePercentOne.toString());
       expect(setTwoFeeInfo.unaccruedFees.toString()).to.eq(expectedFeePercentTwo.toString());
+    });
+  });
+
+  describe('#getSetDetails', () => {
+    let subjectSetTokenAddress: Address;
+    let subjectModuleAddresses: Address[];
+
+    beforeEach(async () => {
+      subjectSetTokenAddress = setTokenOne.address;
+      subjectModuleAddresses = [setup.streamingFeeModule.address, setup.issuanceModule.address];
+    });
+
+    async function subject(): Promise<any> {
+      return protocolViewerWrapper.getSetDetails(
+         subjectSetTokenAddress,
+         subjectModuleAddresses
+       );
+    }
+
+    it('should return the correct streaming fee info', async () => {
+      const setDetails = await subject();
+
+      const expectedSetName = await setTokenOne.name();
+      expect(setDetails.name).to.eq(expectedSetName);
+
+      const expectedSetSymbol = await setTokenOne.symbol();
+      expect(setDetails.symbol).to.eq(expectedSetSymbol);
+
+      const expectedSetManager = await setTokenOne.manager();
+      expect(setDetails.manager).to.eq(expectedSetManager);
+
+      const expectSetModules = await setTokenOne.getModules();
+      expect(setDetails.modules.toString()).to.eq(expectSetModules.toString());
+
+      const expectSetModuleStatuses = [2, 2];
+      expect(setDetails.moduleStatuses.toString()).to.eq(expectSetModuleStatuses.toString());
+
+      const expectSetPositions = await setTokenOne.getPositions();
+      expect(setDetails.positions.toString()).to.eq(expectSetPositions.toString());
     });
   });
 });

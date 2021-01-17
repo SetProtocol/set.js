@@ -20,7 +20,7 @@ import { Provider, JsonRpcProvider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import ContractWrapper from './ContractWrapper';
-import { StreamingFeeInfo } from '../../types';
+import { SetDetails, StreamingFeeInfo } from '../../types';
 
 /**
  * @title ProtocolViewerWrapper
@@ -80,5 +80,26 @@ export default class ProtocolViewerWrapper {
       this.streamingFeeModuleAddress,
       tokenAddresses
     );
+  }
+
+  /**
+   * Fetches the details of the SetToken. Accepts an array of module addresses and returns
+   * the initialization statuses of each of the modules for the SetToken
+   *
+   * @param  setTokenAddress    Address of SetToken to fetch details for
+   * @param  moduleAddresses    Addresses of ERC20 contracts to check balance for
+   * @param  callerAddress      Address to use as the caller (optional)
+   */
+  public async getSetDetails(
+    setTokenAddress: Address,
+    moduleAddresses: Address[],
+    callerAddress?: Address,
+  ): Promise<SetDetails> {
+    const protocolViewerInstance = await this.contracts.loadProtocolViewerContractAsync(
+      this.protocolViewerAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+    );
+
+    return await protocolViewerInstance.getSetDetails(setTokenAddress, moduleAddresses);
   }
 }
