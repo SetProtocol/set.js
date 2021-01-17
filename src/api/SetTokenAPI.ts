@@ -43,6 +43,8 @@ export default class SetTokenAPI {
   private protocolUtils: ProtocolUtils;
   private assert: Assertions;
 
+  private streamingFeeModuleAddress: Address;
+
   public constructor(
     provider: Provider,
     protocolViewerAddress: Address,
@@ -59,6 +61,8 @@ export default class SetTokenAPI {
     );
     this.protocolUtils = new ProtocolUtils(provider);
     this.assert = assertions || new Assertions();
+
+    this.streamingFeeModuleAddress = streamingFeeModuleAddress;
   }
 
   /**
@@ -131,25 +135,25 @@ export default class SetTokenAPI {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
     this.assert.schema.isValidAddressList('moduleAddresses', moduleAddresses);
 
-    const setDetails = await this.protocolViewerWrapper.getSetDetails(setTokenAddress, moduleAddresses, callerAddress);
-
-
-    const streamingFeeInfo = await this.protocolViewerWrapper.batchFetchStreamingFeeInfo(
-      [setTokenAddress],
+    const setDetails: SetDetailsWithStreamingInfo = await this.protocolViewerWrapper.getSetDetails(
+      setTokenAddress,
+      moduleAddresses,
       callerAddress
-    )[0];
+    ) as SetDetailsWithStreamingInfo;
 
-    return {
-      name: setDetails.name,
-      symbol: setDetails.symbol,
-      manager: setDetails.manager,
-      modules: setDetails.modules,
-      moduleStatuses: setDetails.moduleStatuses,
-      positions: setDetails.positions,
-      feeRecipient: streamingFeeInfo.feeRecipient,
-      streamingFeePercentage: streamingFeeInfo.streamingFeePercentage,
-      unaccruedFees: streamingFeeInfo.unaccruedFees,
-    } as SetDetailsWithStreamingInfo;
+    const shouldIncludeStreamingFee = setDetails.modules.includes(this.streamingFeeModuleAddress);
+    if (shouldIncludeStreamingFee) {
+      const [streamingFeeInfo] = await this.protocolViewerWrapper.batchFetchStreamingFeeInfo(
+        [setTokenAddress],
+        callerAddress
+      );
+
+      setDetails.feeRecipient = streamingFeeInfo.feeRecipient;
+      setDetails.streamingFeePercentage = streamingFeeInfo.streamingFeePercentage;
+      setDetails.unaccruedFees = streamingFeeInfo.unaccruedFees;
+    }
+
+    return setDetails;
   }
 
   /**

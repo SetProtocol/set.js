@@ -43,6 +43,7 @@ jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper', () => {
           name: 'DeFi Pulse Index',
           symbol: 'DPI',
           manager: '0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5',
+          modules: ['0x5409ED021D9299bf6814279A6A1411A7e866A631'],
         };
       }),
       batchFetchManagers: jest.fn().mockImplementationOnce(() => {
