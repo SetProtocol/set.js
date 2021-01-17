@@ -879,9 +879,9 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@setprotocol/set-protocol-v2@0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.0.12.tgz#3ba3bfef5f138f7eb12f2ca5fbf0cdeffc2b2b1a"
+"@setprotocol/set-protocol-v2@0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.0.13.tgz#375c53bab4fb07ca6c3bce5fb36848da2e73e2e6"
   dependencies:
     fs-extra "^5.0.0"
     module-alias "^2.2.2"
