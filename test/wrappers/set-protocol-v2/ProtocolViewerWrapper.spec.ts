@@ -203,6 +203,9 @@ describe('ProtocolViewerWrapper', () => {
 
       const expectSetPositions = await setTokenOne.getPositions();
       expect(setDetails.positions.toString()).to.eq(expectSetPositions.toString());
+
+      const expectedSetSupply = await setTokenOne.totalSupply();
+      expect(setDetails.totalSupply.toString()).to.eq(expectedSetSupply.toString());
     });
   });
 });
