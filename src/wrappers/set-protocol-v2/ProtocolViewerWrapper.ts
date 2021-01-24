@@ -102,4 +102,25 @@ export default class ProtocolViewerWrapper {
 
     return await protocolViewerInstance.getSetDetails(setTokenAddress, moduleAddresses);
   }
+
+  /**
+   * Fetches the details of multiple SetToken contract. Accepts an array of module addresses
+   * and returns the initialization statuses of each of the modules for the SetToken
+   *
+   * @param  setTokenAddresses    Addresses of SetToken to fetch details for
+   * @param  moduleAddresses      Addresses of ERC20 contracts to check balance for
+   * @param  callerAddress        Address to use as the caller (optional)
+   */
+  public async batchFetchDetails(
+    setTokenAddress: Address[],
+    moduleAddresses: Address[],
+    callerAddress?: Address,
+  ): Promise<SetDetails[]> {
+    const protocolViewerInstance = await this.contracts.loadProtocolViewerContractAsync(
+      this.protocolViewerAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+    );
+
+    return await protocolViewerInstance.batchFetchDetails(setTokenAddress, moduleAddresses);
+  }
 }
