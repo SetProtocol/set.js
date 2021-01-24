@@ -23,7 +23,7 @@ import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import SetTokenAPI from '@src/api/SetTokenAPI';
 import SetTokenWrapper from '@src/wrappers/set-protocol-v2/SetTokenWrapper';
 import SetTokenCreatorWrapper from '@src/wrappers/set-protocol-v2/SetTokenCreatorWrapper';
-import { ModuleState, SetDetailsWithStreamingInfo } from '@src/types';
+import { ModuleState, SetDetails, SetDetailsWithStreamingInfo } from '@src/types';
 import { expect } from '@test/utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
@@ -48,6 +48,14 @@ jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper', () => {
       }),
       batchFetchManagers: jest.fn().mockImplementationOnce(() => {
         return ['0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5'];
+      }),
+      batchFetchDetails: jest.fn().mockImplementationOnce(() => {
+        return [{
+          name: 'DeFi Pulse Index',
+          symbol: 'DPI',
+          manager: '0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5',
+          modules: ['0x5409ED021D9299bf6814279A6A1411A7e866A631'],
+        }];
       }),
     };
   };
@@ -195,6 +203,27 @@ describe('SetTokenAPI', () => {
     async function subject(): Promise<SetDetailsWithStreamingInfo> {
       return await setTokenAPI.fetchSetDetailsAsync(
         subjectSetTokenAddress,
+        subjectModuleAddresses
+      );
+    }
+
+    it('should call the ProtocolViewerWrapper with correct params', async () => {
+      await subject();
+    });
+  });
+
+  describe('#batchFetchSetDetailsAsync', () => {
+    let subjectSetTokenAddresses: Address[];
+    let subjectModuleAddresses: Address[];
+
+    beforeEach(async () => {
+      subjectSetTokenAddresses = ['0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569'];
+      subjectModuleAddresses = ['0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569', '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569'];
+    });
+
+    async function subject(): Promise<SetDetails[]> {
+      return await setTokenAPI.batchFetchSetDetailsAsync(
+        subjectSetTokenAddresses,
         subjectModuleAddresses
       );
     }
