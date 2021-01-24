@@ -113,10 +113,16 @@ export default class SetTokenAPI {
    * @param  txHash    Transaction hash of the createAsync transaction
    * @return           Address of the newly created Set
    */
-  public async getSetAddressFromCreateHash(txHash: string): Promise<Address> {
+  public async getSetAddressFromCreateHash(
+    txHash: string,
+    fromBlockNumber?: string,
+    toBlockNumber?: string
+  ): Promise<Address> {
     this.assert.schema.isValidBytes32('txHash', txHash);
+    this.assert.schema.isValidNumber('fromBlockNumber', fromBlockNumber);
+    this.assert.schema.isValidNumber('toBlockNumber', toBlockNumber);
 
-    return await this.protocolUtils.getCreatedSetTokenAddress(txHash);
+    return await this.protocolUtils.getCreatedSetTokenAddress(txHash, fromBlockNumber, toBlockNumber);
   }
 
   /**
