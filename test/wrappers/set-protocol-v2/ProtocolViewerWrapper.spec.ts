@@ -208,4 +208,60 @@ describe('ProtocolViewerWrapper', () => {
       expect(setDetails.totalSupply.toString()).to.eq(expectedSetSupply.toString());
     });
   });
+
+  describe('#batchFetchDetails', () => {
+    let subjectSetTokenAddresses: Address[];
+    let subjectModuleAddresses: Address[];
+
+    beforeEach(async () => {
+      subjectSetTokenAddresses = [setTokenOne.address, setTokenTwo.address];
+      subjectModuleAddresses = [setup.streamingFeeModule.address, setup.issuanceModule.address];
+    });
+
+    async function subject(): Promise<any> {
+      return protocolViewerWrapper.batchFetchDetails(
+         subjectSetTokenAddresses,
+         subjectModuleAddresses
+       );
+    }
+
+    it('should return the correct streaming fee info', async () => {
+      const [setOneDetails, setTwoDetails] = await subject();
+
+      const expectedSetOneName = await setTokenOne.name();
+      const expectedSetTwoName = await setTokenOne.name();
+      expect(setOneDetails.name).to.eq(expectedSetOneName);
+      expect(setTwoDetails.name).to.eq(expectedSetTwoName);
+
+      const expectedSetOneSymbol = await setTokenOne.symbol();
+      const expectedSetTwoSymbol = await setTokenTwo.symbol();
+      expect(setOneDetails.symbol).to.eq(expectedSetOneSymbol);
+      expect(setTwoDetails.symbol).to.eq(expectedSetTwoSymbol);
+
+      const expectedSetOneManager = await setTokenOne.manager();
+      const expectedSetTwoManager = await setTokenTwo.manager();
+      expect(setOneDetails.manager).to.eq(expectedSetOneManager);
+      expect(setTwoDetails.manager).to.eq(expectedSetTwoManager);
+
+      const expectedSetOneModules = await setTokenOne.getModules();
+      const expectedSetTwoModules = await setTokenTwo.getModules();
+      expect(setOneDetails.modules.toString()).to.eq(expectedSetOneModules.toString());
+      expect(setTwoDetails.modules.toString()).to.eq(expectedSetTwoModules.toString());
+
+      const expectedSetOneModuleStatuses = [2, 2];
+      const expectedSetTwoModuleStatuses = [2, 1];
+      expect(setOneDetails.moduleStatuses.toString()).to.eq(expectedSetOneModuleStatuses.toString());
+      expect(setTwoDetails.moduleStatuses.toString()).to.eq(expectedSetTwoModuleStatuses.toString());
+
+      const expectedSetOnePositions = await setTokenOne.getPositions();
+      const expectedSetTwoPositions = await setTokenTwo.getPositions();
+      expect(setOneDetails.positions.toString()).to.eq(expectedSetOnePositions.toString());
+      expect(setTwoDetails.positions.toString()).to.eq(expectedSetTwoPositions.toString());
+
+      const expectedSetOneSupply = await setTokenOne.totalSupply();
+      const expectedSetTwoSupply = await setTokenTwo.totalSupply();
+      expect(setOneDetails.totalSupply.toString()).to.eq(expectedSetOneSupply.toString());
+      expect(setTwoDetails.totalSupply.toString()).to.eq(expectedSetTwoSupply.toString());
+    });
+  });
 });
