@@ -339,7 +339,7 @@ export default class SetTokenAPI {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return this.setTokenWrapper.isModule(setAddress, moduleAddress);
+    return this.setTokenWrapper.isInitializedModule(setAddress, moduleAddress);
   }
 
   /**
