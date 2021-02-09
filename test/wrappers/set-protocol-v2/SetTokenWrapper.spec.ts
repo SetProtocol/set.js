@@ -432,5 +432,23 @@ describe('SetTokenWrapper', () => {
         expect(JSON.stringify(moduleAddresses)).to.eq(JSON.stringify(modules));
       });
     });
+
+    describe('#isInitializedModule', () => {
+      let subjectModule: Address;
+
+      beforeEach(async () => {
+        subjectModule = modules[0];
+      });
+
+      async function subject(): Promise<boolean> {
+        return await setToken.isInitializedModule(subjectModule);
+      }
+
+      it('should return the correct state', async () => {
+        const isInitializedModule = await subject();
+
+        expect(isInitializedModule).to.eq(true);
+      });
+    });
   });
 });
