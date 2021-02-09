@@ -441,7 +441,7 @@ describe('SetTokenWrapper', () => {
       });
 
       async function subject(): Promise<boolean> {
-        return await setToken.isInitializedModule(subjectModule);
+        return await setTokenWrapper.isInitializedModule(setToken.address, subjectModule);
       }
 
       it('should return the correct state', async () => {
