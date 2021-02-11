@@ -77,9 +77,9 @@ describe('DebtIssuanceModuleWrapper', () => {
         [debtIssuanceModule.address]
       );
       subjectSetTokenAddress = setToken.address;
-      subjectMaxManagerFee = ether(1);
-      subjectManagerIssueFee = ether(0.1);
-      subjectManagerRedeemFee = ether(0.2);
+      subjectMaxManagerFee = ether(0.02);
+      subjectManagerIssueFee = ether(0.005);
+      subjectManagerRedeemFee = ether(0.004);
       subjectFeeRecipient = owner;
       subjectManagerIssuanceHook = randomAddress;
       subjectCaller = owner;
@@ -111,6 +111,26 @@ describe('DebtIssuanceModuleWrapper', () => {
       const issuanceSettings = await debtIssuanceModule.issuanceSettings(subjectSetTokenAddress);
       const managerIssuanceHook = issuanceSettings.managerIssuanceHook;
       expect(managerIssuanceHook).to.eq(subjectManagerIssuanceHook);
+    });
+
+    describe('when the issue fee is greater than the maximum fee', async () => {
+      beforeEach(async () => {
+        subjectManagerIssueFee = ether(0.03);
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith("Issue fee can't exceed maximum fee");
+      });
+    });
+
+    describe('when the redeem fee is greater than the maximum fee', async () => {
+      beforeEach(async () => {
+        subjectManagerRedeemFee = ether(0.03);
+      });
+
+      it('should revert', async () => {
+        await expect(subject()).to.be.rejectedWith("Redeem fee can't exceed maximum fee");
+      });
     });
 
     describe('when the caller is not the SetToken manager', () => {
@@ -180,9 +200,9 @@ describe('DebtIssuanceModuleWrapper', () => {
       );
 
       subjectSetTokenAddress = setToken.address;
-      subjectMaxManagerFee = ether(1);
-      subjectManagerIssueFee = ether(0.1);
-      subjectManagerRedeemFee = ether(0.2);
+      subjectMaxManagerFee = ether(0.02);
+      subjectManagerIssueFee = ether(0.005);
+      subjectManagerRedeemFee = ether(0.004);
       subjectFeeRecipient = owner;
       subjectManagerIssuanceHook = ADDRESS_ZERO;
       subjectIssuanceQuantity = ether(2);
@@ -244,9 +264,9 @@ describe('DebtIssuanceModuleWrapper', () => {
       );
 
       subjectSetTokenAddress = setToken.address;
-      subjectMaxManagerFee = ether(1);
-      subjectManagerIssueFee = ether(0.1);
-      subjectManagerRedeemFee = ether(0.2);
+      subjectMaxManagerFee = ether(0.02);
+      subjectManagerIssueFee = ether(0.005);
+      subjectManagerRedeemFee = ether(0.004);
       subjectFeeRecipient = owner;
       subjectManagerIssuanceHook = ADDRESS_ZERO;
       subjectRedeemQuantity = ether(2);
