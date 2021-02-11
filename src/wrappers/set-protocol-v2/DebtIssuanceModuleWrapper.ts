@@ -159,7 +159,7 @@ export default class DebtIssuanceModuleWrapper {
     setTokenAddress: Address,
     quantity: BigNumber,
     callerAddress: Address = undefined,
-  ): Promise<ContractTransaction> {
+  ): Promise<(Address|BigNumber)[][]> {
     const debtIssuanceModuleInstance = await this.contracts.loadDebtIssuanceModuleAsync(
       this.debtIssuanceModuleAddress,
       callerAddress
@@ -189,7 +189,7 @@ export default class DebtIssuanceModuleWrapper {
     setTokenAddress: Address,
     quantity: BigNumber,
     callerAddress: Address = undefined,
-  ): Promise<ContractTransaction> {
+  ): Promise<(Address|BigNumber)[][]> {
     const debtIssuanceModuleInstance = await this.contracts.loadDebtIssuanceModuleAsync(
       this.debtIssuanceModuleAddress,
       callerAddress

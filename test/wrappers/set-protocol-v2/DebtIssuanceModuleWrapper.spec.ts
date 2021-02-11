@@ -268,11 +268,6 @@ describe('DebtIssuanceModuleWrapper', () => {
 
       issuanceQuantity = ether(2);
       await debtIssuanceModule.issue(setToken.address, issuanceQuantity, functionCaller);
-
-      subjectSetTokenAddress = setToken.address;
-      subjectRedeemQuantity = ether(2);
-      subjectCaller = functionCaller;
-      subjectRedeemTo = recipient;
     });
 
     async function subject(): Promise<ContractTransaction> {
@@ -308,6 +303,91 @@ describe('DebtIssuanceModuleWrapper', () => {
             'ERC20: burn amount exceeds balance'
           );
         }
+      });
+    });
+  });
+
+  describe('#getRequiredComponentIssuanceUnits', () => {
+    let setToken: SetToken;
+
+    let subjectSetTokenAddress: Address;
+    let subjectMaxManagerFee: BigNumber;
+    let subjectManagerIssueFee: BigNumber;
+    let subjectManagerRedeemFee: BigNumber;
+    let subjectFeeRecipient: Address;
+    let subjectManagerIssuanceHook: Address;
+    let subjectIssuanceQuantity: BigNumber;
+    let subjectCaller: Address;
+
+    beforeEach(async () => {
+      setToken = await setup.createSetToken(
+        [setup.weth.address, setup.wbtc.address],
+        [ether(1), bitcoin(2)],
+        [debtIssuanceModule.address]
+      );
+
+      subjectSetTokenAddress = setToken.address;
+      subjectMaxManagerFee = ether(1);
+      subjectManagerIssueFee = ether(0);
+      subjectManagerRedeemFee = ether(0);
+      subjectFeeRecipient = owner;
+      subjectManagerIssuanceHook = ADDRESS_ZERO;
+      subjectIssuanceQuantity = ether(2);
+      subjectCaller = functionCaller;
+    });
+
+    async function subject(): Promise<(Address|BigNumber)[][]> {
+      await debtIssuanceModule.initialize(
+        subjectSetTokenAddress,
+        subjectMaxManagerFee,
+        subjectManagerIssueFee,
+        subjectManagerRedeemFee,
+        subjectFeeRecipient,
+        subjectManagerIssuanceHook,
+      );
+
+      return debtIssuanceModuleWrapper.getRequiredComponentIssuanceUnits(
+        subjectSetTokenAddress,
+        subjectIssuanceQuantity,
+        subjectCaller
+      );
+    }
+
+    it('should return the correct required quantity of component tokens for issuing', async () => {
+      const requiredComponents = await subject();
+      const [
+        [tokenAddress1, tokenAddress2],
+        [equityAmount1, equityAmount2],
+        [debtAmount1, debtAmount2],
+      ] = requiredComponents;
+
+      expect(tokenAddress1).to.equal(setup.weth.address);
+      expect(tokenAddress2).to.equal(setup.wbtc.address);
+      expect(equityAmount1.toString()).to.equal(ether(2).toString());
+      expect(equityAmount2.toString()).to.equal(bitcoin(4).toString());
+      expect(debtAmount1.toString()).to.equal(ether(0).toString());
+      expect(debtAmount2.toString()).to.equal(ether(0).toString());
+    });
+
+    describe('when there\'s an issue fee', () => {
+      beforeEach(() => {
+        subjectManagerIssueFee = ether(0.01);
+      });
+
+      it('should return required amount with fee', async () => {
+        const requiredComponents = await subject();
+        const [
+          [tokenAddress1, tokenAddress2],
+          [equityAmount1, equityAmount2],
+          [debtAmount1, debtAmount2],
+        ] = requiredComponents;
+
+        expect(tokenAddress1).to.equal(setup.weth.address);
+        expect(tokenAddress2).to.equal(setup.wbtc.address);
+        expect(equityAmount1.toString()).to.equal(ether(2.02).toString());
+        expect(equityAmount2.toString()).to.equal(bitcoin(4.04).toString());
+        expect(debtAmount1.toString()).to.equal(ether(0).toString());
+        expect(debtAmount2.toString()).to.equal(ether(0).toString());
       });
     });
   });
