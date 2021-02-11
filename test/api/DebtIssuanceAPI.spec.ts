@@ -129,7 +129,7 @@ describe('DebtIssuanceAPI', () => {
       );
     }
 
-    it('should call the DebtIssuanceModuleWrapper with correct params', async () => {
+    it('should call issue with correct params', async () => {
       await subject();
 
       expect(debtIssuanceModuleWrapper.issue).to.have.beenCalledWith(
@@ -187,7 +187,7 @@ describe('DebtIssuanceAPI', () => {
       );
     }
 
-    it('should call the DebtIssuanceModuleWrapper with correct params', async () => {
+    it('should call issue with correct params', async () => {
       await subject();
 
       expect(debtIssuanceModuleWrapper.redeem).to.have.beenCalledWith(
@@ -196,6 +196,46 @@ describe('DebtIssuanceAPI', () => {
         subjectSetTokenRecipientAddress,
         subjectCallerAddress,
         subjectTransactionOptions
+      );
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+  });
+
+  describe('#getRequiredComponentIssuanceUnits', () => {
+    let subjectSetTokenAddress: Address;
+    let subjectIssuanceQuantity: BigNumber;
+    let subjectCallerAddress: Address;
+
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectIssuanceQuantity = ether(1);
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+    });
+
+    async function subject(): Promise<(Address|BigNumber)[][]> {
+      return await debtIssuanceAPI.getRequiredComponentIssuanceUnits(
+        subjectSetTokenAddress,
+        subjectIssuanceQuantity,
+        subjectCallerAddress,
+      );
+    }
+
+    it('should call getRequiredComponentIssuanceUnits with correct params', async () => {
+      await subject();
+
+      expect(debtIssuanceModuleWrapper.getRequiredComponentIssuanceUnits).to.have.beenCalledWith(
+        subjectSetTokenAddress,
+        subjectIssuanceQuantity,
+        subjectCallerAddress,
       );
     });
 

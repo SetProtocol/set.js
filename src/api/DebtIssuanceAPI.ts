@@ -157,7 +157,7 @@ export default class DebtIssuanceAPI {
     setTokenAddress: Address,
     quantity: BigNumber,
     callerAddress: Address = undefined,
-  ): Promise<ContractTransaction> {
+  ): Promise<(Address|BigNumber)[][]> {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
 
     return await this.debtIssuanceModuleWrapper.getRequiredComponentIssuanceUnits(
@@ -185,7 +185,7 @@ export default class DebtIssuanceAPI {
     setTokenAddress: Address,
     quantity: BigNumber,
     callerAddress: Address = undefined,
-  ): Promise<ContractTransaction> {
+  ): Promise<(Address|BigNumber)[][]> {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
 
     return await this.debtIssuanceModuleWrapper.getRequiredComponentRedemptionUnits(
