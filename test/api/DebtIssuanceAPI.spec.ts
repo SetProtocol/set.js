@@ -54,36 +54,36 @@ describe('DebtIssuanceAPI', () => {
   });
 
   describe('#initializeAsync', () => {
-    let subjectSetToken: Address;
+    let subjectSetTokenAddress: Address;
     let subjectMaxManagerFee: BigNumber;
     let subjectManagerIssueFee: BigNumber;
     let subjectManagerRedeemFee: BigNumber;
-    let subjectFeeRecipient: Address;
+    let subjectFeeRecipientAddress: Address;
     let subjectManagerIssuanceHook: Address;
-    let subjectCaller: Address;
+    let subjectCallerAddress: Address;
 
     let subjectTransactionOptions: any;
 
     beforeEach(async () => {
-      subjectSetToken = setTokenAddress;
+      subjectSetTokenAddress = setTokenAddress;
       subjectMaxManagerFee = ether(1);
       subjectManagerIssueFee = ether(0.1);
       subjectManagerRedeemFee = ether(0.2);
-      subjectFeeRecipient = owner;
+      subjectFeeRecipientAddress = owner;
       subjectManagerIssuanceHook = managerIssuanceHook;
-      subjectCaller = owner;
+      subjectCallerAddress = owner;
       subjectTransactionOptions = {};
     });
 
     async function subject(): Promise<any> {
       return debtIssuanceAPI.initializeAsync(
-        subjectSetToken,
+        subjectSetTokenAddress,
         subjectMaxManagerFee,
         subjectManagerIssueFee,
         subjectManagerRedeemFee,
-        subjectFeeRecipient,
+        subjectFeeRecipientAddress,
         subjectManagerIssuanceHook,
-        subjectCaller,
+        subjectCallerAddress,
         subjectTransactionOptions,
       );
     }
@@ -92,13 +92,13 @@ describe('DebtIssuanceAPI', () => {
       await subject();
 
       expect(debtIssuanceModuleWrapper.initialize).to.have.beenCalledWith(
-        subjectSetToken,
+        subjectSetTokenAddress,
         subjectMaxManagerFee,
         subjectManagerIssueFee,
         subjectManagerRedeemFee,
-        subjectFeeRecipient,
+        subjectFeeRecipientAddress,
         subjectManagerIssuanceHook,
-        subjectCaller,
+        subjectCallerAddress,
         subjectTransactionOptions,
       );
     });
