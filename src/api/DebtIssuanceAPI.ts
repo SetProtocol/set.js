@@ -30,8 +30,10 @@ import Assertions from '../assertions';
  * @title  DebtIssuanceAPI
  * @author Set Protocol
  *
- * The DebtIssuanceAPI exposes simple issuance and redemption functions of the DebtIssuanceModule
- * to allow minting and burning of SetTokens from the Positions of the Set
+ * The DebtIssuanceModuleAPI exposes issue and redeem functionality that contain default and all
+ * external positions, including debt positions. Module hooks are added to allow for syncing of positions, and component
+ * level hooks are added to ensure positions are replicated correctly. The manager can define arbitrary issuance logic
+ * in the manager hook, as well as specify issue and redeem fees.
  *
  */
 export default class DebtIssuanceAPI {
@@ -133,6 +135,63 @@ export default class DebtIssuanceAPI {
       setTokenRecipientAddress,
       callerAddress,
       txOpts
+    );
+  }
+
+  /**
+   * Calculates the amount of each component needed to collateralize passed issue quantity plus fees of Sets as well
+   * as amount of debt that will be returned to caller. Values DO NOT take into account any updates from pre action
+   * manager or module hooks.
+   *
+   * @param  setTokenAddress           Address of the SetToken contract
+   * @param  quantity                  Quantity to issue
+   * @param  callerAddress             Address of caller (optional)
+   *
+   * @return address[]                 Array of component addresses making up the Set
+   * @return BigNumber[]               Array of equity notional amounts of each component, respectively, represented
+   *                                   as a BigNumber
+   * @return BigNumber[]               Array of debt notional amounts of each component, respectively, represented
+   *                                   as a BigNumber
+   */
+  public async getRequiredComponentIssuanceUnits(
+    setTokenAddress: Address,
+    quantity: BigNumber,
+    callerAddress: Address = undefined,
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+
+    return await this.debtIssuanceModuleWrapper.getRequiredComponentIssuanceUnits(
+      setTokenAddress,
+      quantity,
+      callerAddress,
+    );
+  }
+
+  /**
+   * Calculates the amount of each component will be returned on redemption net of fees as well as how much debt needs
+   * to be paid down to redeem. Values DO NOT take into account any updates from pre action manager or module hooks.
+   *
+   * @param  setTokenAddress           Address of the SetToken contract
+   * @param  quantity                  Quantity to issue
+   * @param  callerAddress             Address of caller (optional)
+   *
+   * @return address[]                 Array of component addresses making up the Set
+   * @return BigNumber[]               Array of equity notional amounts of each component, respectively, represented as
+   *                                   a BigNumber
+   * @return BigNumber[]               Array of debt notional amounts of each component, respectively, represented as
+   *                                   a BigNumber
+   */
+  public async getRequiredComponentRedemptionUnits(
+    setTokenAddress: Address,
+    quantity: BigNumber,
+    callerAddress: Address = undefined,
+  ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+
+    return await this.debtIssuanceModuleWrapper.getRequiredComponentRedemptionUnits(
+      setTokenAddress,
+      quantity,
+      callerAddress,
     );
   }
 }
