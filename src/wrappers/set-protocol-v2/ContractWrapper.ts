@@ -22,6 +22,7 @@ import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import {
   BasicIssuanceModule,
+  DebtIssuanceModule,
   Controller,
   ERC20,
   ProtocolViewer,
@@ -33,6 +34,7 @@ import {
   PriceOracle,
 } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
+import { DebtIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModule__factory';
 import { Controller__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/Controller__factory';
 import { ERC20__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ERC20__factory';
 import { ProtocolViewer__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ProtocolViewer__factory';
@@ -323,6 +325,34 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = protocolViewerContract;
       return protocolViewerContract;
+    }
+  }
+
+
+  /**
+   * Load DebtIssuanceModule contract
+   *
+   * @param  debtIssuanceModuleAddress   Address of the token contract
+   * @param  callerAddress                Address of caller, uses first one on node if none provided.
+   * @return                              DebtIssuanceModule contract instance
+   */
+  public async loadDebtIssuanceModuleAsync(
+    debtIssuanceModuleAddress: Address,
+    callerAddress?: Address,
+  ): DebtIssuanceModule {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `DebtIssuance_${debtIssuanceModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as DebtIssuanceModule;
+    } else {
+      const debtIssuanceModuleContract = DebtIssuanceModule__factory.connect(
+        debtIssuanceModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = debtIssuanceModuleContract;
+      return debtIssuanceModuleContract;
     }
   }
 }
