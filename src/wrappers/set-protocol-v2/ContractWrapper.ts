@@ -332,7 +332,7 @@ export default class ContractWrapper {
   /**
    * Load DebtIssuanceModule contract
    *
-   * @param  debtIssuanceModuleAddress   Address of the token contract
+   * @param  debtIssuanceModuleAddress    Address of the token contract
    * @param  callerAddress                Address of caller, uses first one on node if none provided.
    * @return                              DebtIssuanceModule contract instance
    */
@@ -341,7 +341,7 @@ export default class ContractWrapper {
     callerAddress?: Address,
   ): DebtIssuanceModule {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
-    const cacheKey = `DebtIssuance_${debtIssuanceModuleAddress}_${await signer.getAddress()}`;
+    const cacheKey = `DebtIssuanceModule_${debtIssuanceModuleAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
       return this.cache[cacheKey] as DebtIssuanceModule;

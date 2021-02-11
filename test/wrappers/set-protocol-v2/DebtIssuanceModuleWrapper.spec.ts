@@ -3,7 +3,13 @@ import { BigNumber } from 'ethers/lib/ethers';
 
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { ADDRESS_ZERO, ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants';
-import { Blockchain, ether, bitcoin } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import {
+  Blockchain,
+  ether,
+  bitcoin,
+  preciseMul,
+  preciseMulCeil,
+} from '@setprotocol/set-protocol-v2/dist/utils/common';
 import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
 import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
 import {
@@ -17,19 +23,17 @@ import { expect } from '../../utils/chai';
 const provider = new ethers.providers.JsonRpcProvider();
 const blockchain = new Blockchain(provider);
 
-
 describe('DebtIssuanceModuleWrapper', () => {
   let owner: Address;
   let recipient: Address;
   let functionCaller: Address;
   let randomAddress: Address;
 
+  let debtIssuanceModuleWrapper: DebtIssuanceModuleWrapper;
   let debtIssuanceModule: DebtIssuanceModule;
 
   let deployer: DeployHelper;
   let setup: SystemFixture;
-
-  let debtIssuanceModuleWrapper: DebtIssuanceModuleWrapper;
 
   beforeAll(async() => {
     [
@@ -100,7 +104,7 @@ describe('DebtIssuanceModuleWrapper', () => {
       );
     }
 
-    it('should enable the Module on the SetToken', async () => {
+    it('should enable the module on the SetToken', async () => {
       await subject();
       const isModuleEnabled = await setToken.isInitializedModule(debtIssuanceModule.address);
       expect(isModuleEnabled).to.eq(true);
@@ -113,23 +117,23 @@ describe('DebtIssuanceModuleWrapper', () => {
       expect(managerIssuanceHook).to.eq(subjectManagerIssuanceHook);
     });
 
-    describe('when the issue fee is greater than the maximum fee', async () => {
+    describe('when the issue fee is greater than the maximum fee', () => {
       beforeEach(async () => {
         subjectManagerIssueFee = ether(0.03);
       });
 
       it('should revert', async () => {
-        await expect(subject()).to.be.rejectedWith("Issue fee can't exceed maximum fee");
+        await expect(subject()).to.be.rejectedWith('Issue fee can\'t exceed maximum fee');
       });
     });
 
-    describe('when the redeem fee is greater than the maximum fee', async () => {
+    describe('when the redeem fee is greater than the maximum fee', () => {
       beforeEach(async () => {
         subjectManagerRedeemFee = ether(0.03);
       });
 
       it('should revert', async () => {
-        await expect(subject()).to.be.rejectedWith("Redeem fee can't exceed maximum fee");
+        await expect(subject()).to.be.rejectedWith('Redeem fee can\'t exceed maximum fee');
       });
     });
 
@@ -262,6 +266,7 @@ describe('DebtIssuanceModuleWrapper', () => {
         [ether(1), bitcoin(2)],
         [debtIssuanceModule.address]
       );
+      issuanceQuantity = ether(2);
 
       subjectSetTokenAddress = setToken.address;
       subjectMaxManagerFee = ether(0.02);
@@ -286,7 +291,6 @@ describe('DebtIssuanceModuleWrapper', () => {
       await setup.weth.approve(debtIssuanceModule.address, ether(5));
       await setup.wbtc.approve(debtIssuanceModule.address, bitcoin(10));
 
-      issuanceQuantity = ether(2);
       await debtIssuanceModule.issue(setToken.address, issuanceQuantity, functionCaller);
     });
 
@@ -299,7 +303,7 @@ describe('DebtIssuanceModuleWrapper', () => {
       );
     }
 
-    it('should redeems the correct quantity of SetToken for the caller', async () => {
+    it('should redeem the correct quantity of SetTokens for the caller', async () => {
       const existingBalance = await setToken.balanceOf(subjectCaller);
       expect(existingBalance.toString()).to.be.eq(issuanceQuantity.toString());
 
@@ -374,40 +378,37 @@ describe('DebtIssuanceModuleWrapper', () => {
     }
 
     it('should return the correct required quantity of component tokens for issuing', async () => {
-      const requiredComponents = await subject();
-      const [
-        [tokenAddress1, tokenAddress2],
-        [equityAmount1, equityAmount2],
-        [debtAmount1, debtAmount2],
-      ] = requiredComponents;
+      const [components, equityFlows, debtFlows] = await subject();
+      const wethFlows = preciseMul(subjectIssuanceQuantity, ether(1));
+      const wbtcFlows = preciseMulCeil(subjectIssuanceQuantity, bitcoin(2));
 
-      expect(tokenAddress1).to.equal(setup.weth.address);
-      expect(tokenAddress2).to.equal(setup.wbtc.address);
-      expect(equityAmount1.toString()).to.equal(ether(2).toString());
-      expect(equityAmount2.toString()).to.equal(bitcoin(4).toString());
-      expect(debtAmount1.toString()).to.equal(ether(0).toString());
-      expect(debtAmount2.toString()).to.equal(ether(0).toString());
+      const expectedComponents = await setToken.getComponents();
+      const expectedEquityFlows = [wethFlows, wbtcFlows];
+      const expectedDebtFlows = [ZERO, ZERO];
+
+      expect(JSON.stringify(expectedComponents)).to.eq(JSON.stringify(components));
+      expect(JSON.stringify(expectedEquityFlows)).to.eq(JSON.stringify(equityFlows));
+      expect(JSON.stringify(expectedDebtFlows)).to.eq(JSON.stringify(debtFlows));
     });
 
-    describe('when there\'s an issue fee', () => {
+    describe('when there\'s an issuance fee', () => {
       beforeEach(() => {
         subjectManagerIssueFee = ether(0.01);
       });
 
       it('should return required amount with fee', async () => {
-        const requiredComponents = await subject();
-        const [
-          [tokenAddress1, tokenAddress2],
-          [equityAmount1, equityAmount2],
-          [debtAmount1, debtAmount2],
-        ] = requiredComponents;
+        const [components, equityFlows, debtFlows] = await subject();
+        const mintQuantity = preciseMul(subjectIssuanceQuantity, ether(1).add(subjectManagerIssueFee));
+        const wethFlows = preciseMul(mintQuantity, ether(1));
+        const wbtcFlows = preciseMulCeil(mintQuantity, bitcoin(2));
 
-        expect(tokenAddress1).to.equal(setup.weth.address);
-        expect(tokenAddress2).to.equal(setup.wbtc.address);
-        expect(equityAmount1.toString()).to.equal(ether(2.02).toString());
-        expect(equityAmount2.toString()).to.equal(bitcoin(4.04).toString());
-        expect(debtAmount1.toString()).to.equal(ether(0).toString());
-        expect(debtAmount2.toString()).to.equal(ether(0).toString());
+        const expectedComponents = await setToken.getComponents();
+        const expectedEquityFlows = [wethFlows, wbtcFlows];
+        const expectedDebtFlows = [ZERO, ZERO];
+
+        expect(JSON.stringify(expectedComponents)).to.eq(JSON.stringify(components));
+        expect(JSON.stringify(expectedEquityFlows)).to.eq(JSON.stringify(equityFlows));
+        expect(JSON.stringify(expectedDebtFlows)).to.eq(JSON.stringify(debtFlows));
       });
     });
   });
@@ -459,40 +460,37 @@ describe('DebtIssuanceModuleWrapper', () => {
     }
 
     it('should return the correct required quantity of component tokens for redeeming', async () => {
-      const requiredComponents = await subject();
-      const [
-        [tokenAddress1, tokenAddress2],
-        [equityAmount1, equityAmount2],
-        [debtAmount1, debtAmount2],
-      ] = requiredComponents;
+      const [components, equityFlows, debtFlows] = await subject();
+      const wethFlows = preciseMul(subjectRedemptionQuantity, ether(1));
+      const wbtcFlows = preciseMulCeil(subjectRedemptionQuantity, bitcoin(2));
 
-      expect(tokenAddress1).to.equal(setup.weth.address);
-      expect(tokenAddress2).to.equal(setup.wbtc.address);
-      expect(equityAmount1.toString()).to.equal(ether(2).toString());
-      expect(equityAmount2.toString()).to.equal(bitcoin(4).toString());
-      expect(debtAmount1.toString()).to.equal(ether(0).toString());
-      expect(debtAmount2.toString()).to.equal(ether(0).toString());
+      const expectedComponents = await setToken.getComponents();
+      const expectedEquityFlows = [wethFlows, wbtcFlows];
+      const expectedDebtFlows = [ZERO, ZERO];
+
+      expect(JSON.stringify(expectedComponents)).to.eq(JSON.stringify(components));
+      expect(JSON.stringify(expectedEquityFlows)).to.eq(JSON.stringify(equityFlows));
+      expect(JSON.stringify(expectedDebtFlows)).to.eq(JSON.stringify(debtFlows));
     });
 
-    describe('when there\'s a redeem fee', () => {
+    describe('when there\'s a redemption fee', () => {
       beforeEach(() => {
         subjectManagerRedeemFee = ether(0.01);
       });
 
       it('should return required amount with fee', async () => {
-        const requiredComponents = await subject();
-        const [
-          [tokenAddress1, tokenAddress2],
-          [equityAmount1, equityAmount2],
-          [debtAmount1, debtAmount2],
-        ] = requiredComponents;
+        const [components, equityFlows, debtFlows] = await subject();
+        const mintQuantity = preciseMul(subjectRedemptionQuantity, ether(1).sub(subjectManagerRedeemFee));
+        const wethFlows = preciseMul(mintQuantity, ether(1));
+        const wbtcFlows = preciseMulCeil(mintQuantity, bitcoin(2));
 
-        expect(tokenAddress1).to.equal(setup.weth.address);
-        expect(tokenAddress2).to.equal(setup.wbtc.address);
-        expect(equityAmount1.toString()).to.equal(ether(1.98).toString());
-        expect(equityAmount2.toString()).to.equal(bitcoin(3.96).toString());
-        expect(debtAmount1.toString()).to.equal(ether(0).toString());
-        expect(debtAmount2.toString()).to.equal(ether(0).toString());
+        const expectedComponents = await setToken.getComponents();
+        const expectedEquityFlows = [wethFlows, wbtcFlows];
+        const expectedDebtFlows = [ZERO, ZERO];
+
+        expect(JSON.stringify(expectedComponents)).to.eq(JSON.stringify(components));
+        expect(JSON.stringify(expectedEquityFlows)).to.eq(JSON.stringify(equityFlows));
+        expect(JSON.stringify(expectedDebtFlows)).to.eq(JSON.stringify(debtFlows));
       });
     });
   });

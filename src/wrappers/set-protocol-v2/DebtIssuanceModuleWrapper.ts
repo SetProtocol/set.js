@@ -114,7 +114,7 @@ export default class DebtIssuanceModuleWrapper {
    * Redeem a SetToken into its underlying positions
    *
    * @param  setTokenAddress           Address of the SetToken contract
-   * @param  quantity                  Quantity to issue
+   * @param  quantity                  Quantity to redeem
    * @param  setTokenRecipientAddress  Address of recipient of component tokens from redemption
    * @param  callerAddress             Address of caller (optional)
    * @return                           Transaction hash of the redemption transaction
@@ -176,7 +176,7 @@ export default class DebtIssuanceModuleWrapper {
    * to be paid down to redeem. Values DO NOT take into account any updates from pre action manager or module hooks.
    *
    * @param  setTokenAddress           Address of the SetToken contract
-   * @param  quantity                  Quantity to issue
+   * @param  quantity                  Quantity to redeem
    * @param  callerAddress             Address of caller (optional)
    *
    * @return address[]                 Array of component addresses making up the Set

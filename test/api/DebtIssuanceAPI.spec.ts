@@ -27,7 +27,6 @@ const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 jest.mock('@src/wrappers/set-protocol-v2/DebtIssuanceModuleWrapper');
 
-
 describe('DebtIssuanceAPI', () => {
   let debtIssuanceModuleAddress: Address;
   let managerIssuanceHook: Address;
@@ -66,9 +65,9 @@ describe('DebtIssuanceAPI', () => {
 
     beforeEach(async () => {
       subjectSetTokenAddress = setTokenAddress;
-      subjectMaxManagerFee = ether(1);
-      subjectManagerIssueFee = ether(0.1);
-      subjectManagerRedeemFee = ether(0.2);
+      subjectMaxManagerFee = ether(0.02);
+      subjectManagerIssueFee = ether(0.005);
+      subjectManagerRedeemFee = ether(0.004);
       subjectFeeRecipientAddress = owner;
       subjectManagerIssuanceHook = managerIssuanceHook;
       subjectCallerAddress = owner;
@@ -165,14 +164,14 @@ describe('DebtIssuanceAPI', () => {
   describe('#redeemAsync', () => {
     let subjectSetTokenAddress: Address;
     let subjectRedemptionQuantity: BigNumber;
-    let subjectSetTokenRecipientAddress: Address;
+    let subjectRecipientAddress: Address;
     let subjectCallerAddress: Address;
     let subjectTransactionOptions: any;
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       subjectRedemptionQuantity = ether(1);
-      subjectSetTokenRecipientAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
+      subjectRecipientAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
       subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
       subjectTransactionOptions = {};
     });
@@ -181,7 +180,7 @@ describe('DebtIssuanceAPI', () => {
       return await debtIssuanceAPI.redeemAsync(
         subjectSetTokenAddress,
         subjectRedemptionQuantity,
-        subjectSetTokenRecipientAddress,
+        subjectRecipientAddress,
         subjectCallerAddress,
         subjectTransactionOptions
       );
@@ -193,7 +192,7 @@ describe('DebtIssuanceAPI', () => {
       expect(debtIssuanceModuleWrapper.redeem).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectRedemptionQuantity,
-        subjectSetTokenRecipientAddress,
+        subjectRecipientAddress,
         subjectCallerAddress,
         subjectTransactionOptions
       );
@@ -202,6 +201,16 @@ describe('DebtIssuanceAPI', () => {
     describe('when the SetToken address is invalid', () => {
       beforeEach(async () => {
         subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when the recipient address is invalid', () => {
+      beforeEach(async () => {
+        subjectRecipientAddress = '0xInvalidAddress';
       });
 
       it('should throw with invalid params', async () => {
