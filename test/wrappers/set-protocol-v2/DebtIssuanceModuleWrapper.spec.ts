@@ -494,4 +494,122 @@ describe('DebtIssuanceModuleWrapper', () => {
       });
     });
   });
+
+  describe('#calculateTotalFees', () => {
+    let setToken: SetToken;
+
+    let subjectSetTokenAddress: Address;
+    let subjectMaxManagerFee: BigNumber;
+    let subjectManagerIssueFee: BigNumber;
+    let subjectManagerRedeemFee: BigNumber;
+    let subjectFeeRecipient: Address;
+    let subjectManagerIssuanceHook: Address;
+    let subjectQuantity: BigNumber;
+    let subjectIsIssue: boolean;
+    let subjectCaller: Address;
+
+    beforeEach(async () => {
+      setToken = await setup.createSetToken(
+        [setup.weth.address, setup.wbtc.address],
+        [ether(1), bitcoin(2)],
+        [debtIssuanceModule.address]
+      );
+
+      subjectSetTokenAddress = setToken.address;
+      subjectMaxManagerFee = ether(1);
+      subjectManagerIssueFee = ether(0);
+      subjectManagerRedeemFee = ether(0);
+      subjectFeeRecipient = owner;
+      subjectManagerIssuanceHook = ADDRESS_ZERO;
+      subjectQuantity = ether(2);
+      subjectCaller = functionCaller;
+    });
+
+    async function subject(): Promise<(BigNumber)[][]> {
+      await debtIssuanceModule.initialize(
+        subjectSetTokenAddress,
+        subjectMaxManagerFee,
+        subjectManagerIssueFee,
+        subjectManagerRedeemFee,
+        subjectFeeRecipient,
+        subjectManagerIssuanceHook,
+      );
+
+      return debtIssuanceModuleWrapper.calculateTotalFees(
+        subjectSetTokenAddress,
+        subjectQuantity,
+        subjectIsIssue,
+        subjectCaller
+      );
+    }
+    describe('when calculateTotalFees is used for issuance with no issue fee', () => {
+      beforeEach(() => {
+        subjectIsIssue = true;
+      });
+
+      it('should return no issue fee value', async () => {
+        const [issuedSetsAmount, managerFeeAmount, protocolFeeAmount] = await subject();
+        const expectedIssuedSetsAmount = subjectQuantity;
+        const expectedManagerFeeAmount = ether(0);
+        const expectedProtocolFeeAmount = ether(0);
+
+        expect(JSON.stringify(issuedSetsAmount)).to.eq(JSON.stringify(expectedIssuedSetsAmount));
+        expect(JSON.stringify(managerFeeAmount)).to.eq(JSON.stringify(expectedManagerFeeAmount));
+        expect(JSON.stringify(protocolFeeAmount)).to.eq(JSON.stringify(expectedProtocolFeeAmount));
+      });
+    });
+
+    describe('when there\'s an issue fee', () => {
+      beforeEach(() => {
+        subjectIsIssue = true;
+        subjectManagerIssueFee = ether(0.01);
+      });
+
+      it('should return required amount with issue fee', async () => {
+        const [issuedSetsAmount, managerFeeAmount, protocolFeeAmount] = await subject();
+        const expectedIssuedSetsAmount = preciseMul(subjectQuantity, ether(1).add(subjectManagerIssueFee));
+        const expectedManagerFeeAmount = preciseMul(subjectQuantity, subjectManagerIssueFee);
+        const expectedProtocolFeeAmount = ether(0);
+
+        expect(JSON.stringify(issuedSetsAmount)).to.eq(JSON.stringify(expectedIssuedSetsAmount));
+        expect(JSON.stringify(managerFeeAmount)).to.eq(JSON.stringify(expectedManagerFeeAmount));
+        expect(JSON.stringify(protocolFeeAmount)).to.eq(JSON.stringify(expectedProtocolFeeAmount));
+      });
+    });
+
+    describe('when calculateTotalFees is used for redemption with no redeem fee', () => {
+      beforeEach(() => {
+        subjectIsIssue = false;
+      });
+
+      it('should return no redeem fee value', async () => {
+        const [issuedSetsAmount, managerFeeAmount, protocolFeeAmount] = await subject();
+        const expectedIssuedSetsAmount = subjectQuantity;
+        const expectedManagerFeeAmount = ether(0);
+        const expectedProtocolFeeAmount = ether(0);
+
+        expect(JSON.stringify(issuedSetsAmount)).to.eq(JSON.stringify(expectedIssuedSetsAmount));
+        expect(JSON.stringify(managerFeeAmount)).to.eq(JSON.stringify(expectedManagerFeeAmount));
+        expect(JSON.stringify(protocolFeeAmount)).to.eq(JSON.stringify(expectedProtocolFeeAmount));
+      });
+    });
+
+    describe('when there\'s a redeem fee', () => {
+      beforeEach(() => {
+        subjectIsIssue = false;
+        subjectManagerRedeemFee = ether(0.01);
+      });
+
+      it('should return required amount with redeem fee', async () => {
+        const [issuedSetsAmount, managerFeeAmount, protocolFeeAmount] = await subject();
+        const expectedIssuedSetsAmount = preciseMul(subjectQuantity, ether(1).sub(subjectManagerRedeemFee));
+        const expectedManagerFeeAmount = preciseMul(subjectQuantity, subjectManagerRedeemFee);
+        const expectedProtocolFeeAmount = ether(0);
+
+        expect(JSON.stringify(issuedSetsAmount)).to.eq(JSON.stringify(expectedIssuedSetsAmount));
+        expect(JSON.stringify(managerFeeAmount)).to.eq(JSON.stringify(expectedManagerFeeAmount));
+        expect(JSON.stringify(protocolFeeAmount)).to.eq(JSON.stringify(expectedProtocolFeeAmount));
+      });
+    });
+  });
 });

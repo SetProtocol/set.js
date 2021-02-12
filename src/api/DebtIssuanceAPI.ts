@@ -195,4 +195,36 @@ export default class DebtIssuanceAPI {
       callerAddress,
     );
   }
+
+  /**
+   * Calculates the manager fee, protocol fee and resulting totalQuantity to use when calculating unit amounts. If fees
+   * are charged they are added to the total issue quantity, for example 1% fee on 100 Sets means 101 Sets are minted
+   * by caller, the _to address receives 100 and the feeRecipient receives 1. Conversely, on redemption the redeemer
+   * will only receive the collateral that collateralizes 99 Sets, while the additional Set is given to the
+   * feeRecipient.
+   *
+   * @param setTokenAddress  Instance of the SetToken to issue
+   * @param quantity         Amount of SetToken issuer wants to receive/redeem
+   * @param isIssue          If issuing or redeeming
+   *
+   * @return BigNumber       Total amount of Sets to be issued/redeemed with fee adjustment
+   * @return BigNumber       Sets minted to the manager
+   * @return BigNumber       Sets minted to the protocol
+   */
+  public async calculateTotalFeesAsync(
+    setTokenAddress: Address,
+    quantity: BigNumber,
+    isIssue: boolean,
+    callerAddress: Address = undefined,
+  ): Promise<(BigNumber)[][]> {
+    this.assert.schema.isValidAddress('setAddress', setTokenAddress);
+    this.assert.common.isNotUndefined(isIssue, 'isIssue arg must be a boolean.');
+
+    return await this.debtIssuanceModuleWrapper.calculateTotalFees(
+      setTokenAddress,
+      quantity,
+      isIssue,
+      callerAddress,
+    );
+  }
 }

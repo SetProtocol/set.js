@@ -298,4 +298,58 @@ describe('DebtIssuanceAPI', () => {
       });
     });
   });
+
+  describe('#calculateTotalFeesAsync', () => {
+    let subjectSetTokenAddress: Address;
+    let subjectQuantity: BigNumber;
+    let subjectIsIssue: boolean;
+    let subjectCallerAddress: Address;
+
+    beforeEach(async () => {
+      subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      subjectQuantity = ether(1);
+      subjectIsIssue = true;
+      subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+    });
+
+    async function subject(): Promise<(Address|BigNumber)[][]> {
+      return await debtIssuanceAPI.calculateTotalFeesAsync(
+        subjectSetTokenAddress,
+        subjectQuantity,
+        subjectIsIssue,
+        subjectCallerAddress,
+      );
+    }
+
+    it('should call calculateTotalFeesAsync with correct params', async () => {
+      await subject();
+
+      expect(debtIssuanceModuleWrapper.calculateTotalFees).to.have.beenCalledWith(
+        subjectSetTokenAddress,
+        subjectQuantity,
+        subjectIsIssue,
+        subjectCallerAddress,
+      );
+    });
+
+    describe('when the SetToken address is invalid', () => {
+      beforeEach(async () => {
+        subjectSetTokenAddress = '0xInvalidAddress';
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when isIssue is undefined', () => {
+      beforeEach(async () => {
+        subjectIsIssue = undefined;
+      });
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('isIssue arg must be a boolean.');
+      });
+    });
+  });
 });
