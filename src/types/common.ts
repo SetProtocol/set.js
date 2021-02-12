@@ -11,6 +11,7 @@ export interface SetJSConfig {
   streamingFeeModuleAddress: Address;
   tradeModuleAddress: Address;
   governanceModuleAddress: Address;
+  debtIssuanceModuleAddress: Address;
 }
 
 export type SetDetails = {
