@@ -29,6 +29,7 @@ import {
   TradeAPI,
   NavIssuanceAPI,
   PriceOracleAPI,
+  DebtIssuanceAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -91,6 +92,12 @@ class Set {
   public priceOracle: PriceOracleAPI;
 
   /**
+   * An instance of the DebtIssuanceAPI class. Contains interfaces for interacting
+   * with the DebtIssuance contract to issue and redeem tokens.
+   */
+  public debtIssuance: DebtIssuanceAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(provider: Web3CoreProvider, config: SetJSConfig) {
@@ -111,6 +118,7 @@ class Set {
     this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress);
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
+    this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
   }
 }
 
