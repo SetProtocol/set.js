@@ -167,8 +167,8 @@ export default class SetTokenWrapper {
   }
 
   /**
-   * isModule
-   * Determines if given address is a module
+   * isInitializedModule
+   * Determines if given address is an initialized module
    *
    * @param  setAddress    Address of Set to check
    * @param  moduleAddress Address of potential module
@@ -176,7 +176,7 @@ export default class SetTokenWrapper {
    *
    * @return               boolean
    */
-  public async isModule(
+  public async isInitializedModule(
     setAddress: Address,
     moduleAddress: Address,
     callerAddress?: Address,
@@ -186,7 +186,7 @@ export default class SetTokenWrapper {
       callerAddress,
     );
 
-    return await setToken.isModule(moduleAddress);
+    return await setToken.isInitializedModule(moduleAddress);
   }
 
   /**

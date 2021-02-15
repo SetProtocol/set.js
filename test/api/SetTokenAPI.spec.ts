@@ -557,7 +557,7 @@ describe('SetTokenAPI', () => {
     it('should call the SetTokenWrapper with correct params', async () => {
       await subject();
 
-      expect(setTokenWrapper.isModule).to.have.beenCalledWith(
+      expect(setTokenWrapper.isInitializedModule).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectModuleAddress,
       );
@@ -603,7 +603,7 @@ describe('SetTokenAPI', () => {
     it('should call the SetTokenWrapper with correct params', async () => {
       await subject();
 
-      expect(setTokenWrapper.isModule).to.have.beenCalledWith(
+      expect(setTokenWrapper.isInitializedModule).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectModuleAddress,
       );
