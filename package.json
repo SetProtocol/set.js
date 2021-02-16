@@ -1,6 +1,6 @@
 {
     "name": "@setprotocol/set.js",
-    "version": "1.1.7",
+    "version": "1.2.0",
     "description": "A javascript library for interacting with the Set Protocol v2",
     "keywords": [
         "set.js",
