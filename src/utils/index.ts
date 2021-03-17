@@ -1,0 +1,1 @@
+export { IntervalManager } from './intervalManager';
