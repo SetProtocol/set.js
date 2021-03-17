@@ -18,7 +18,7 @@
 
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
-import { BigNumber } from 'ethers/lib/ethers';
+import { BigNumber, ContractTransaction } from 'ethers/lib/ethers';
 import { Provider } from '@ethersproject/providers';
 
 import ERC20Wrapper from '../wrappers/set-protocol-v2/ERC20Wrapper';
@@ -139,7 +139,7 @@ export default class ERC20API {
     value: BigNumber,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {},
-  ): Promise<string> {
+  ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('toAddress', to);
     this.assert.schema.isValidNumber('value', value);
@@ -163,7 +163,7 @@ export default class ERC20API {
     value: BigNumber,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
-  ): Promise<string> {
+  ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
     this.assert.schema.isValidNumber('value', value);
@@ -189,7 +189,7 @@ export default class ERC20API {
     value: BigNumber,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {},
-  ): Promise<string> {
+  ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('toAddress', to);
     this.assert.schema.isValidAddress('fromAddress', from);

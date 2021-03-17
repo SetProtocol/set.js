@@ -18,7 +18,7 @@
 
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
-import { BigNumber } from 'ethers/lib/ethers';
+import { BigNumber, ContractTransaction } from 'ethers/lib/ethers';
 import { Provider } from '@ethersproject/providers';
 
 import { generateTxOpts } from '../../utils/transactions';
@@ -137,7 +137,7 @@ export default class ERC20Wrapper {
     value: BigNumber,
     callerAddress: Address = undefined,
     txOpts?: TransactionOverrides,
-  ): Promise<string> {
+  ): Promise<ContractTransaction> {
     const txOptions = await generateTxOpts(txOpts);
     const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
 
@@ -163,7 +163,7 @@ export default class ERC20Wrapper {
     value: BigNumber,
     callerAddress: Address = undefined,
     txOpts?: TransactionOverrides,
-  ): Promise<string> {
+  ): Promise<ContractTransaction> {
     const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
     const txOptions = await generateTxOpts(txOpts);
 
@@ -186,7 +186,7 @@ export default class ERC20Wrapper {
     value: BigNumber,
     callerAddress: Address = undefined,
     txOpts?: TransactionOverrides,
-  ): Promise<string> {
+  ): Promise<ContractTransaction> {
     const txOptions = await generateTxOpts(txOpts);
     const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
 

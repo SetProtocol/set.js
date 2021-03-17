@@ -15,7 +15,7 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/lib/ethers';
+import { BigNumber, ContractTransaction } from 'ethers/lib/ethers';
 import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
@@ -26,7 +26,6 @@ import { expect } from '../utils/chai';
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 jest.mock('@src/wrappers/set-protocol-v2/ERC20Wrapper');
-
 
 describe('ERC20API', () => {
   let erc20API: ERC20API;
@@ -272,7 +271,7 @@ describe('ERC20API', () => {
       subjectTransactionOptions = {};
     });
 
-    async function subject(): Promise<string> {
+    async function subject(): Promise<ContractTransaction> {
       return await erc20API.transferAsync(
         subjectTokenAddress,
         subjectReceiverAddress,
@@ -330,7 +329,7 @@ describe('ERC20API', () => {
       subjectTransactionOptions = {};
     });
 
-    async function subject(): Promise<string> {
+    async function subject(): Promise<ContractTransaction> {
       return await erc20API.approveProxyAsync(
         subjectTokenAddress,
         subjectSpenderAddress,
@@ -390,7 +389,7 @@ describe('ERC20API', () => {
       subjectTransactionOptions = {};
     });
 
-    async function subject(): Promise<string> {
+    async function subject(): Promise<ContractTransaction> {
       return await erc20API.proxyTransferAsync(
         subjectTokenAddress,
         subjectFromAddress,
