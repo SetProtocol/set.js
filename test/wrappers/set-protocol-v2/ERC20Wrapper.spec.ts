@@ -15,7 +15,7 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/lib/ethers';
+import { BigNumber, ContractTransaction } from 'ethers/lib/ethers';
 
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { Blockchain, ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
@@ -169,7 +169,7 @@ describe('ERC20Wrapper', () => {
       subjectCaller = owner;
     });
 
-    async function subject(): Promise<string> {
+    async function subject(): Promise<ContractTransaction> {
       return await erc20Wrapper.approve(
         subjectTokenAddress,
         subjectSpenderAddress,
@@ -214,7 +214,7 @@ describe('ERC20Wrapper', () => {
       );
     });
 
-    async function subject(): Promise<string> {
+    async function subject(): Promise<ContractTransaction> {
       return await erc20Wrapper.transferFrom(
         subjectTokenAddress,
         subjectOwnerAddress,
@@ -249,7 +249,7 @@ describe('ERC20Wrapper', () => {
       subjectTransferAmount = BigNumber.from(1000);
     });
 
-    async function subject(): Promise<string> {
+    async function subject(): Promise<ContractTransaction> {
       return await erc20Wrapper.transfer(
         subjectTokenAddress,
         subjectTokenReceiver,

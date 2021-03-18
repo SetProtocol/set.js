@@ -16,11 +16,10 @@
 
 'use strict';
 
-import { provider as Web3CoreProvider } from 'web3-core';
-
 import { SetJSConfig } from './types';
 import Assertions from './assertions';
 import {
+  BlockchainAPI,
   ERC20API,
   FeeAPI,
   IssuanceAPI,
@@ -98,10 +97,19 @@ class Set {
   public debtIssuance: DebtIssuanceAPI;
 
   /**
+   * An instance of the BlockchainAPI class. Contains interfaces for
+   * interacting with the blockchain
+   */
+  public blockchain: BlockchainAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
-  constructor(provider: Web3CoreProvider, config: SetJSConfig) {
-    const ethersProvider = new ethersProviders.Web3Provider(provider);
+  constructor(config: SetJSConfig) {
+    if (!config.ethersProvider && !config.web3Provider) {
+      throw new Error('SetJS requires an ethersProvider or web3Provider passed in as part of the configuration');
+    }
+    const ethersProvider = config.ethersProvider || new ethersProviders.Web3Provider(config.web3Provider);
     const assertions = new Assertions();
 
     this.erc20 = new ERC20API(ethersProvider, assertions);
@@ -119,6 +127,7 @@ class Set {
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
+    this.blockchain = new BlockchainAPI(ethersProvider, assertions);
   }
 }
 
