@@ -19,6 +19,7 @@
 import { SetJSConfig } from './types';
 import Assertions from './assertions';
 import {
+  BlockchainAPI,
   ERC20API,
   FeeAPI,
   IssuanceAPI,
@@ -29,7 +30,6 @@ import {
   PriceOracleAPI,
   DebtIssuanceAPI,
 } from './api/index';
-import BlockchainAPI from './api/BlockchainAPI';
 
 const ethersProviders = require('ethers').providers;
 

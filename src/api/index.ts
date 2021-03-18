@@ -1,3 +1,4 @@
+import BlockchainAPI from './BlockchainAPI';
 import ERC20API from './ERC20API';
 import FeeAPI from './FeeAPI';
 import IssuanceAPI from './IssuanceAPI';
@@ -9,6 +10,7 @@ import PriceOracleAPI from './PriceOracleAPI';
 import DebtIssuanceAPI from './DebtIssuanceAPI';
 
 export {
+  BlockchainAPI,
   ERC20API,
   FeeAPI,
   IssuanceAPI,
