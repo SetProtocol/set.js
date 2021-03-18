@@ -121,6 +121,17 @@ export default class ProtocolViewerWrapper {
       (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
 
-    return await protocolViewerInstance.batchFetchDetails(setTokenAddress, moduleAddresses);
+    /*
+      Returns the result as an array of SetDetails objects rather than actual class instances
+      which get translated to an array of data when passed to clients.
+      Tests remain unchanged because while it is still an class instance, it can be called with `.name` or whatever key
+      but once it gets translated to a string in the response, it'll be improperly rendered as an array if we don't
+      do this.
+    */
+    return (await protocolViewerInstance.batchFetchDetails(setTokenAddress, moduleAddresses)).map(setDetails => {
+      return {
+        ...setDetails,
+      };
+    });
   }
 }
