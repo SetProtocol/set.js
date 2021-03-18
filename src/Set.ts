@@ -106,7 +106,7 @@ class Set {
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(config: SetJSConfig) {
-    if (!config.ethersProvider && config.web3Provider) {
+    if (!config.ethersProvider && !config.web3Provider) {
       throw new Error('SetJS requires an ethersProvider or web3Provider passed in as part of the configuration');
     }
     const ethersProvider = config.ethersProvider || new ethersProviders.Web3Provider(config.web3Provider);
