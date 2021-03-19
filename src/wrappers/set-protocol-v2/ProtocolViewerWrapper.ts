@@ -100,7 +100,17 @@ export default class ProtocolViewerWrapper {
       (this.provider as JsonRpcProvider).getSigner(callerAddress)
     );
 
-    return await protocolViewerInstance.getSetDetails(setTokenAddress, moduleAddresses);
+    const setDetails = await protocolViewerInstance.getSetDetails(setTokenAddress, moduleAddresses);
+
+    return {
+      name: setDetails.name,
+      symbol: setDetails.symbol,
+      manager: setDetails.manager,
+      modules: setDetails.modules,
+      moduleStatuses: setDetails.moduleStatuses,
+      positions: setDetails.positions,
+      totalSupply: setDetails.totalSupply,
+    };
   }
 
   /**
