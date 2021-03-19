@@ -200,7 +200,7 @@ describe('SetTokenAPI', () => {
       subjectModuleAddresses = ['0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569', '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569'];
     });
 
-    async function subject(): Promise<SetDetailsWithStreamingInfo> {
+    async function subject(): Promise<SetDetails | SetDetailsWithStreamingInfo> {
       return await setTokenAPI.fetchSetDetailsAsync(
         subjectSetTokenAddress,
         subjectModuleAddresses
