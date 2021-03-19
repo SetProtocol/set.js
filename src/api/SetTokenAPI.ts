@@ -131,7 +131,7 @@ export default class SetTokenAPI {
     setTokenAddress: Address,
     moduleAddresses: Address[],
     callerAddress?: Address,
-  ): Promise<SetDetailsWithStreamingInfo> {
+  ): Promise<SetDetails | SetDetailsWithStreamingInfo> {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
     this.assert.schema.isValidAddressList('moduleAddresses', moduleAddresses);
 
@@ -143,7 +143,7 @@ export default class SetTokenAPI {
 
     const shouldIncludeStreamingFee = setDetails.modules.includes(this.streamingFeeModuleAddress);
     if (!shouldIncludeStreamingFee) {
-      return setDetails as SetDetailsWithStreamingInfo;
+      return setDetails;
     }
 
     const [streamingFeeInfo] = await this.protocolViewerWrapper.batchFetchStreamingFeeInfo(

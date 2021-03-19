@@ -225,7 +225,7 @@ describe('ProtocolViewerWrapper', () => {
        );
     }
 
-    it('should return the correct streaming fee info', async () => {
+    it('should return the correct info', async () => {
       const [setOneDetails, setTwoDetails] = await subject();
 
       const expectedSetOneName = await setTokenOne.name();

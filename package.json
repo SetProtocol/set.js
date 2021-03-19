@@ -1,6 +1,6 @@
 {
     "name": "@setprotocol/set.js",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "A javascript library for interacting with the Set Protocol v2",
     "keywords": [
         "set.js",
@@ -67,7 +67,7 @@
         "dotenv": "^8.2.0",
         "ethereum-types": "^3.2.0",
         "ethereumjs-util": "^7.0.3",
-        "ethers": "^5.0.25",
+        "ethers": "^5.0.3",
         "jsonschema": "^1.2.6",
         "lodash": "^4.17.19",
         "truffle": "^5.1.35",

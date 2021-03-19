@@ -27,6 +27,7 @@ export type SetDetails = {
   modules: Address[];
   moduleStatuses: number[];
   positions: Position[]
+  totalSupply: BigNumber;
 };
 
 export type Position = {
