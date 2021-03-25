@@ -85,7 +85,7 @@ export default class SetTokenAPI {
     managerAddress: Address,
     name: string,
     symbol: string,
-    callerAddress?: Address,
+    callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<Address[]> {
     this.assert.common.isNotEmptyArray(componentAddresses, 'Component addresses must contain at least one component.');
@@ -130,7 +130,7 @@ export default class SetTokenAPI {
   public async fetchSetDetailsAsync(
     setTokenAddress: Address,
     moduleAddresses: Address[],
-    callerAddress?: Address,
+    callerAddress: Address = undefined
   ): Promise<SetDetails | SetDetailsWithStreamingInfo> {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
     this.assert.schema.isValidAddressList('moduleAddresses', moduleAddresses);
@@ -170,7 +170,7 @@ export default class SetTokenAPI {
   public async batchFetchSetDetailsAsync(
     setTokenAddresses: Address[],
     moduleAddresses: Address[],
-    callerAddress?: Address,
+    callerAddress: Address = undefined
   ): Promise<SetDetails[]> {
     this.assert.schema.isValidAddressList('setTokenAddresses', setTokenAddresses);
     this.assert.schema.isValidAddressList('moduleAddresses', moduleAddresses);
@@ -227,11 +227,12 @@ export default class SetTokenAPI {
    * @return                 Array of current Set Positions.
    */
   public async getPositionsAsync(
-    setAddress: Address
+    setAddress: Address,
+    callerAddress: Address = undefined
   ): Promise<Position[]> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return this.setTokenWrapper.getPositions(setAddress);
+    return this.setTokenWrapper.getPositions(setAddress, callerAddress);
   }
 
   /**
@@ -241,11 +242,12 @@ export default class SetTokenAPI {
    * @return                 Array of module addresses.
    */
   public async getModulesAsync(
-    setAddress: Address
+    setAddress: Address,
+    callerAddress: Address = undefined
   ): Promise<Address[]> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
 
-    return this.setTokenWrapper.getModules(setAddress);
+    return this.setTokenWrapper.getModules(setAddress, callerAddress);
   }
 
   /**
@@ -258,11 +260,12 @@ export default class SetTokenAPI {
   public async getModuleStateAsync(
     setAddress: Address,
     moduleAddress: Address,
+    callerAddress: Address = undefined
   ): Promise<ModuleState> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return this.setTokenWrapper.moduleStates(setAddress, moduleAddress);
+    return this.setTokenWrapper.moduleStates(setAddress, moduleAddress, callerAddress);
   }
 
   /**
@@ -334,12 +337,13 @@ export default class SetTokenAPI {
    */
   public async isModuleEnabledAsync(
     setAddress: Address,
-    moduleAddress: Address
+    moduleAddress: Address,
+    callerAddress: Address = undefined
   ): Promise<boolean> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return this.setTokenWrapper.isInitializedModule(setAddress, moduleAddress);
+    return this.setTokenWrapper.isInitializedModule(setAddress, moduleAddress, callerAddress);
   }
 
   /**
@@ -351,11 +355,12 @@ export default class SetTokenAPI {
    */
   public async isModulePendingAsync(
     setAddress: Address,
-    moduleAddress: Address
+    moduleAddress: Address,
+    callerAddress: Address = undefined
   ): Promise<boolean> {
     this.assert.schema.isValidAddress('setAddress', setAddress);
     this.assert.schema.isValidAddress('moduleAddress', moduleAddress);
 
-    return this.setTokenWrapper.isPendingModule(setAddress, moduleAddress);
+    return this.setTokenWrapper.isPendingModule(setAddress, moduleAddress, callerAddress);
   }
 }
