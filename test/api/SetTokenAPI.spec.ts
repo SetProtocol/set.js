@@ -316,9 +316,11 @@ describe('SetTokenAPI', () => {
 
   describe('#getPositionsAsync', () => {
     let subjectSetTokenAddress: Address;
+    let noCallerAddress: undefined;
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      noCallerAddress = undefined;
     });
 
     async function subject(): Promise<Position[]> {
@@ -330,7 +332,7 @@ describe('SetTokenAPI', () => {
     it('should call the SetTokenWrapper with correct params', async () => {
       await subject();
 
-      expect(setTokenWrapper.getPositions).to.have.beenCalledWith(subjectSetTokenAddress);
+      expect(setTokenWrapper.getPositions).to.have.beenCalledWith(subjectSetTokenAddress, noCallerAddress);
     });
 
     describe('when the SetToken address is invalid', () => {
@@ -346,9 +348,11 @@ describe('SetTokenAPI', () => {
 
   describe('#getModulesAsync', () => {
     let subjectSetTokenAddress: Address;
+    let noCallerAddress: undefined;
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      noCallerAddress = undefined;
     });
 
     async function subject(): Promise<Address[]> {
@@ -360,7 +364,7 @@ describe('SetTokenAPI', () => {
     it('should call the SetTokenWrapper with correct params', async () => {
       await subject();
 
-      expect(setTokenWrapper.getModules).to.have.beenCalledWith(subjectSetTokenAddress);
+      expect(setTokenWrapper.getModules).to.have.beenCalledWith(subjectSetTokenAddress, noCallerAddress);
     });
 
     describe('when the SetToken address is invalid', () => {
@@ -377,10 +381,12 @@ describe('SetTokenAPI', () => {
   describe('#getModuleStateAsync', () => {
     let subjectSetTokenAddress: Address;
     let subjectModuleAddress: Address;
+    let noCallerAddress: undefined;
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       subjectModuleAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      noCallerAddress = undefined;
     });
 
     async function subject(): Promise<ModuleState> {
@@ -396,6 +402,7 @@ describe('SetTokenAPI', () => {
       expect(setTokenWrapper.moduleStates).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectModuleAddress,
+        noCallerAddress,
       );
     });
 
@@ -541,16 +548,18 @@ describe('SetTokenAPI', () => {
   describe('#isModuleEnabledAsync', () => {
     let subjectSetTokenAddress: Address;
     let subjectModuleAddress: Address;
+    let noCallerAddress: undefined;
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       subjectModuleAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
+      noCallerAddress = undefined;
     });
 
     async function subject(): Promise<boolean> {
       return await setTokenAPI.isModuleEnabledAsync(
         subjectSetTokenAddress,
-        subjectModuleAddress
+        subjectModuleAddress,
       );
     }
 
@@ -560,6 +569,7 @@ describe('SetTokenAPI', () => {
       expect(setTokenWrapper.isInitializedModule).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectModuleAddress,
+        noCallerAddress,
       );
     });
 
@@ -587,16 +597,18 @@ describe('SetTokenAPI', () => {
   describe('#isModuleEnabledAsync', () => {
     let subjectSetTokenAddress: Address;
     let subjectModuleAddress: Address;
+    let noCallerAddress: undefined;
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       subjectModuleAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
+      noCallerAddress = undefined;
     });
 
     async function subject(): Promise<boolean> {
       return await setTokenAPI.isModuleEnabledAsync(
         subjectSetTokenAddress,
-        subjectModuleAddress
+        subjectModuleAddress,
       );
     }
 
@@ -606,6 +618,7 @@ describe('SetTokenAPI', () => {
       expect(setTokenWrapper.isInitializedModule).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectModuleAddress,
+        noCallerAddress,
       );
     });
 
@@ -633,16 +646,18 @@ describe('SetTokenAPI', () => {
   describe('#isModulePendingAsync', () => {
     let subjectSetTokenAddress: Address;
     let subjectModuleAddress: Address;
+    let noCallerAddress: undefined;
 
     beforeEach(async () => {
       subjectSetTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       subjectModuleAddress = '0x0872262A92581EC09C2d522b48bCcd9E3C8ACf9C';
+      noCallerAddress = undefined;
     });
 
     async function subject(): Promise<boolean> {
       return await setTokenAPI.isModulePendingAsync(
         subjectSetTokenAddress,
-        subjectModuleAddress
+        subjectModuleAddress,
       );
     }
 
@@ -652,6 +667,7 @@ describe('SetTokenAPI', () => {
       expect(setTokenWrapper.isPendingModule).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectModuleAddress,
+        noCallerAddress,
       );
     });
 
