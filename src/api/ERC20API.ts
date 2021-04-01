@@ -23,7 +23,6 @@ import { Provider } from '@ethersproject/providers';
 
 import ERC20Wrapper from '../wrappers/set-protocol-v2/ERC20Wrapper';
 import Assertions from '../assertions';
-import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
 
 /**
  * @title  ERC20Wrapper
