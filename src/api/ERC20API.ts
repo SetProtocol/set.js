@@ -23,6 +23,7 @@ import { Provider } from '@ethersproject/providers';
 
 import ERC20Wrapper from '../wrappers/set-protocol-v2/ERC20Wrapper';
 import Assertions from '../assertions';
+import ProtocolViewerWrapper from '@src/wrappers/set-protocol-v2/ProtocolViewerWrapper';
 
 /**
  * @title  ERC20Wrapper
@@ -34,8 +35,10 @@ import Assertions from '../assertions';
 export default class ERC20API {
   private assert: Assertions;
   private erc20Wrapper: ERC20Wrapper;
-
-  public constructor(provider: Provider, assertions?: Assertions) {
+  public constructor(
+    provider: Provider,
+    assertions?: Assertions
+  ) {
     this.erc20Wrapper = new ERC20Wrapper(provider);
     this.assert = assertions || new Assertions();
   }

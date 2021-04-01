@@ -21,6 +21,7 @@ import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import ContractWrapper from './ContractWrapper';
 import { SetDetails, StreamingFeeInfo } from '../../types';
+import { BigNumber } from 'ethers/lib/ethers';
 
 /**
  * @title ProtocolViewerWrapper
@@ -46,7 +47,7 @@ export default class ProtocolViewerWrapper {
   /**
    * Fetches the managers of set tokens
    *
-   * @param  tokenAddresses    Addresses of ERC20 contracts to check balance for
+   * @param  tokenAddresses    Addresses of ERC20 contracts to check managers for
    * @param  callerAddress     Address to use as the caller (optional)
    */
   public async batchFetchManagers(
@@ -64,7 +65,7 @@ export default class ProtocolViewerWrapper {
   /**
    * Fetches the streaming fee info of set tokens
    *
-   * @param   tokenAddresses    Addresses of ERC20 contracts to check balance for
+   * @param   tokenAddresses    Addresses of ERC20 contracts to check streaming fee for
    * @param   callerAddress     Address to use as the caller (optional)
    */
   public async batchFetchStreamingFeeInfo(
@@ -79,6 +80,55 @@ export default class ProtocolViewerWrapper {
     return await protocolViewerInstance.batchFetchStreamingFeeInfo(
       this.streamingFeeModuleAddress,
       tokenAddresses
+    );
+  }
+
+  /**
+   * Fetches the balance of list of set tokens and user addresses
+   *
+   * @param   tokenAddresses    Addresses of ERC20 contracts to check balance for
+   * @param   userAddresses     Addresses of users to check balances for matched up with token index
+   * @param   callerAddress     Address to use as the caller (optional)
+   */
+  public async batchFetchBalancesOf(
+    tokenAddresses: Address[],
+    userAddresses: Address[],
+    callerAddress?: Address,
+  ): Promise<BigNumber[]> {
+    const protocolViewerInstance = await this.contracts.loadProtocolViewerContractAsync(
+      this.protocolViewerAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+    );
+
+    return await protocolViewerInstance.batchFetchBalancesOf(
+      tokenAddresses,
+      userAddresses
+    );
+  }
+
+  /**
+   * Fetches the allowances of list of set tokens and owner/spender addresses
+   *
+   * @param   tokenAddresses    Addresses of ERC20 contracts to check alloances for
+   * @param   ownerAddresses    Addresses of owners of token matched up with token index
+   * @param   spenderAddresses  Addresses of spenders of token matched up with token index
+   * @param   callerAddress     Address to use as the caller (optional)
+   */
+  public async batchFetchAllowances(
+    tokenAddresses: Address[],
+    ownerAddresses: Address[],
+    spenderAddresses: Address[],
+    callerAddress?: Address,
+  ): Promise<BigNumber[]> {
+    const protocolViewerInstance = await this.contracts.loadProtocolViewerContractAsync(
+      this.protocolViewerAddress,
+      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+    );
+
+    return await protocolViewerInstance.batchFetchAllowances(
+      tokenAddresses,
+      ownerAddresses,
+      spenderAddresses
     );
   }
 

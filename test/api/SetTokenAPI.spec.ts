@@ -49,6 +49,12 @@ jest.mock('@src/wrappers/set-protocol-v2/ProtocolViewerWrapper', () => {
       batchFetchManagers: jest.fn().mockImplementationOnce(() => {
         return ['0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5'];
       }),
+      batchFetchBalancesOf: jest.fn().mockImplementationOnce(() => {
+        return ['10000000000000'];
+      }),
+      batchFetchAllowances: jest.fn().mockImplementationOnce(() => {
+        return ['311173045478743'];
+      }),
       batchFetchDetails: jest.fn().mockImplementationOnce(() => {
         return [{
           name: 'DeFi Pulse Index',
@@ -68,6 +74,8 @@ describe('SetTokenAPI', () => {
   let streamingFeeModuleAddress: Address;
   let protocolViewerAddress: Address;
   let setTokenCreatorAddress: Address;
+  let ownerAddress: Address;
+  let spenderAddress: Address;
   let setTokenAPI: SetTokenAPI;
   let setTokenWrapper: SetTokenWrapper;
   let setTokenCreatorWrapper: SetTokenCreatorWrapper;
@@ -77,6 +85,8 @@ describe('SetTokenAPI', () => {
       streamingFeeModuleAddress,
       protocolViewerAddress,
       setTokenCreatorAddress,
+      ownerAddress,
+      spenderAddress,
     ] = await provider.listAccounts();
 
     setTokenAPI = new SetTokenAPI(provider, protocolViewerAddress, streamingFeeModuleAddress, setTokenCreatorAddress);
@@ -247,6 +257,45 @@ describe('SetTokenAPI', () => {
 
     async function subject(): Promise<Address[]> {
       return await setTokenAPI.batchFetchManagersAsync(setTokenAddresses);
+    }
+
+    it('should call the ProtocolViewerWrapper with correct params', async () => {
+      await subject();
+    });
+  });
+
+  describe('#batchFetchBalancesOfAsync', () => {
+    let subjectSetTokenAddresses: Address[];
+
+    beforeEach(async () => {
+      subjectSetTokenAddresses = ['0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569'];
+    });
+
+    async function subject(): Promise<BigNumber[]> {
+      return await setTokenAPI.batchFetchBalancesOfAsync(
+        subjectSetTokenAddresses,
+        ownerAddress
+      );
+    }
+
+    it('should call the ProtocolViewerWrapper with correct params', async () => {
+      await subject();
+    });
+  });
+
+  describe('#batchFetchAllowancesAsync', () => {
+    let subjectSetTokenAddresses: Address[];
+
+    beforeEach(async () => {
+      subjectSetTokenAddresses = ['0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569'];
+    });
+
+    async function subject(): Promise<BigNumber[]> {
+      return await setTokenAPI.batchFetchAllowancesAsync(
+        subjectSetTokenAddresses,
+        ownerAddress,
+        spenderAddress
+      );
     }
 
     it('should call the ProtocolViewerWrapper with correct params', async () => {
