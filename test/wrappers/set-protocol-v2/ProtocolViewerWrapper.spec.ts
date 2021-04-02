@@ -5,7 +5,7 @@ import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/t
 import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import { Blockchain, ether, getStreamingFee } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures/systemFixture';
 import {
   ProtocolViewer,
   SetToken,
@@ -139,10 +139,10 @@ describe('ProtocolViewerWrapper', () => {
       const [balanceOne, balanceTwo]: any = await subject();
 
       const expectedUSDCBalance = await setup.usdc.connect(provider.getSigner(owner)).balanceOf(owner);
-      expect(balanceOne).to.eq(expectedUSDCBalance);
+      expect(balanceOne.toString()).to.eq(expectedUSDCBalance.toString());
 
       const expectedDAIBalance = await setup.dai.connect(provider.getSigner(owner)).balanceOf(managerOne);
-      expect(balanceTwo).to.eq(expectedDAIBalance);
+      expect(balanceTwo.toString()).to.eq(expectedDAIBalance.toString());
     });
   });
 
@@ -178,13 +178,13 @@ describe('ProtocolViewerWrapper', () => {
         owner,
         managerOne
       );
-      expect(allowanceOne).to.eq(expectedUSDCAllowance);
+      expect(allowanceOne.toString()).to.eq(expectedUSDCAllowance.toString());
 
       const expectedDAIAllowance = await setup.dai.allowance(
         owner,
         managerTwo
       );
-      expect(allowanceTwo).to.eq(expectedDAIAllowance);
+      expect(allowanceTwo.toString()).to.eq(expectedDAIAllowance.toString());
     });
   });
 
