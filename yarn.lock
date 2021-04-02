@@ -1163,10 +1163,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@setprotocol/set-protocol-v2@0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.0.19.tgz#0f1e374cb86557c065dfbba7beaf1d38c801fa49"
-  integrity sha512-IoZxyKAH2Nv126fg2yrJ7wdS8B3Up6IJAAKShRZMri/81UgoLdr+RcNUO2sZxT+CMR3z+dEsTzEziquNVW/NUg==
+"@setprotocol/set-protocol-v2@0.0.31":
+  version "0.0.31"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.0.31.tgz#38b41d1d092f388b1ca9ee66c5c8fad53188e153"
+  integrity sha512-uUvqPDJ+rhCVTGUZXrdplhM+6xwrWkDDuAlaUN/10PlAeFoyMGJUK1VAWAPgy/mab5Pe3jrsYfWnbc09X0M2pw==
   dependencies:
     fs-extra "^5.0.0"
     module-alias "^2.2.2"

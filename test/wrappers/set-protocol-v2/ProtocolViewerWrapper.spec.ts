@@ -5,7 +5,7 @@ import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/t
 import { ADDRESS_ZERO, ZERO, ONE_YEAR_IN_SECONDS } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import { Blockchain, ether, getStreamingFee } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures/systemFixture';
 import {
   ProtocolViewer,
   SetToken,
@@ -119,6 +119,72 @@ describe('ProtocolViewerWrapper', () => {
 
       expect(managers[0]).to.eq(managerOne);
       expect(managers[1]).to.eq(managerTwo);
+    });
+  });
+
+  describe('#batchFetchBalancesOf', () => {
+    let subjectTokenAddresses: Address[];
+    let subjectOwnerAddresses: Address[];
+
+    beforeEach(async () => {
+      subjectTokenAddresses = [setup.usdc.address, setup.dai.address];
+      subjectOwnerAddresses = [owner, managerOne];
+    });
+
+    async function subject(): Promise<any> {
+      return protocolViewerWrapper.batchFetchBalancesOf(subjectTokenAddresses, subjectOwnerAddresses);
+    }
+
+    it('should return the correct set details', async () => {
+      const [balanceOne, balanceTwo]: any = await subject();
+
+      const expectedUSDCBalance = await setup.usdc.connect(provider.getSigner(owner)).balanceOf(owner);
+      expect(balanceOne.toString()).to.eq(expectedUSDCBalance.toString());
+
+      const expectedDAIBalance = await setup.dai.connect(provider.getSigner(owner)).balanceOf(managerOne);
+      expect(balanceTwo.toString()).to.eq(expectedDAIBalance.toString());
+    });
+  });
+
+  describe('#batchFetchAllowances', () => {
+    let subjectTokenAddresses: Address[];
+    let subjectOwnerAddresses: Address[];
+    let subjectSpenderAddresses: Address[];
+
+    beforeEach(async () => {
+      const usdcApprovalAmount = ether(3);
+      await setup.usdc.approve(managerOne, usdcApprovalAmount);
+
+      const daiApprovalAmount = ether(2);
+      await setup.dai.approve(managerTwo, daiApprovalAmount);
+
+      subjectTokenAddresses = [setup.usdc.address, setup.dai.address];
+      subjectOwnerAddresses = [owner, owner];
+      subjectSpenderAddresses = [managerOne, managerTwo];
+    });
+
+    async function subject(): Promise<any> {
+      return protocolViewerWrapper.batchFetchAllowances(
+        subjectTokenAddresses,
+        subjectOwnerAddresses,
+        subjectSpenderAddresses
+      );
+    }
+
+    it('should return the correct allowances', async () => {
+      const [allowanceOne, allowanceTwo]: any = await subject();
+
+      const expectedUSDCAllowance = await setup.usdc.allowance(
+        owner,
+        managerOne
+      );
+      expect(allowanceOne.toString()).to.eq(expectedUSDCAllowance.toString());
+
+      const expectedDAIAllowance = await setup.dai.allowance(
+        owner,
+        managerTwo
+      );
+      expect(allowanceTwo.toString()).to.eq(expectedDAIAllowance.toString());
     });
   });
 

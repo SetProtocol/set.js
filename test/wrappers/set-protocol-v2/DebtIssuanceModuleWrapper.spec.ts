@@ -11,7 +11,7 @@ import {
   preciseMulCeil,
 } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures/systemFixture';
 import {
   DebtIssuanceModule,
   SetToken,

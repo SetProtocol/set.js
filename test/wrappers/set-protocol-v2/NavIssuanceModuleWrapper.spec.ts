@@ -19,7 +19,7 @@ import {
   getExpectedRedeemPositionUnit
 } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
-import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures';
+import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures/systemFixture';
 import { ERC20__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ERC20__factory';
 import {
   NAVIssuanceModule,

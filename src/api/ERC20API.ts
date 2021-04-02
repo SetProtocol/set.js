@@ -34,8 +34,10 @@ import Assertions from '../assertions';
 export default class ERC20API {
   private assert: Assertions;
   private erc20Wrapper: ERC20Wrapper;
-
-  public constructor(provider: Provider, assertions?: Assertions) {
+  public constructor(
+    provider: Provider,
+    assertions?: Assertions
+  ) {
     this.erc20Wrapper = new ERC20Wrapper(provider);
     this.assert = assertions || new Assertions();
   }

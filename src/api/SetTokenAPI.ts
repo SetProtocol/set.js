@@ -197,6 +197,52 @@ export default class SetTokenAPI {
   }
 
   /**
+   * Batch fetches balances for a list of tokens for a given owner
+   * @param   tokenAddresses Array of ERC20 token addresses
+   * @param   userAddress    Address of the user
+   * @returns                The balances of the ERC20 tokens for the user in array of BigNumbers format
+   */
+   public async batchFetchBalancesOfAsync(tokenAddresses: Address[], userAddress: Address): Promise<BigNumber[]> {
+    this.assert.schema.isValidAddress('userAddress', userAddress);
+    const ownerAddresses = tokenAddresses.map(tokenAddress => {
+      this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
+      return userAddress;
+    });
+
+    return await this.protocolViewerWrapper.batchFetchBalancesOf(tokenAddresses, ownerAddresses);
+  }
+
+  /**
+   * Batch fetches allowances for a list of tokens for a given owners/spenders
+   * @param   tokenAddresses Array of ERC20 token addresses
+   * @param   ownerAddress   Owner address to check for
+   * @param   spenderAddress Spender address to check for
+   * @returns                The allowances of the ERC20 tokens for the owner, spender in array of BigNumbers format
+   */
+  public async batchFetchAllowancesAsync(
+    tokenAddresses: Address[],
+    ownerAddress: Address,
+    spenderAddress: Address
+  ): Promise<BigNumber[]> {
+    this.assert.schema.isValidAddress('ownerAddress', ownerAddress);
+    this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
+    const ownerAddresses = [];
+    const spenderAddresses = [];
+
+    tokenAddresses.forEach(tokenAddress => {
+      this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
+      ownerAddresses.push(ownerAddress);
+      spenderAddresses.push(spenderAddress);
+    });
+
+    return await this.protocolViewerWrapper.batchFetchAllowances(
+      tokenAddresses,
+      ownerAddresses,
+      spenderAddresses
+    );
+  }
+
+  /**
    * Gets the controller address of a target Set Token.
    *
    * @param  setAddress    Address of the Set.
