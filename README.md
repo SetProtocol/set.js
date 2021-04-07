@@ -1,7 +1,7 @@
 <p align="center"><img src="https://s3-us-west-1.amazonaws.com/set-protocol/img/assets/set-protocol-logo.png" width="64" /></p>
 
 <p align="center">
-  <a href="https://circleci.com/gh/SetProtocol/set.js/tree/master" target="_blank" rel="noopener">
+  <a href="https://app.circleci.com/pipelines/github/SetProtocol/set.js" target="_blank" rel="noopener">
     <img src="https://img.shields.io/circleci/project/github/SetProtocol/set.js/master.svg" />
   </a>
   <a href='https://github.com/SetProtocol/set.js/blob/master/LICENSE' target="_blank" rel="noopener">
