@@ -202,14 +202,18 @@ export default class SetTokenAPI {
    * @param   userAddress    Address of the user
    * @returns                The balances of the ERC20 tokens for the user in array of BigNumbers format
    */
-   public async batchFetchBalancesOfAsync(tokenAddresses: Address[], userAddress: Address): Promise<BigNumber[]> {
+  public async batchFetchBalancesOfAsync(
+    tokenAddresses: Address[],
+    userAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<BigNumber[]> {
     this.assert.schema.isValidAddress('userAddress', userAddress);
     const ownerAddresses = tokenAddresses.map(tokenAddress => {
       this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
       return userAddress;
     });
 
-    return await this.protocolViewerWrapper.batchFetchBalancesOf(tokenAddresses, ownerAddresses);
+    return await this.protocolViewerWrapper.batchFetchBalancesOf(tokenAddresses, ownerAddresses, callerAddress);
   }
 
   /**
@@ -222,7 +226,8 @@ export default class SetTokenAPI {
   public async batchFetchAllowancesAsync(
     tokenAddresses: Address[],
     ownerAddress: Address,
-    spenderAddress: Address
+    spenderAddress: Address,
+    callerAddress: Address = undefined
   ): Promise<BigNumber[]> {
     this.assert.schema.isValidAddress('ownerAddress', ownerAddress);
     this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
@@ -238,7 +243,8 @@ export default class SetTokenAPI {
     return await this.protocolViewerWrapper.batchFetchAllowances(
       tokenAddresses,
       ownerAddresses,
-      spenderAddresses
+      spenderAddresses,
+      callerAddress
     );
   }
 
