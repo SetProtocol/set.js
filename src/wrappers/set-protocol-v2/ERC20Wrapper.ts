@@ -45,10 +45,18 @@ export default class ERC20Wrapper {
    *
    * @param  tokenAddress  Address of the ERC20 token
    * @param  userAddress   Address of the user
+   * @param  callerAddress Address of the method caller
    * @return               The balance of the ERC20 token
    */
-  public async balanceOf(tokenAddress: Address, userAddress: Address): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+  public async balanceOf(
+    tokenAddress: Address,
+    userAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<BigNumber> {
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.balanceOf(userAddress);
   }
@@ -57,10 +65,17 @@ export default class ERC20Wrapper {
    * Gets name of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
+   * @param  callerAddress Address of the method caller
    * @return               The name of the ERC20 token
    */
-  public async name(tokenAddress: Address): Promise<string> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+  public async name(
+    tokenAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<string> {
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.name();
   }
@@ -69,10 +84,17 @@ export default class ERC20Wrapper {
    * Gets balance of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
+   * @param  callerAddress Address of the method caller
    * @return               The symbol of the ERC20 token
    */
-  public async symbol(tokenAddress: Address): Promise<string> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+  public async symbol(
+    tokenAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<string> {
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.symbol();
   }
@@ -81,10 +103,17 @@ export default class ERC20Wrapper {
    * Gets the total supply of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
+   * @param  callerAddress Address of the method caller
    * @return               The symbol of the ERC20 token
    */
-  public async totalSupply(tokenAddress: Address): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+  public async totalSupply(
+    tokenAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<BigNumber> {
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.totalSupply();
   }
@@ -96,8 +125,14 @@ export default class ERC20Wrapper {
    * @param  userAddress   Address of the user
    * @return               The decimals of the ERC20 token
    */
-  public async decimals(tokenAddress: Address): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+  public async decimals(
+    tokenAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<BigNumber> {
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.decimals();
   }
@@ -108,15 +143,19 @@ export default class ERC20Wrapper {
    * @param  tokenAddress      Address of the token
    * @param  ownerAddress      Address of the owner
    * @param  spenderAddress    Address of the spender
+   * @param  callerAddress     Address of the method caller
    * @return                   The allowance of the spender
    */
   public async allowance(
     tokenAddress: Address,
     ownerAddress: Address,
     spenderAddress: Address,
-    callerAddress: Address = undefined,
+    callerAddress: Address = undefined
   ): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.allowance(ownerAddress, spenderAddress);
   }
@@ -137,10 +176,13 @@ export default class ERC20Wrapper {
     to: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts?: TransactionOverrides
   ): Promise<ContractTransaction> {
     const txOptions = await generateTxOpts(txOpts);
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.transfer(to, value, txOptions);
   }
@@ -163,9 +205,12 @@ export default class ERC20Wrapper {
     to: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts?: TransactionOverrides
   ): Promise<ContractTransaction> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
     const txOptions = await generateTxOpts(txOpts);
 
     return await tokenInstance.transferFrom(from, to, value, txOptions);
@@ -186,10 +231,13 @@ export default class ERC20Wrapper {
     spenderAddress: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts?: TransactionOverrides,
+    txOpts?: TransactionOverrides
   ): Promise<ContractTransaction> {
     const txOptions = await generateTxOpts(txOpts);
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
+    const tokenInstance = await this.contracts.loadERC20Async(
+      tokenAddress,
+      callerAddress
+    );
 
     return await tokenInstance.approve(spenderAddress, value, txOptions);
   }
