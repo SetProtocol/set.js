@@ -122,7 +122,7 @@ export default class ERC20Wrapper {
    * Gets decimals of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
-   * @param  userAddress   Address of the user
+   * @param  callerAddress Address of the method caller
    * @return               The decimals of the ERC20 token
    */
   public async decimals(
