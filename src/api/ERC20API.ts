@@ -34,10 +34,7 @@ import Assertions from '../assertions';
 export default class ERC20API {
   private assert: Assertions;
   private erc20Wrapper: ERC20Wrapper;
-  public constructor(
-    provider: Provider,
-    assertions?: Assertions
-  ) {
+  public constructor(provider: Provider, assertions?: Assertions) {
     this.erc20Wrapper = new ERC20Wrapper(provider);
     this.assert = assertions || new Assertions();
   }
@@ -47,61 +44,86 @@ export default class ERC20API {
    *
    * @param  tokenAddress  Address of the ERC20 token
    * @param  userAddress   Address of the user
+   * @param  callerAddress Optional. The address of user transferring from.
    * @return               The balance of the ERC20 token in BigNumber format
    */
-  public async getBalanceAsync(tokenAddress: Address, userAddress: Address): Promise<BigNumber> {
+  public async getBalanceAsync(
+    tokenAddress: Address,
+    userAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('userAddress', userAddress);
 
-    return this.erc20Wrapper.balanceOf(tokenAddress, userAddress);
+    return this.erc20Wrapper.balanceOf(
+      tokenAddress,
+      userAddress,
+      callerAddress
+    );
   }
 
   /**
    * Gets name of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
+   * @param  callerAddress Optional. The address of user transferring from.
    * @return               The name of the ERC20 token
    */
-  public async getTokenNameAsync(tokenAddress: Address): Promise<string> {
+  public async getTokenNameAsync(
+    tokenAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<string> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
-    return this.erc20Wrapper.name(tokenAddress);
+    return this.erc20Wrapper.name(tokenAddress, callerAddress);
   }
 
   /**
    * Gets symbol of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
+   * @param  callerAddress Optional. The address of user transferring from.
    * @return               The symbol of the ERC20 token
    */
-  public async getTokenSymbolAsync(tokenAddress: Address): Promise<string> {
+  public async getTokenSymbolAsync(
+    tokenAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<string> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
-    return this.erc20Wrapper.symbol(tokenAddress);
+    return this.erc20Wrapper.symbol(tokenAddress, callerAddress);
   }
 
   /**
    * Gets the total supply of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
+   * @param  callerAddress Optional. The address of user transferring from.
    * @return               The total supply of ERC-20 in BigNumber format
    */
-  public async getTotalSupplyAsync(tokenAddress: Address): Promise<BigNumber> {
+  public async getTotalSupplyAsync(
+    tokenAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
-    return this.erc20Wrapper.totalSupply(tokenAddress);
+    return this.erc20Wrapper.totalSupply(tokenAddress, callerAddress);
   }
 
   /**
    * Gets decimals of the ERC20 token
    *
    * @param  tokenAddress  Address of the ERC20 token
+   * @param  callerAddress Optional. The address of user transferring from.
    * @return               The decimals of the ERC20 token
    */
-  public async getDecimalsAsync(tokenAddress: Address): Promise<BigNumber> {
+  public async getDecimalsAsync(
+    tokenAddress: Address,
+    callerAddress: Address = undefined
+  ): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
-    return this.erc20Wrapper.decimals(tokenAddress);
+    return this.erc20Wrapper.decimals(tokenAddress, callerAddress);
   }
 
   /**
@@ -110,18 +132,25 @@ export default class ERC20API {
    * @param  tokenAddress      Address of the token
    * @param  ownerAddress      Address of the owner
    * @param  spenderAddress    Address of the spender
+   * @param  callerAddress     Optional. The address of user transferring from.
    * @return                   The allowance of the spender in BigNumber format
    */
   public async getAllowanceAsync(
     tokenAddress: Address,
     ownerAddress: Address,
     spenderAddress: Address,
+    callerAddress: Address = undefined
   ): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('ownerAddress', ownerAddress);
     this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
 
-    return this.erc20Wrapper.allowance(tokenAddress, ownerAddress, spenderAddress);
+    return this.erc20Wrapper.allowance(
+      tokenAddress,
+      ownerAddress,
+      spenderAddress,
+      callerAddress
+    );
   }
 
   /**
@@ -140,13 +169,19 @@ export default class ERC20API {
     to: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts: TransactionOverrides = {},
+    txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('toAddress', to);
     this.assert.schema.isValidNumber('value', value);
 
-    return await this.erc20Wrapper.transfer(tokenAddress, to, value, callerAddress, txOpts);
+    return await this.erc20Wrapper.transfer(
+      tokenAddress,
+      to,
+      value,
+      callerAddress,
+      txOpts
+    );
   }
 
   /**
@@ -170,7 +205,13 @@ export default class ERC20API {
     this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
     this.assert.schema.isValidNumber('value', value);
 
-    return this.erc20Wrapper.approve(tokenAddress, spenderAddress, value, callerAddress, txOpts);
+    return this.erc20Wrapper.approve(
+      tokenAddress,
+      spenderAddress,
+      value,
+      callerAddress,
+      txOpts
+    );
   }
 
   /**
@@ -190,13 +231,20 @@ export default class ERC20API {
     to: Address,
     value: BigNumber,
     callerAddress: Address = undefined,
-    txOpts: TransactionOverrides = {},
+    txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('toAddress', to);
     this.assert.schema.isValidAddress('fromAddress', from);
     this.assert.schema.isValidNumber('value', value);
 
-    return this.erc20Wrapper.transferFrom(tokenAddress, from, to, value, callerAddress, txOpts);
+    return this.erc20Wrapper.transferFrom(
+      tokenAddress,
+      from,
+      to,
+      value,
+      callerAddress,
+      txOpts
+    );
   }
 }

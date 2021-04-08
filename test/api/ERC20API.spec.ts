@@ -43,16 +43,19 @@ describe('ERC20API', () => {
   describe('#getBalanceAsync', () => {
     let subjectTokenAddress: Address;
     let subjectHolderAddress: Address;
+    let nullCallerAddress: Address;
 
     beforeEach(async () => {
       subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       subjectHolderAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
     async function subject(): Promise<BigNumber> {
       return await erc20API.getBalanceAsync(
         subjectTokenAddress,
-        subjectHolderAddress
+        subjectHolderAddress,
+        nullCallerAddress,
       );
     }
 
@@ -61,7 +64,8 @@ describe('ERC20API', () => {
 
       expect(erc20Wrapper.balanceOf).to.have.beenCalledWith(
         subjectTokenAddress,
-        subjectHolderAddress
+        subjectHolderAddress,
+        nullCallerAddress,
       );
     });
 
@@ -78,21 +82,24 @@ describe('ERC20API', () => {
 
   describe('#getTokenNameAsync', () => {
     let subjectTokenAddress: Address;
+    let nullCallerAddress: Address;
 
     beforeEach(async () => {
       subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
     async function subject(): Promise<string> {
       return await erc20API.getTokenNameAsync(
         subjectTokenAddress,
+        nullCallerAddress,
       );
     }
 
     it('should call the ERC20Wrapper with correct params', async () => {
       await subject();
 
-      expect(erc20Wrapper.name).to.have.beenCalledWith(subjectTokenAddress);
+      expect(erc20Wrapper.name).to.have.beenCalledWith(subjectTokenAddress, nullCallerAddress);
     });
 
     describe('when the SetToken address is invalid', () => {
@@ -108,21 +115,24 @@ describe('ERC20API', () => {
 
   describe('#getTokenSymbolAsync', () => {
     let subjectTokenAddress: Address;
+    let nullCallerAddress: Address;
 
     beforeEach(async () => {
       subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
     async function subject(): Promise<string> {
       return await erc20API.getTokenSymbolAsync(
         subjectTokenAddress,
+        nullCallerAddress,
       );
     }
 
     it('should call the ERC20Wrapper with correct params', async () => {
       await subject();
 
-      expect(erc20Wrapper.symbol).to.have.beenCalledWith(subjectTokenAddress);
+      expect(erc20Wrapper.symbol).to.have.beenCalledWith(subjectTokenAddress, nullCallerAddress);
     });
 
     describe('when the SetToken address is invalid', () => {
@@ -138,21 +148,24 @@ describe('ERC20API', () => {
 
   describe('#getTotalSupplyAsync', () => {
     let subjectTokenAddress: Address;
+    let nullCallerAddress: Address;
 
     beforeEach(async () => {
       subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
     async function subject(): Promise<BigNumber> {
       return await erc20API.getTotalSupplyAsync(
         subjectTokenAddress,
+        nullCallerAddress,
       );
     }
 
     it('should call the ERC20Wrapper with correct params', async () => {
       await subject();
 
-      expect(erc20Wrapper.totalSupply).to.have.beenCalledWith(subjectTokenAddress);
+      expect(erc20Wrapper.totalSupply).to.have.beenCalledWith(subjectTokenAddress, nullCallerAddress);
     });
 
     describe('when the SetToken address is invalid', () => {
@@ -168,21 +181,24 @@ describe('ERC20API', () => {
 
   describe('#getDecimalsAsync', () => {
     let subjectTokenAddress: Address;
+    let nullCallerAddress: Address;
 
     beforeEach(async () => {
       subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
     async function subject(): Promise<BigNumber> {
       return await erc20API.getDecimalsAsync(
         subjectTokenAddress,
+        nullCallerAddress,
       );
     }
 
     it('should call the ERC20Wrapper with correct params', async () => {
       await subject();
 
-      expect(erc20Wrapper.decimals).to.have.beenCalledWith(subjectTokenAddress);
+      expect(erc20Wrapper.decimals).to.have.beenCalledWith(subjectTokenAddress, nullCallerAddress);
     });
 
     describe('when the SetToken address is invalid', () => {
@@ -200,18 +216,21 @@ describe('ERC20API', () => {
     let subjectTokenAddress: Address;
     let subjectUserAddress: Address;
     let subjectSpenderAddress: Address;
+    let nullCallerAddress: Address;
 
     beforeEach(async () => {
       subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       subjectUserAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
       subjectSpenderAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
+      nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
     async function subject(): Promise<BigNumber> {
       return await erc20API.getAllowanceAsync(
         subjectTokenAddress,
         subjectUserAddress,
-        subjectSpenderAddress
+        subjectSpenderAddress,
+        nullCallerAddress
       );
     }
 
@@ -221,7 +240,8 @@ describe('ERC20API', () => {
       expect(erc20Wrapper.allowance).to.have.beenCalledWith(
         subjectTokenAddress,
         subjectUserAddress,
-        subjectSpenderAddress
+        subjectSpenderAddress,
+        nullCallerAddress,
       );
     });
 
