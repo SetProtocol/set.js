@@ -116,12 +116,13 @@ export default class ERC20API {
     tokenAddress: Address,
     ownerAddress: Address,
     spenderAddress: Address,
+    callerAddress: Address = undefined,
   ): Promise<BigNumber> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
     this.assert.schema.isValidAddress('ownerAddress', ownerAddress);
     this.assert.schema.isValidAddress('spenderAddress', spenderAddress);
 
-    return this.erc20Wrapper.allowance(tokenAddress, ownerAddress, spenderAddress);
+    return this.erc20Wrapper.allowance(tokenAddress, ownerAddress, spenderAddress, callerAddress);
   }
 
   /**

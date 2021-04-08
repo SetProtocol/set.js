@@ -114,8 +114,9 @@ export default class ERC20Wrapper {
     tokenAddress: Address,
     ownerAddress: Address,
     spenderAddress: Address,
+    callerAddress: Address = undefined,
   ): Promise<BigNumber> {
-    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress);
+    const tokenInstance = await this.contracts.loadERC20Async(tokenAddress, callerAddress);
 
     return await tokenInstance.allowance(ownerAddress, spenderAddress);
   }
