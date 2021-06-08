@@ -18,6 +18,7 @@ export interface SetJSConfig {
   tradeModuleAddress: Address;
   governanceModuleAddress: Address;
   debtIssuanceModuleAddress: Address;
+  zeroExApiKey?: string;
 }
 
 export type SetDetails = {
