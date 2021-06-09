@@ -44,6 +44,7 @@ export type QuoteOptions = {
   fromAddress: Address,
   chainId: number,
   setToken: SetTokenAPI,
+  gasPrice?: number,
   slippagePercentage?: number,
   isFirmQuote?: boolean,
   feePercentage?: number,

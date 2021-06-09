@@ -134,8 +134,10 @@ export class TradeQuoter {
       vsCurrencies: [ USD_CURRENCY_CODE, USD_CURRENCY_CODE, USD_CURRENCY_CODE ],
     });
 
-    const gasOracle = new GasOracleService(chainId);
-    const gasPrice = await gasOracle.fetchGasPrice();
+    if (!options.gasPrice) {
+      const gasOracle = new GasOracleService(chainId);
+      options.gasPrice = await gasOracle.fetchGasPrice();
+    }
 
     return {
       from: fromAddress,
@@ -144,7 +146,7 @@ export class TradeQuoter {
       exchangeAdapterName,
       calldata,
       gas: gas.toString(),
-      gasPrice: gasPrice.toString(),
+      gasPrice: options.gasPrice.toString(),
       slippagePercentage: this.formatAsPercentage(options.slippagePercentage),
       fromTokenAmount: fromUnits.toString(),
       toTokenAmount: toUnits.toString(),
@@ -166,8 +168,8 @@ export class TradeQuoter {
           options.toTokenDecimals,
           coinPrices
         ),
-        gasCostsUsd: this.gasCostsUsd(gasPrice, gas, coinPrices, chainId),
-        gasCostsChainCurrency: this.gasCostsChainCurrency(gasPrice, gas, chainId),
+        gasCostsUsd: this.gasCostsUsd(options.gasPrice, gas, coinPrices, chainId),
+        gasCostsChainCurrency: this.gasCostsChainCurrency(options.gasPrice, gas, chainId),
         feePercentage: this.formatAsPercentage(feePercentage),
         slippage: this.calculateSlippage(
           fromTokenAmount,
