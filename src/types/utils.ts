@@ -38,10 +38,11 @@ export type PolygonMappedTokenData = {
 export type QuoteOptions = {
   fromToken: Address,
   toToken: Address,
+  fromTokenDecimals: number,
+  toTokenDecimals: number,
   rawAmount: string,
   fromAddress: Address,
   chainId: number,
-  tokenMap: CoinGeckoTokenMap,
   setToken: SetTokenAPI,
   slippagePercentage?: number,
   isFirmQuote?: boolean,
@@ -57,13 +58,6 @@ export type ZeroExQuote = {
   toUnits: BigNumber,
   calldata: string,
   zeroExGas: number
-};
-
-export type TokenResponse = {
-  symbol: string,
-  name: string,
-  address: Address,
-  decimals: number
 };
 
 export type TradeQuote = {
@@ -85,8 +79,6 @@ export type TradeQuote = {
     toTokenDisplayAmount: string,
     fromTokenPriceUsd: string,
     toTokenPriceUsd: string,
-    toToken: TokenResponse,
-    fromToken: TokenResponse,
     gasCostsUsd: string,
     gasCostsChainCurrency: string,
     feePercentage: string,

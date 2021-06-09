@@ -190,16 +190,6 @@ export const tradeQuoteFixtures = {
        toTokenDisplayAmount: '0.04131269116050703',
        fromTokenPriceUsd: '$1,597.20',
        toTokenPriceUsd: '$1,614.79',
-       toToken:
-        { symbol: 'MKR',
-          name: 'Maker',
-          address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-          decimals: 18 },
-       fromToken:
-        { symbol: 'YFI',
-          name: 'Yearn',
-          address: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
-          decimals: 18 },
        gasCostsUsd: '$79.20',
        gasCostsChainCurrency: '0.0317688 ETH',
        feePercentage: '0.00%',
@@ -289,16 +279,6 @@ export const tradeQuoteFixtures = {
        toTokenDisplayAmount: '0.00002973',
        fromTokenPriceUsd: '$1.01',
        toTokenPriceUsd: '$1.00',
-       toToken:
-        { symbol: 'WBTC',
-          name: '(PoS) Wrapped BTC',
-          address: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
-          decimals: 8 },
-       fromToken:
-        { symbol: 'USDC',
-          name: 'USD Coin (PoS)',
-          address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-          decimals: 6 },
        gasCostsUsd: '$0.003051',
        gasCostsChainCurrency: '0.0020475 MATIC',
        feePercentage: '0.00%',

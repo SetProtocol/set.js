@@ -94,21 +94,23 @@ describe('TradeQuoteAPI', () => {
     describe('generate a quote', () => {
       let subjectFromToken: Address;
       let subjectToToken: Address;
+      let subjectFromTokenDecimals: number;
+      let subjectToTokenDecimals: number;
       let subjectRawAmount: string;
       let subjectSetTokenAddress: Address;
       let subjectChainId: number;
       let subjectSlippagePercentage: number;
-      let subjectTokenMap: CoinGeckoTokenMap;
       let subjectSetToken: SetTokenAPI;
 
       beforeEach(async () => {
         subjectFromToken = '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2'; // MKR
-        subjectToToken = '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e'; // YFI
+        subjectToToken = '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e'; // YFI
+        subjectFromTokenDecimals = tokenMap[subjectFromToken].decimals;
+        subjectToTokenDecimals = tokenMap[subjectToToken].decimals;
         subjectSetTokenAddress = DPI_ETH; // DPI
         subjectRawAmount = '.5';
         subjectChainId = 1;
         subjectSlippagePercentage = 2,
-        subjectTokenMap = tokenMap;
         subjectSetToken = setTokenAPI;
       });
 
@@ -116,11 +118,12 @@ describe('TradeQuoteAPI', () => {
         return await tradeQuoter.generate({
           fromToken: subjectFromToken,
           toToken: subjectToToken,
+          fromTokenDecimals: subjectFromTokenDecimals,
+          toTokenDecimals: subjectToTokenDecimals,
           rawAmount: subjectRawAmount,
           fromAddress: subjectSetTokenAddress,
           chainId: subjectChainId,
           slippagePercentage: subjectSlippagePercentage,
-          tokenMap: subjectTokenMap,
           setToken: subjectSetToken,
         });
       }
@@ -146,21 +149,23 @@ describe('TradeQuoteAPI', () => {
     describe('generate a quote', () => {
       let subjectFromToken: Address;
       let subjectToToken: Address;
+      let subjectFromTokenDecimals: number;
+      let subjectToTokenDecimals: number;
       let subjectRawAmount: string;
       let subjectSetTokenAddress: Address;
       let subjectChainId: number;
       let subjectSlippagePercentage: number;
-      let subjectTokenMap: CoinGeckoTokenMap;
       let subjectSetToken: SetTokenAPI;
 
       beforeEach(async () => {
         subjectFromToken = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'; // USDC
         subjectToToken = '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6'; // WBTC
+        subjectFromTokenDecimals = tokenMap[subjectFromToken].decimals;
+        subjectToTokenDecimals = tokenMap[subjectToToken].decimals;
         subjectSetTokenAddress = BUD_POLY; // BUD
         subjectRawAmount = '1';
         subjectChainId = 137;
         subjectSlippagePercentage = 2,
-        subjectTokenMap = tokenMap;
         subjectSetToken = setTokenAPI;
       });
 
@@ -168,11 +173,12 @@ describe('TradeQuoteAPI', () => {
         return await tradeQuoter.generate({
           fromToken: subjectFromToken,
           toToken: subjectToToken,
+          fromTokenDecimals: subjectFromTokenDecimals,
+          toTokenDecimals: subjectToTokenDecimals,
           rawAmount: subjectRawAmount,
           fromAddress: subjectSetTokenAddress,
           chainId: subjectChainId,
           slippagePercentage: subjectSlippagePercentage,
-          tokenMap: subjectTokenMap,
           setToken: subjectSetToken,
         });
       }

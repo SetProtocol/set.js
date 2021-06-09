@@ -21,10 +21,8 @@ import BigDecimal from 'js-big-decimal';
 
 import {
   CoinGeckoCoinPrices,
-  CoinGeckoTokenMap,
   QuoteOptions,
   TradeQuote,
-  TokenResponse,
 } from '../../types/index';
 
 import {
@@ -50,7 +48,6 @@ const SCALE = BigNumber.from(10).pow(18);
  */
 
 export class TradeQuoter {
-  private tokenMap: CoinGeckoTokenMap;
   private largeTradeGasCostBase: number = 150000;
   private tradeQuoteGasBuffer: number = 5;
   private feeRecipient: Address = '0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55';
@@ -73,8 +70,6 @@ export class TradeQuoter {
    * @return          TradeQuote: trade quote object
    */
   async generate(options: QuoteOptions): Promise<TradeQuote> {
-    this.tokenMap = options.tokenMap;
-
     const chainId = options.chainId;
     const feePercentage = options.feePercentage || this.feePercentage;
     const isFirmQuote = (options.isFirmQuote === false) ? false : this.isFirmQuote;
@@ -90,7 +85,7 @@ export class TradeQuoter {
       fromAddress,
     } = this.sanitizeAddress(options.fromToken, options.toToken, options.fromAddress);
 
-    const amount = this.sanitizeAmount(fromTokenAddress, options.rawAmount);
+    const amount = this.sanitizeAmount(options.rawAmount, options.fromTokenDecimals);
 
     const setOnChainDetails = await options.setToken.fetchSetDetailsAsync(
       fromAddress, [fromTokenAddress, toTokenAddress]
@@ -157,12 +152,20 @@ export class TradeQuoter {
         inputAmountRaw: options.rawAmount.toString(),
         inputAmount: amount.toString(),
         quoteAmount: fromTokenRequestAmount.toString(),
-        fromTokenDisplayAmount: this.tokenDisplayAmount(fromTokenAmount, fromTokenAddress),
-        toTokenDisplayAmount: this.tokenDisplayAmount(toTokenAmount, toTokenAddress),
-        fromTokenPriceUsd: this.tokenPriceUsd(fromTokenAmount, fromTokenAddress, coinPrices),
-        toTokenPriceUsd: this.tokenPriceUsd(toTokenAmount, toTokenAddress, coinPrices),
-        toToken: this.tokenResponse(toTokenAddress),
-        fromToken: this.tokenResponse(fromTokenAddress),
+        fromTokenDisplayAmount: this.tokenDisplayAmount(fromTokenAmount, options.fromTokenDecimals),
+        toTokenDisplayAmount: this.tokenDisplayAmount(toTokenAmount, options.toTokenDecimals),
+        fromTokenPriceUsd: this.tokenPriceUsd(
+          fromTokenAmount,
+          fromTokenAddress,
+          options.fromTokenDecimals,
+          coinPrices
+        ),
+        toTokenPriceUsd: this.tokenPriceUsd(
+          toTokenAmount,
+          toTokenAddress,
+          options.toTokenDecimals,
+          coinPrices
+        ),
         gasCostsUsd: this.gasCostsUsd(gasPrice, gas, coinPrices, chainId),
         gasCostsChainCurrency: this.gasCostsChainCurrency(gasPrice, gas, chainId),
         feePercentage: this.formatAsPercentage(feePercentage),
@@ -171,6 +174,8 @@ export class TradeQuoter {
           toTokenAmount,
           fromTokenAddress,
           toTokenAddress,
+          options.fromTokenDecimals,
+          options.toTokenDecimals,
           coinPrices
         ),
       },
@@ -185,8 +190,7 @@ export class TradeQuoter {
     };
   }
 
-  private sanitizeAmount(fromTokenAddress: Address, rawAmount: string): BigNumber {
-    const decimals = this.tokenMap[fromTokenAddress].decimals;
+  private sanitizeAmount(rawAmount: string, decimals: number): BigNumber {
     return ethersUtils.parseUnits(rawAmount, decimals);
   }
 
@@ -313,18 +317,8 @@ export class TradeQuoter {
     }
   }
 
-  private tokenDisplayAmount(amount: BigNumber, address: Address): string {
-    return this.normalizeTokenAmount(amount, address).toString();
-  }
-
-  private tokenResponse(address: Address): TokenResponse {
-    const tokenEntry = this.tokenMap[address];
-    return {
-      symbol: tokenEntry.symbol,
-      name: tokenEntry.name,
-      address,
-      decimals: tokenEntry.decimals,
-    };
+  private tokenDisplayAmount(amount: BigNumber, decimals: number): string {
+    return this.normalizeTokenAmount(amount, decimals).toString();
   }
 
   private chainCurrencyAddress(chainId: number): Address {
@@ -335,14 +329,19 @@ export class TradeQuoter {
     }
   }
 
-  private normalizeTokenAmount(amount: BigNumber, address: Address): number {
-    const tokenScale = BigNumber.from(10).pow(this.tokenMap[address].decimals);
+  private normalizeTokenAmount(amount: BigNumber, decimals: number): number {
+    const tokenScale = BigNumber.from(10).pow(decimals);
     return FixedNumber.from(amount).divUnsafe(FixedNumber.from(tokenScale)).toUnsafeFloat();
   }
 
-  private tokenPriceUsd(amount: BigNumber, address: Address, coinPrices: CoinGeckoCoinPrices): string {
+  private tokenPriceUsd(
+    amount: BigNumber,
+    address: Address,
+    decimals: number,
+    coinPrices: CoinGeckoCoinPrices
+  ): string {
     const coinPrice = coinPrices[address][USD_CURRENCY_CODE];
-    const normalizedAmount = this.normalizeTokenAmount(amount, address) * coinPrice;
+    const normalizedAmount = this.normalizeTokenAmount(amount, decimals) * coinPrice;
     return new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(normalizedAmount);
   }
 
@@ -399,13 +398,15 @@ export class TradeQuoter {
     toTokenAmount: BigNumber,
     fromTokenAddress: Address,
     toTokenAddress: Address,
+    fromTokenDecimals: number,
+    toTokenDecimals: number,
     coinPrices: CoinGeckoCoinPrices
   ): string {
     const fromTokenPriceUsd = coinPrices[fromTokenAddress][USD_CURRENCY_CODE];
     const toTokenPriceUsd = coinPrices[toTokenAddress][USD_CURRENCY_CODE];
 
-    const fromTokenTotalUsd = this.normalizeTokenAmount(fromTokenAmount, fromTokenAddress) * fromTokenPriceUsd;
-    const toTokenTotalUsd = this.normalizeTokenAmount(toTokenAmount, toTokenAddress) * toTokenPriceUsd;
+    const fromTokenTotalUsd = this.normalizeTokenAmount(fromTokenAmount, fromTokenDecimals) * fromTokenPriceUsd;
+    const toTokenTotalUsd = this.normalizeTokenAmount(toTokenAmount, toTokenDecimals) * toTokenPriceUsd;
 
     const slippageRaw = (fromTokenTotalUsd - toTokenTotalUsd) / fromTokenTotalUsd;
     return this.formatAsPercentage(slippageRaw * 100);

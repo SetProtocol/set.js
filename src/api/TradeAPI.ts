@@ -138,26 +138,32 @@ export default class TradeAPI {
   public async fetchTradeQuoteAsync(
     fromToken: Address,
     toToken: Address,
+    fromTokenDecimals: number,
+    toTokenDecimals: number,
     rawAmount: string,
     fromAddress: Address,
     setToken: SetTokenAPI,
-    tokenMap?: CoinGeckoTokenMap,
     slippagePercentage?: number,
     isFirmQuote?: boolean,
     feePercentage?: number,
     feeRecipient?: Address,
     excludedSources?: string[],
   ): Promise<TradeQuote> {
-    await this.initializeForChain();
-    const _tokenMap = (tokenMap) ? tokenMap : await this.coinGecko.fetchTokenMap();
+    this.assert.schema.isValidAddress('fromToken', fromToken);
+    this.assert.schema.isValidAddress('toToken', toToken);
+    this.assert.schema.isValidAddress('fromAddress', fromAddress);
+    this.assert.schema.isValidNumber('fromTokenDecimals', fromTokenDecimals);
+    this.assert.schema.isValidNumber('toTokenDecimals', toTokenDecimals);
+    this.assert.schema.isValidNumber('rawAmount', rawAmount);
 
     return this.tradeQuoter.generate({
       fromToken,
       toToken,
+      fromTokenDecimals,
+      toTokenDecimals,
       rawAmount,
       fromAddress,
       chainId: this.chainId,
-      tokenMap: _tokenMap,
       setToken,
       slippagePercentage,
       isFirmQuote,
