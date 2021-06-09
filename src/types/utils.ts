@@ -1,6 +1,9 @@
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { BigNumber } from 'ethers/lib/ethers';
+import type { Provider } from '@ethersproject/providers';
 import type SetTokenAPI  from '../api/SetTokenAPI';
+import type TradeModuleWrapper from '../wrappers/set-protocol-v2/TradeModuleWrapper';
+
 
 export type CurrencyCodePriceMap = {
   [key: string]: number
@@ -44,6 +47,8 @@ export type QuoteOptions = {
   fromAddress: Address,
   chainId: number,
   setToken: SetTokenAPI,
+  tradeModule: TradeModuleWrapper,
+  provider: Provider,
   gasPrice?: number,
   slippagePercentage?: number,
   isFirmQuote?: boolean,
@@ -111,8 +116,7 @@ export type ZeroExTradeQuote = {
   price: number,
   sellAmount: BigNumber,
   buyAmount: BigNumber,
-  calldata: string,
-  gas: number
+  calldata: string
 };
 
 export type GasNowData = {

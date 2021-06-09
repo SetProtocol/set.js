@@ -165,6 +165,8 @@ export default class TradeAPI {
       rawAmount,
       fromAddress,
       chainId: this.chainId,
+      tradeModule: this.tradeModuleWrapper,
+      provider: this.provider,
       setToken,
       gasPrice,
       slippagePercentage,

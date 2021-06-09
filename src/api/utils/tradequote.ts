@@ -16,8 +16,9 @@
 
 'use strict';
 
-import { BigNumber, FixedNumber, utils as ethersUtils } from 'ethers';
 import BigDecimal from 'js-big-decimal';
+import { BigNumber, FixedNumber, utils as ethersUtils } from 'ethers';
+import type TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
 
 import {
   CoinGeckoCoinPrices,
@@ -48,7 +49,6 @@ const SCALE = BigNumber.from(10).pow(18);
  */
 
 export class TradeQuoter {
-  private largeTradeGasCostBase: number = 150000;
   private tradeQuoteGasBuffer: number = 5;
   private feeRecipient: Address = '0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55';
   private feePercentage: number = 0;
@@ -103,7 +103,6 @@ export class TradeQuoter {
       toTokenAmount,
       toUnits,
       calldata,
-      zeroExGas,
     } = await this.fetchZeroExQuote( // fetchQuote (and switch...)
       fromTokenAddress,
       toTokenAddress,
@@ -126,7 +125,17 @@ export class TradeQuoter {
       toUnits
     );
 
-    const gas = this.estimateGasCost(zeroExGas);
+    const gas = await this.estimateGasCost(
+      options.tradeModule,
+      fromTokenAddress,
+      fromUnits,
+      toTokenAddress,
+      toUnits,
+      exchangeAdapterName,
+      fromAddress,
+      calldata,
+      setOnChainDetails.manager
+    );
 
     const coinGecko = new CoinGeckoDataService(chainId);
     const coinPrices = await coinGecko.fetchCoinPrices({
@@ -251,7 +260,6 @@ export class TradeQuoter {
       toTokenAmount,
       toUnits,
       calldata: quote.calldata,
-      zeroExGas: quote.gas,
     };
   }
 
@@ -389,10 +397,34 @@ export class TradeQuoter {
     }
   }
 
-  private estimateGasCost(zeroExGas: number): number {
-    const gas = zeroExGas + this.largeTradeGasCostBase;
-    const gasCostBuffer = (100 + this.tradeQuoteGasBuffer) / 100;
-    return Math.floor(gas * gasCostBuffer);
+  private async estimateGasCost(
+    tradeModule: TradeModuleWrapper,
+    fromTokenAddress: Address,
+    fromTokenUnits: BigNumber,
+    toTokenAddress: Address,
+    toTokenUnits: BigNumber,
+    adapterName: string,
+    fromAddress: Address,
+    calldata: string,
+    managerAddress: Address
+  ): Promise<number> {
+    try {
+      const gas = await tradeModule.estimateGasForTradeAsync(
+        fromAddress,
+        adapterName,
+        fromTokenAddress,
+        fromTokenUnits,
+        toTokenAddress,
+        toTokenUnits,
+        calldata,
+        managerAddress
+      );
+      const gasCostBuffer = (100 + this.tradeQuoteGasBuffer) / 100;
+      return Math.floor(gas.toNumber() * gasCostBuffer);
+    } catch (error) {
+      console.log('error --> ' + error);
+      throw new Error('Unable to fetch gas cost estimate for trade');
+    }
   }
 
   private calculateSlippage(

@@ -15,10 +15,11 @@
 */
 
 import axios from 'axios';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { CoinGeckoTokenMap, TradeQuote } from '@src/types';
 import SetTokenAPI from '@src/api/SetTokenAPI';
+import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
 import { TradeQuoter, CoinGeckoDataService } from '@src/api/utils';
 import { tradeQuoteFixtures as fixture } from '../fixtures/tradeQuote';
 import { expect } from '@test/utils/chai';
@@ -59,17 +60,23 @@ axios.get.mockImplementation(val => {
   }
 });
 
+// @ts-ignore
+provider.estimateGas = jest.fn((arg: any) => Promise.resolve(BigNumber.from(300_000)));
+
 describe('TradeQuoteAPI', () => {
   let streamingFeeModuleAddress: Address;
   let protocolViewerAddress: Address;
   let setTokenCreatorAddress: Address;
+  let tradeModuleAddress: Address;
   let setTokenAPI: SetTokenAPI;
+  let tradeModuleWrapper: TradeModuleWrapper;
 
   beforeEach(async () => {
     [
       streamingFeeModuleAddress,
       protocolViewerAddress,
       setTokenCreatorAddress,
+      tradeModuleAddress,
     ] = await provider.listAccounts();
 
     setTokenAPI = new SetTokenAPI(
@@ -78,6 +85,8 @@ describe('TradeQuoteAPI', () => {
       streamingFeeModuleAddress,
       setTokenCreatorAddress
     );
+
+    tradeModuleWrapper = new TradeModuleWrapper(provider, tradeModuleAddress);
   });
 
   describe('mainnet', () => {
@@ -125,6 +134,8 @@ describe('TradeQuoteAPI', () => {
           chainId: subjectChainId,
           slippagePercentage: subjectSlippagePercentage,
           setToken: subjectSetToken,
+          tradeModule: tradeModuleWrapper,
+          provider: provider,
         });
       }
 
@@ -180,6 +191,8 @@ describe('TradeQuoteAPI', () => {
           chainId: subjectChainId,
           slippagePercentage: subjectSlippagePercentage,
           setToken: subjectSetToken,
+          tradeModule: tradeModuleWrapper,
+          provider: provider,
         });
       }
 
