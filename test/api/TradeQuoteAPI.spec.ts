@@ -48,7 +48,7 @@ axios.get.mockImplementation(val => {
   switch (val) {
     case fixture.zeroExRequestEth: return fixture.zeroExReponseEth;
     case fixture.zeroExRequestPoly: return fixture.zeroExReponsePoly;
-    case fixture.ethGasStationRequest: return fixture.ethGasStationResponse;
+    case fixture.gasNowRequest: return fixture.gasNowResponse;
     case fixture.maticGasStationRequest: return fixture.maticGasStationResponse;
     case fixture.coinGeckoTokenRequestEth: return fixture.coinGeckoTokenResponseEth;
     case fixture.coinGeckoTokenRequestPoly: return fixture.coinGeckoTokenResponsePoly;

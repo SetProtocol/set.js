@@ -19,7 +19,7 @@ import axios from 'axios';
 import Assertions from '../../../assertions';
 
 import {
-  EthGasStationData,
+  GasNowData,
   GasOracleSpeed,
 } from '../../../types';
 
@@ -64,14 +64,14 @@ export class GasOracleService {
   }
 
   private async getEthereumGasPrice(speed: GasOracleSpeed): Promise<number> {
-    const url = 'https://ethgasstation.info/json/ethgasAPI.json';
-    const data: EthGasStationData = (await axios.get(url)).data;
+    const url = 'https://www.gasnow.org/api/v3/gas/price';
+    const data: GasNowData = (await axios.get(url)).data.data;
 
     // EthGasStation returns gas price in x10 Gwei (divite by 10 to convert it to gwei)
     switch (speed) {
-      case GasOracleService.AVERAGE: return data.average / 10;
-      case GasOracleService.FAST:    return data.fast / 10;
-      case GasOracleService.FASTEST: return data.fastest / 10;
+      case GasOracleService.AVERAGE: return data.standard / 1e9;
+      case GasOracleService.FAST:    return data.fast / 1e9;
+      case GasOracleService.FASTEST: return data.rapid / 1e9;
     }
   }
 

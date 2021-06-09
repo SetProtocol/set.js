@@ -81,6 +81,18 @@ export const tradeQuoteFixtures = {
     },
   },
 
+  gasNowRequest: 'https://www.gasnow.org/api/v3/gas/price',
+  gasNowResponse: {
+    data: {
+      data: {
+        rapid: 61000000000,
+        fast: 61000000000,
+        standard: 17800000000,
+        slow: 17800000000,
+      },
+    },
+  },
+
   maticGasStationRequest: 'https://gasstation-mainnet.matic.network',
   maticGasStationResponse: {
     data: {
