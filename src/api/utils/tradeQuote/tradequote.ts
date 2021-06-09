@@ -27,8 +27,6 @@ import {
   TokenResponse,
 } from '../../../types/index';
 
-import SetTokenAPI from '../../SetTokenAPI';
-
 import {
   CoinGeckoDataService,
   USD_CURRENCY_CODE
@@ -52,14 +50,17 @@ const SCALE = BigNumber.from(10).pow(18);
  */
 
 export class TradeQuoteAPI {
-  private setToken: SetTokenAPI;
   private tokenMap: CoinGeckoTokenMap;
   private largeTradeGasCostBase: number = 150000;
   private tradeQuoteGasBuffer: number = 5;
+  private feeRecipient: Address = '0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55';
+  private feePercentage: number = 0;
+  private isFirmQuote: boolean = true;
+  private slippagePercentage: number = 2;
+  private excludedSources: string[] = ['Kyber', 'Eth2Dai', 'Uniswap', 'Mesh'];
   private zeroExApiKey: string;
 
-  constructor(setToken: SetTokenAPI, zeroExApiKey: string = '') {
-    this.setToken = setToken;
+  constructor(zeroExApiKey: string = '') {
     this.zeroExApiKey = zeroExApiKey;
   }
 
@@ -73,9 +74,14 @@ export class TradeQuoteAPI {
    */
   async generate(options: QuoteOptions): Promise<TradeQuote> {
     this.tokenMap = options.tokenMap;
-    const feePercentage = options.feePercentage || 0;
-    const isFirmQuote = options.isFirmQuote || false;
+
     const chainId = options.chainId;
+    const feePercentage = options.feePercentage || this.feePercentage;
+    const isFirmQuote = (options.isFirmQuote === false) ? false : this.isFirmQuote;
+    const slippagePercentage = options.slippagePercentage || this.slippagePercentage;
+    const feeRecipient = options.feeRecipient || this.feeRecipient;
+    const excludedSources = options.excludedSources || this.excludedSources;
+
     const exchangeAdapterName = ZERO_EX_ADAPTER_NAME;
 
     const {
@@ -86,7 +92,7 @@ export class TradeQuoteAPI {
 
     const amount = this.sanitizeAmount(fromTokenAddress, options.rawAmount);
 
-    const setOnChainDetails = await this.setToken.fetchSetDetailsAsync(
+    const setOnChainDetails = await options.setToken.fetchSetDetailsAsync(
       fromAddress, [fromTokenAddress, toTokenAddress]
     );
 
@@ -111,7 +117,9 @@ export class TradeQuoteAPI {
       (setOnChainDetails as any).totalSupply, // Typings incorrect,
       chainId,
       isFirmQuote,
-      options.slippagePercentage
+      slippagePercentage,
+      feeRecipient,
+      excludedSources
     );
 
     // Sanity check response from quote APIs
@@ -190,7 +198,9 @@ export class TradeQuoteAPI {
     setTotalSupply: BigNumber,
     chainId: number,
     isFirmQuote: boolean,
-    slippagePercentage: number
+    slippagePercentage: number,
+    feeRecipient: Address,
+    excludedSources: string[]
   ) {
     const zeroEx = new ZeroExTradeQuoter({
       chainId: chainId,
@@ -202,7 +212,10 @@ export class TradeQuoteAPI {
       toTokenAddress,
       fromTokenRequestAmount,
       manager,
-      isFirmQuote
+      isFirmQuote,
+      (slippagePercentage / 100),
+      feeRecipient,
+      excludedSources
     );
 
     const fromTokenAmount = quote.sellAmount;
@@ -222,7 +235,7 @@ export class TradeQuoteAPI {
     // BigNumber does not do fixed point math & FixedNumber underflows w/ numbers less than 1
     // Multiply the slippage by a factor and divide the end result by same...
     const percentMultiplier = 1000;
-    const slippageToleranceBN = percentMultiplier * this.outputSlippageTolerance(slippagePercentage);
+    const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippagePercentage));
     const toTokenAmountMinusSlippage = toTokenAmount.mul(slippageToleranceBN).div(percentMultiplier);
     const toUnits = toTokenAmountMinusSlippage.mul(SCALE).div(setTotalSupply);
 

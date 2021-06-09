@@ -41,11 +41,8 @@ export class ZeroExTradeQuoter {
 
   private swapQuoteRoute = '/swap/v1/quote';
   private feePercentage: number = 0;
-  private feeRecipientAddress: Address = '0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55';
   private affiliateAddress: Address = '0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55';
-  private excludedSources: string[] = ['Kyber', 'Eth2Dai', 'Uniswap', 'Mesh'];
   private skipValidation: boolean = true;
-  private slippagePercentage: number = 0.02;
 
   constructor(options: ZeroExTradeQuoterOptions) {
     this.assert = new Assertions();
@@ -72,18 +69,21 @@ export class ZeroExTradeQuoter {
     sellAmount: BigNumber,
     takerAddress: Address,
     isFirm: boolean,
+    slippagePercentage,
+    feeRecipient,
+    excludedSources
   ): Promise<ZeroExTradeQuote> {
     const url = `${this.host}${this.swapQuoteRoute}`;
 
     const params: ZeroExQueryParams = {
       sellToken: sellTokenAddress,
       buyToken: buyTokenAddress,
-      slippagePercentage: this.slippagePercentage,
+      slippagePercentage: slippagePercentage,
       sellAmount: sellAmount.toString(),
       takerAddress,
-      excludedSources: this.excludedSources.join(','),
+      excludedSources: excludedSources.join(','),
       skipValidation: this.skipValidation,
-      feeRecipient: this.feeRecipientAddress,
+      feeRecipient: feeRecipient,
       buyTokenPercentageFee: this.feePercentage,
       affiliateAddress: this.affiliateAddress,
       intentOnFilling: isFirm,

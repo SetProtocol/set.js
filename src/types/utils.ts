@@ -41,9 +41,12 @@ export type QuoteOptions = {
   fromAddress: Address,
   chainId: number,
   tokenMap: CoinGeckoTokenMap,
-  slippagePercentage: number,
+  setToken: SetTokenAPI,
+  slippagePercentage?: number,
   isFirmQuote?: boolean,
-  feePercentage?: number
+  feePercentage?: number,
+  feeRecipient?: Address,
+  excludedSources?: string[],
 };
 
 export type ZeroExQuote = {

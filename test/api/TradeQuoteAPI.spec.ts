@@ -88,7 +88,7 @@ describe('TradeQuoteAPI', () => {
     beforeEach(async () => {
       coingecko = new CoinGeckoDataService(1);
       tokenMap = await coingecko.fetchTokenMap();
-      tradeQuote = new TradeQuoteAPI(setTokenAPI, 'xyz');
+      tradeQuote = new TradeQuoteAPI('xyz');
     });
 
     describe('generate a quote', () => {
@@ -99,6 +99,7 @@ describe('TradeQuoteAPI', () => {
       let subjectChainId: number;
       let subjectSlippagePercentage: number;
       let subjectTokenMap: CoinGeckoTokenMap;
+      let subjectSetToken: SetTokenAPI;
 
       beforeEach(async () => {
         subjectFromToken = '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2'; // MKR
@@ -108,6 +109,7 @@ describe('TradeQuoteAPI', () => {
         subjectChainId = 1;
         subjectSlippagePercentage = 2,
         subjectTokenMap = tokenMap;
+        subjectSetToken = setTokenAPI;
       });
 
       async function subject(): Promise<TradeQuote> {
@@ -119,6 +121,7 @@ describe('TradeQuoteAPI', () => {
           chainId: subjectChainId,
           slippagePercentage: subjectSlippagePercentage,
           tokenMap: subjectTokenMap,
+          setToken: subjectSetToken,
         });
       }
 
@@ -137,7 +140,7 @@ describe('TradeQuoteAPI', () => {
     beforeEach(async () => {
       coingecko = new CoinGeckoDataService(137);
       tokenMap = await coingecko.fetchTokenMap();
-      tradeQuote = new TradeQuoteAPI(setTokenAPI, 'xyz');
+      tradeQuote = new TradeQuoteAPI('xyz');
     });
 
     describe('generate a quote', () => {
@@ -148,6 +151,7 @@ describe('TradeQuoteAPI', () => {
       let subjectChainId: number;
       let subjectSlippagePercentage: number;
       let subjectTokenMap: CoinGeckoTokenMap;
+      let subjectSetToken: SetTokenAPI;
 
       beforeEach(async () => {
         subjectFromToken = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'; // USDC
@@ -157,6 +161,7 @@ describe('TradeQuoteAPI', () => {
         subjectChainId = 137;
         subjectSlippagePercentage = 2,
         subjectTokenMap = tokenMap;
+        subjectSetToken = setTokenAPI;
       });
 
       async function subject(): Promise<TradeQuote> {
@@ -168,6 +173,7 @@ describe('TradeQuoteAPI', () => {
           chainId: subjectChainId,
           slippagePercentage: subjectSlippagePercentage,
           tokenMap: subjectTokenMap,
+          setToken: subjectSetToken,
         });
       }
 
