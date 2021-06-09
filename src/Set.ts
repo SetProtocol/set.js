@@ -29,7 +29,6 @@ import {
   NavIssuanceAPI,
   PriceOracleAPI,
   DebtIssuanceAPI,
-  TradeQuoteAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -103,13 +102,6 @@ class Set {
    */
   public blockchain: BlockchainAPI;
 
-
-  /**
-   * An instance of the TradeQuoteAPI class. Contains interfaces for
-   * getting a trade quote from 0x exchange API on Ethereum or Polygon networks
-   */
-  public tradeQuote: TradeQuoteAPI;
-
   /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
@@ -131,12 +123,11 @@ class Set {
       assertions
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
-    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress);
+    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey);
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
-    this.tradeQuote = new TradeQuoteAPI(this.setToken, config.zeroExApiKey);
   }
 }
 

@@ -19,7 +19,7 @@ import { ethers } from 'ethers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { CoinGeckoTokenMap, TradeQuote } from '@src/types';
 import SetTokenAPI from '@src/api/SetTokenAPI';
-import { TradeQuoteAPI, CoinGeckoDataService } from '@src/api/utils/tradeQuote';
+import { TradeQuoter, CoinGeckoDataService } from '@src/api/utils';
 import { tradeQuoteFixtures as fixture } from '../fixtures/tradeQuote';
 import { expect } from '@test/utils/chai';
 
@@ -81,14 +81,14 @@ describe('TradeQuoteAPI', () => {
   });
 
   describe('mainnet', () => {
-    let tradeQuote: TradeQuoteAPI;
     let coingecko: CoinGeckoDataService;
     let tokenMap: CoinGeckoTokenMap;
+    let tradeQuoter: TradeQuoter;
 
     beforeEach(async () => {
       coingecko = new CoinGeckoDataService(1);
       tokenMap = await coingecko.fetchTokenMap();
-      tradeQuote = new TradeQuoteAPI('xyz');
+      tradeQuoter = new TradeQuoter('xyz');
     });
 
     describe('generate a quote', () => {
@@ -113,7 +113,7 @@ describe('TradeQuoteAPI', () => {
       });
 
       async function subject(): Promise<TradeQuote> {
-        return await tradeQuote.generate({
+        return await tradeQuoter.generate({
           fromToken: subjectFromToken,
           toToken: subjectToToken,
           rawAmount: subjectRawAmount,
@@ -133,14 +133,14 @@ describe('TradeQuoteAPI', () => {
   });
 
   describe('polygon', () => {
-    let tradeQuote: TradeQuoteAPI;
     let coingecko: CoinGeckoDataService;
     let tokenMap: CoinGeckoTokenMap;
+    let tradeQuoter: TradeQuoter;
 
     beforeEach(async () => {
       coingecko = new CoinGeckoDataService(137);
       tokenMap = await coingecko.fetchTokenMap();
-      tradeQuote = new TradeQuoteAPI('xyz');
+      tradeQuoter = new TradeQuoter('xyz');
     });
 
     describe('generate a quote', () => {
@@ -165,7 +165,7 @@ describe('TradeQuoteAPI', () => {
       });
 
       async function subject(): Promise<TradeQuote> {
-        return await tradeQuote.generate({
+        return await tradeQuoter.generate({
           fromToken: subjectFromToken,
           toToken: subjectToToken,
           rawAmount: subjectRawAmount,

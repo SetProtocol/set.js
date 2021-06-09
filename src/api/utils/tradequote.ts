@@ -25,23 +25,23 @@ import {
   QuoteOptions,
   TradeQuote,
   TokenResponse,
-} from '../../../types/index';
+} from '../../types/index';
 
 import {
   CoinGeckoDataService,
   USD_CURRENCY_CODE
 } from './coingecko';
 
+import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { GasOracleService } from './gasOracle';
 import { ZeroExTradeQuoter } from './zeroex';
 
 export const ZERO_EX_ADAPTER_NAME = 'ZeroExApiAdapterV3';
-import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 const SCALE = BigNumber.from(10).pow(18);
 
 /**
- * @title TradeQuoteAPI
+ * @title TradeQuote
  * @author Set Protocol
  *
  * A utility library to generate trade quotes for token pairs associated with a
@@ -49,7 +49,7 @@ const SCALE = BigNumber.from(10).pow(18);
  * 0x api key.
  */
 
-export class TradeQuoteAPI {
+export class TradeQuoter {
   private tokenMap: CoinGeckoTokenMap;
   private largeTradeGasCostBase: number = 150000;
   private tradeQuoteGasBuffer: number = 5;

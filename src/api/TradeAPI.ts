@@ -23,7 +23,22 @@ import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechai
 import { BigNumber } from 'ethers/lib/ethers';
 
 import TradeModuleWrapper from '../wrappers/set-protocol-v2/TradeModuleWrapper';
+import SetTokenAPI from './SetTokenAPI';
 import Assertions from '../assertions';
+
+import {
+  TradeQuoter,
+  CoinGeckoDataService,
+  GasOracleService
+} from './utils';
+
+import {
+  TradeQuote,
+  CoinGeckoTokenData,
+  CoinGeckoTokenMap,
+  GasOracleSpeed,
+  CoinGeckoCoinPrices
+} from '../types';
 
 /**
  * @title  TradeAPI
@@ -36,14 +51,20 @@ import Assertions from '../assertions';
 export default class TradeAPI {
   private tradeModuleWrapper: TradeModuleWrapper;
   private assert: Assertions;
+  private provider: Provider;
+  private tradeQuoter: TradeQuoter;
+  private coinGecko: CoinGeckoDataService;
+  private chainId: number;
 
   public constructor(
     provider: Provider,
     tradeModuleAddress: Address,
-    assertions?: Assertions
+    zeroExApiKey?: string,
   ) {
+    this.provider = provider;
     this.tradeModuleWrapper = new TradeModuleWrapper(provider, tradeModuleAddress);
-    this.assert = assertions || new Assertions();
+    this.assert = new Assertions();
+    this.tradeQuoter = new TradeQuoter(zeroExApiKey);
   }
 
   /**
@@ -112,5 +133,69 @@ export default class TradeAPI {
       callerAddress,
       txOpts
     );
+  }
+
+  public async fetchTradeQuoteAsync(
+    fromToken: Address,
+    toToken: Address,
+    rawAmount: string,
+    fromAddress: Address,
+    setToken: SetTokenAPI,
+    tokenMap?: CoinGeckoTokenMap,
+    slippagePercentage?: number,
+    isFirmQuote?: boolean,
+    feePercentage?: number,
+    feeRecipient?: Address,
+    excludedSources?: string[],
+  ): Promise<TradeQuote> {
+    await this.initializeForChain();
+    const _tokenMap = (tokenMap) ? tokenMap : await this.coinGecko.fetchTokenMap();
+
+    return this.tradeQuoter.generate({
+      fromToken,
+      toToken,
+      rawAmount,
+      fromAddress,
+      chainId: this.chainId,
+      tokenMap: _tokenMap,
+      setToken,
+      slippagePercentage,
+      isFirmQuote,
+      feePercentage,
+      feeRecipient,
+      excludedSources,
+    });
+  }
+
+  public async fetchTokenList(): Promise<CoinGeckoTokenData[]> {
+    await this.initializeForChain();
+    return this.coinGecko.fetchTokenList();
+  }
+
+  public async fetchTokenMap(): Promise<CoinGeckoTokenMap> {
+    await this.initializeForChain();
+    return this.coinGecko.fetchTokenMap();
+  }
+
+  public async fetchCoinPrices(
+    contractAddresses: string[],
+    vsCurrencies: string[]
+  ): Promise<CoinGeckoCoinPrices> {
+    await this.initializeForChain();
+    return this.coinGecko.fetchCoinPrices({contractAddresses, vsCurrencies});
+  }
+
+  public async fetchGasPrice(speed: GasOracleSpeed): Promise<number> {
+    await this.initializeForChain();
+    const oracle = new GasOracleService(this.chainId);
+    return oracle.fetchGasPrice(speed);
+  }
+
+  private async initializeForChain() {
+    if (this.coinGecko === undefined) {
+      const network = await this.provider.getNetwork();
+      this.chainId = network.chainId;
+      this.coinGecko = new CoinGeckoDataService(network.chainId);
+    }
   }
 }

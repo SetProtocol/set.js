@@ -18,13 +18,13 @@
 
 import axios from 'axios';
 import { BigNumber } from 'ethers';
-import Assertions from '../../../assertions';
+import Assertions from '../../assertions';
 
 import {
   ZeroExTradeQuoterOptions,
   ZeroExTradeQuote,
   ZeroExQueryParams
-} from '../../../types/index';
+} from '../../types/index';
 
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 

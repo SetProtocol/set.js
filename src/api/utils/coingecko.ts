@@ -19,7 +19,7 @@
 const pageResults = require('graph-results-pager');
 
 import axios from 'axios';
-import Assertions from '../../../assertions';
+import Assertions from '../../assertions';
 
 import {
   CoinGeckoCoinPrices,
@@ -28,7 +28,7 @@ import {
   CoinGeckoTokenMap,
   CoinPricesParams,
   PolygonMappedTokenData
-} from '../../../types';
+} from '../../types';
 
 /**
  * These currency codes can be used for the vs_currencies parameter of the service's

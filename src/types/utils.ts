@@ -1,5 +1,6 @@
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { BigNumber } from 'ethers/lib/ethers';
+import type SetTokenAPI  from '../api/SetTokenAPI';
 
 export type CurrencyCodePriceMap = {
   [key: string]: number

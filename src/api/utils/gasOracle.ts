@@ -16,12 +16,12 @@
 'use strict';
 
 import axios from 'axios';
-import Assertions from '../../../assertions';
+import Assertions from '../../assertions';
 
 import {
   GasNowData,
   GasOracleSpeed,
-} from '../../../types';
+} from '../../types';
 
 /**
  * @title GasOracleService

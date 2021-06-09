@@ -1,1 +1,4 @@
-export { TradeQuoteAPI } from './tradeQuote';
+export * from './tradequote';
+export * from './coingecko';
+export * from './gasOracle';
+export * from './zeroex';
