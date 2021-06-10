@@ -16,9 +16,10 @@
     "scripts": {
         "prod": "yarn run build",
         "chain": "bash scripts/init_chain_internal.sh",
-        "build": "yarn run build-dist && yarn run tslint && tspath -f",
+        "build": "yarn run clean && yarn run build-dist && yarn run tslint && tspath -f",
         "build-ts": "tsc -p tsconfig.json",
         "build-dist": "tsc -p tsconfig.dist.json",
+        "clean": "rm -rf dist",
         "test": "jest --runInBand",
         "test:verbose": "jest --runInBand --silent=false",
         "test:watch": "jest --watch --runInBand",
