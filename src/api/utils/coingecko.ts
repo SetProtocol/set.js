@@ -71,7 +71,17 @@ export class CoinGeckoDataService {
     const vsCurrenciesParams = `vs_currencies=${params.vsCurrencies.join(',')}`;
     const url = `${endpoint}${contractAddressParams}&${vsCurrenciesParams}`;
 
-    const response = await axios.get(url);
+    let response;
+    try {
+      response = await axios.get(url);
+    } catch (e) {
+      // If coingecko fails, set prices to zero
+      response = { data: {} };
+      for (const address of params.contractAddresses) {
+        response.data[address] = {};
+        response.data[address][params.vsCurrencies[0]] = 0.00;
+      }
+    }
     return response.data;
   }
 
