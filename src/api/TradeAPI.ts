@@ -153,10 +153,13 @@ export default class TradeAPI {
     this.assert.schema.isValidAddress('fromToken', fromToken);
     this.assert.schema.isValidAddress('toToken', toToken);
     this.assert.schema.isValidAddress('fromAddress', fromAddress);
-    this.assert.schema.isValidNumber('fromTokenDecimals', fromTokenDecimals);
-    this.assert.schema.isValidNumber('toTokenDecimals', toTokenDecimals);
-    this.assert.schema.isValidNumber('rawAmount', rawAmount);
+    this.assert.schema.isValidJsNumber('fromTokenDecimals', fromTokenDecimals);
+    this.assert.schema.isValidJsNumber('toTokenDecimals', toTokenDecimals);
+    this.assert.schema.isValidString('rawAmount', rawAmount);
 
+    const chainId = (await this.provider.getNetwork()).chainId;
+
+    // @ts-ignore
     return this.tradeQuoter.generate({
       fromToken,
       toToken,
@@ -164,7 +167,7 @@ export default class TradeAPI {
       toTokenDecimals,
       rawAmount,
       fromAddress,
-      chainId: this.chainId,
+      chainId,
       tradeModule: this.tradeModuleWrapper,
       provider: this.provider,
       setToken,

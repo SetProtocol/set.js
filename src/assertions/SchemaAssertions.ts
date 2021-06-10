@@ -91,6 +91,26 @@ export class SchemaAssertions {
     this.assertConformsToSchema(variableName, value, schemas.wholeNumberSchema);
   }
 
+  /**
+   * Throws if a given input is not a native JS number.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param value           Value being validated.
+   */
+  public isValidJsNumber(variableName: string, value: any) {
+    this.assertConformsToSchema(variableName, value, schemas.jsNumberSchema);
+  }
+
+  /**
+   * Throws if a given input is not a string.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param value           Value being validated.
+   */
+  public isValidString(variableName: string, value: any) {
+    this.assertConformsToSchema(variableName, value, schemas.stringSchema);
+  }
+
   private assertConformsToSchema(
     variableName: string,
     value: any,
