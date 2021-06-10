@@ -23,14 +23,14 @@ import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import TradeAPI from '@src/api/TradeAPI';
 import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
 import type SetTokenAPI from '@src/api/SetTokenAPI';
-import { TradeQuoter } from '@src/api/utils/tradequote';
+import { TradeQuoter } from '@src/api/utils';
 import { expect } from '@test/utils/chai';
 import { TradeQuote } from '@src/types';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 jest.mock('@src/wrappers/set-protocol-v2/TradeModuleWrapper');
-jest.mock('@src/api/utils/tradequote');
+jest.mock('@src/api/utils/tradeQuoter');
 
 describe('TradeAPI', () => {
   let tradeModuleAddress: Address;
