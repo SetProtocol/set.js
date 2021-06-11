@@ -108,7 +108,6 @@ describe('TradeQuoteAPI', () => {
       let subjectRawAmount: string;
       let subjectSetTokenAddress: Address;
       let subjectChainId: number;
-      let subjectSlippagePercentage: number;
       let subjectSetToken: SetTokenAPI;
 
       beforeEach(async () => {
@@ -119,7 +118,6 @@ describe('TradeQuoteAPI', () => {
         subjectSetTokenAddress = DPI_ETH; // DPI
         subjectRawAmount = '.5';
         subjectChainId = 1;
-        subjectSlippagePercentage = 2,
         subjectSetToken = setTokenAPI;
       });
 
@@ -132,7 +130,6 @@ describe('TradeQuoteAPI', () => {
           rawAmount: subjectRawAmount,
           fromAddress: subjectSetTokenAddress,
           chainId: subjectChainId,
-          slippagePercentage: subjectSlippagePercentage,
           setToken: subjectSetToken,
           tradeModule: tradeModuleWrapper,
           provider: provider,

@@ -156,7 +156,7 @@ export class TradeQuoter {
       calldata,
       gas: gas.toString(),
       gasPrice: options.gasPrice.toString(),
-      slippagePercentage: this.formatAsPercentage(options.slippagePercentage),
+      slippagePercentage: this.formatAsPercentage(slippagePercentage),
       fromTokenAmount: fromUnits.toString(),
       toTokenAmount: toUnits.toString(),
       display: {
