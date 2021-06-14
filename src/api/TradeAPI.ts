@@ -135,6 +135,25 @@ export default class TradeAPI {
     );
   }
 
+  /**
+   * Call 0x API to generate a trade quote for two SetToken components.
+   *
+   * @param  fromToken            Address of token being sold
+   * @param  toToken              Address of token being bought
+   * @param  fromTokenDecimals    Token decimals of token being sold (ex: 18)
+   * @param  toTokenDecimals      Token decimals of token being bought (ex: 18)
+   * @param  rawAmount            String quantity of token to sell (ex: "0.5")
+   * @param  fromAddress          SetToken address which holds the buy / sell components
+   * @param  setToken             SetTokenAPI instance
+   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from GasNow)
+   * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
+   * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
+   * @param  feePercentage        (Optional) Default: 0
+   * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
+   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Uniswap', 'Mesh'])
+   *
+   * @return {Promise<TradeQuote>}
+   */
   public async fetchTradeQuoteAsync(
     fromToken: Address,
     toToken: Address,
@@ -159,7 +178,6 @@ export default class TradeAPI {
 
     const chainId = (await this.provider.getNetwork()).chainId;
 
-    // @ts-ignore
     return this.tradeQuoter.generate({
       fromToken,
       toToken,
@@ -180,17 +198,40 @@ export default class TradeAPI {
     });
   }
 
-  public async fetchTokenList(): Promise<CoinGeckoTokenData[]> {
+  /**
+   * Fetches a list of tokens and their metadata from CoinGecko. Each entry includes
+   * the token's address, proper name, decimals, exchange symbol and a logo URI if available.
+   * For Ethereum, this is a list of tokens tradeable on Uniswap, for Polygon it's a list of
+   * tokens tradeable on Sushiswap's Polygon exchange. Method is useful for acquiring token decimals
+   * necessary to generate a trade quote and images for representing available tokens in a UI.
+   *
+   * @return List of tradeable tokens for chain platform
+   */
+  public async fetchTokenListAsync(): Promise<CoinGeckoTokenData[]> {
     await this.initializeForChain();
     return this.coinGecko.fetchTokenList();
   }
 
-  public async fetchTokenMap(): Promise<CoinGeckoTokenMap> {
+  /**
+   * Fetches the same info as `fetchTokenList` in the form of a map indexed by address. Method is
+   * useful if you're cacheing the token list and want quick lookups for a variety of trades.
+   *
+   * @return Map of token addresses to token metadata
+   */
+  public async fetchTokenMapAsync(): Promise<CoinGeckoTokenMap> {
     await this.initializeForChain();
     return this.coinGecko.fetchTokenMap();
   }
 
-  public async fetchCoinPrices(
+  /**
+   * Fetches a list of prices vs currencies for the specified inputs from CoinGecko
+   *
+   * @param  contractAddresses         String array of contract addresses
+   * @param  vsCurrencies              String array of currency codes (see CoinGecko api for a complete list)
+   *
+   * @return                           List of prices vs currencies
+   */
+  public async fetchCoinPricesAsync(
     contractAddresses: string[],
     vsCurrencies: string[]
   ): Promise<CoinGeckoCoinPrices> {
@@ -198,11 +239,19 @@ export default class TradeAPI {
     return this.coinGecko.fetchCoinPrices({contractAddresses, vsCurrencies});
   }
 
-  public async fetchGasPrice(speed: GasOracleSpeed): Promise<number> {
+  /**
+   * Fetches the recommended gas price for a specified execution speed.
+   *
+   * @param  speed                   (Optional) string value: "average" | "fast" | "fastest" (Default: fast)
+   *
+   * @return                         Number: gas price
+   */
+  public async fetchGasPriceAsync(speed?: GasOracleSpeed): Promise<number> {
     await this.initializeForChain();
     const oracle = new GasOracleService(this.chainId);
     return oracle.fetchGasPrice(speed);
   }
+
 
   private async initializeForChain() {
     if (this.coinGecko === undefined) {

@@ -122,6 +122,24 @@ export class CoinGeckoDataService {
     return this.tokenMap;
   }
 
+  public convertTokenListToAddressMap(list: CoinGeckoTokenData[] = []): CoinGeckoTokenMap {
+    const tokenMap: CoinGeckoTokenMap = {};
+
+    for (const entry of list) {
+      tokenMap[entry.address] = Object.assign({}, entry);
+    }
+
+    return tokenMap;
+  }
+
+  private getPlatform(): string {
+    switch (this.chainId) {
+      case 1: return 'ethereum';
+      case 137: return 'polygon-pos';
+      default: return '';
+    }
+  }
+
   private async fetchEthereumTokenList(): Promise<CoinGeckoTokenData[]> {
     const url = 'https://tokens.coingecko.com/uniswap/all.json';
     const response = await axios.get(url);
@@ -225,23 +243,5 @@ export class CoinGeckoDataService {
 
     const data = (await axios.get(url)).data;
     return data;
-  }
-
-  private convertTokenListToAddressMap(list: CoinGeckoTokenData[] = []): CoinGeckoTokenMap {
-    const tokenMap: CoinGeckoTokenMap = {};
-
-    for (const entry of list) {
-      tokenMap[entry.address] = Object.assign({}, entry);
-    }
-
-    return tokenMap;
-  }
-
-  private getPlatform(): string {
-    switch (this.chainId) {
-      case 1: return 'ethereum';
-      case 137: return 'polygon-pos';
-      default: return '';
-    }
   }
 }

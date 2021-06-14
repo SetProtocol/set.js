@@ -67,7 +67,6 @@ export class GasOracleService {
     const url = 'https://www.gasnow.org/api/v3/gas/price';
     const data: GasNowData = (await axios.get(url)).data.data;
 
-    // EthGasStation returns gas price in x10 Gwei (divite by 10 to convert it to gwei)
     switch (speed) {
       case GasOracleService.AVERAGE: return data.standard / 1e9;
       case GasOracleService.FAST:    return data.fast / 1e9;

@@ -63,7 +63,7 @@ axios.get.mockImplementation(val => {
 // @ts-ignore
 provider.estimateGas = jest.fn((arg: any) => Promise.resolve(BigNumber.from(300_000)));
 
-describe('TradeQuoteAPI', () => {
+describe('TradeQuoter', () => {
   let streamingFeeModuleAddress: Address;
   let protocolViewerAddress: Address;
   let setTokenCreatorAddress: Address;

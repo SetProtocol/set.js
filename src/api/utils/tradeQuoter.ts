@@ -235,7 +235,7 @@ export class TradeQuoter {
 
     const fromTokenAmount = quote.sellAmount;
 
-    // Convert to BigDecimal to get cieling in fromUnits calculation
+    // Convert to BigDecimal to get ceiling in fromUnits calculation
     // This is necessary to derive the trade amount ZeroEx expects when scaling is
     // done in the TradeModule contract. (ethers.FixedNumber does not work for this case)
     const fromTokenAmountBD = new BigDecimal(fromTokenAmount.toString());
@@ -422,8 +422,7 @@ export class TradeQuoter {
       const gasCostBuffer = (100 + this.tradeQuoteGasBuffer) / 100;
       return Math.floor(gas.toNumber() * gasCostBuffer);
     } catch (error) {
-      console.log('error --> ' + error);
-      throw new Error('Unable to fetch gas cost estimate for trade');
+      throw new Error('Unable to fetch gas cost estimate for trade' + error);
     }
   }
 

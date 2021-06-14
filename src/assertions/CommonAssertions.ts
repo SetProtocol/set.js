@@ -120,7 +120,7 @@ export class CommonAssertions {
     const validChainIds = [1, 137];
 
     if ( !validChainIds.includes(chainId)) {
-      throw new Error('Unsupported chainId: ${chainId}. Must be one of ${validChainIds}');
+      throw new Error(`Unsupported chainId: ${chainId}. Must be one of ${validChainIds}`);
     }
   }
 }
