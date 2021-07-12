@@ -109,6 +109,7 @@ describe('TradeQuoter', () => {
       let subjectSetTokenAddress: Address;
       let subjectChainId: number;
       let subjectSetToken: SetTokenAPI;
+      let subjectFeePercentage: number;
 
       beforeEach(async () => {
         subjectFromToken = '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2'; // MKR
@@ -119,6 +120,7 @@ describe('TradeQuoter', () => {
         subjectRawAmount = '.5';
         subjectChainId = 1;
         subjectSetToken = setTokenAPI;
+        subjectFeePercentage = 1;
       });
 
       async function subject(): Promise<TradeQuote> {
@@ -129,6 +131,7 @@ describe('TradeQuoter', () => {
           toTokenDecimals: subjectToTokenDecimals,
           rawAmount: subjectRawAmount,
           fromAddress: subjectSetTokenAddress,
+          feePercentage: subjectFeePercentage,
           chainId: subjectChainId,
           setToken: subjectSetToken,
           tradeModule: tradeModuleWrapper,

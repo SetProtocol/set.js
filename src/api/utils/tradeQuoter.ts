@@ -54,7 +54,7 @@ export class TradeQuoter {
   private feePercentage: number = 0;
   private isFirmQuote: boolean = true;
   private slippagePercentage: number = 2;
-  private excludedSources: string[] = ['Kyber', 'Eth2Dai', 'Uniswap', 'Mesh'];
+  private excludedSources: string[] = ['Kyber', 'Eth2Dai', 'Mesh'];
   private zeroExApiKey: string;
 
   constructor(zeroExApiKey: string = '') {
@@ -113,7 +113,8 @@ export class TradeQuoter {
       isFirmQuote,
       slippagePercentage,
       feeRecipient,
-      excludedSources
+      excludedSources,
+      feePercentage,
     );
 
     // Sanity check response from quote APIs
@@ -215,7 +216,8 @@ export class TradeQuoter {
     isFirmQuote: boolean,
     slippagePercentage: number,
     feeRecipient: Address,
-    excludedSources: string[]
+    excludedSources: string[],
+    feePercentage: number,
   ) {
     const zeroEx = new ZeroExTradeQuoter({
       chainId: chainId,
@@ -230,7 +232,8 @@ export class TradeQuoter {
       isFirmQuote,
       (slippagePercentage / 100),
       feeRecipient,
-      excludedSources
+      excludedSources,
+      (feePercentage / 100)
     );
 
     const fromTokenAmount = quote.sellAmount;

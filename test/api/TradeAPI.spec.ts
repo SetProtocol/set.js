@@ -224,6 +224,7 @@ describe('TradeAPI', () => {
     let subjectFromAddress: Address;
     let subjectSetToken: SetTokenAPI;
     let subjectGasPrice: number;
+    let subjectFeePercentage: number;
 
     beforeEach(async () => {
       subjectFromToken = '0xAAAA15AA9B462ed4fC84B5dFc43Fd2a10a54B569';
@@ -234,6 +235,7 @@ describe('TradeAPI', () => {
       subjectFromAddress = '0xCCCC262A92581EC09C2d522b48bCcd9E3C8ACf9C';
       subjectSetToken = <unknown>{ val: 'settoken' } as SetTokenAPI;
       subjectGasPrice = 20;
+      subjectFeePercentage = 1;
     });
 
     async function subject(): Promise<TradeQuote> {
@@ -245,7 +247,10 @@ describe('TradeAPI', () => {
         subjectRawAmount,
         subjectFromAddress,
         subjectSetToken,
-        subjectGasPrice
+        subjectGasPrice,
+        undefined,
+        undefined,
+        subjectFeePercentage
       );
     }
 
@@ -264,7 +269,7 @@ describe('TradeAPI', () => {
         gasPrice: subjectGasPrice,
         slippagePercentage: undefined,
         isFirmQuote: undefined,
-        feePercentage: undefined,
+        feePercentage: subjectFeePercentage,
         feeRecipient: undefined,
         excludedSources: undefined,
       };

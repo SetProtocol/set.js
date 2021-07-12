@@ -40,7 +40,6 @@ export class ZeroExTradeQuoter {
   private assert: Assertions;
 
   private swapQuoteRoute = '/swap/v1/quote';
-  private feePercentage: number = 0;
   private affiliateAddress: Address = '0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55';
   private skipValidation: boolean = true;
 
@@ -69,9 +68,10 @@ export class ZeroExTradeQuoter {
     sellAmount: BigNumber,
     takerAddress: Address,
     isFirm: boolean,
-    slippagePercentage,
-    feeRecipient,
-    excludedSources
+    slippagePercentage: number,
+    feeRecipient: Address,
+    excludedSources: string[],
+    feePercentage: number
   ): Promise<ZeroExTradeQuote> {
     const url = `${this.host}${this.swapQuoteRoute}`;
 
@@ -84,7 +84,7 @@ export class ZeroExTradeQuoter {
       excludedSources: excludedSources.join(','),
       skipValidation: this.skipValidation,
       feeRecipient: feeRecipient,
-      buyTokenPercentageFee: this.feePercentage,
+      buyTokenPercentageFee: feePercentage,
       affiliateAddress: this.affiliateAddress,
       intentOnFilling: isFirm,
     };

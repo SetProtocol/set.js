@@ -192,7 +192,7 @@ export const tradeQuoteFixtures = {
        toTokenPriceUsd: '$1,614.79',
        gasCostsUsd: '$47.91',
        gasCostsChainCurrency: '0.0192150 ETH',
-       feePercentage: '0.00%',
+       feePercentage: '1.00%',
        slippage: '-1.10%',
     },
   },
