@@ -253,7 +253,8 @@ export class TradeQuoter {
     // BigNumber does not do fixed point math & FixedNumber underflows w/ numbers less than 1
     // Multiply the slippage by a factor and divide the end result by same...
     const percentMultiplier = 1000;
-    const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippagePercentage));
+    const slippageAndFee = slippagePercentage + feePercentage;
+    const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippageAndFee));
     const toTokenAmountMinusSlippage = toTokenAmount.mul(slippageToleranceBN).div(percentMultiplier);
     const toUnits = toTokenAmountMinusSlippage.mul(SCALE).div(setTotalSupply);
 
