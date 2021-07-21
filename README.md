@@ -13,7 +13,7 @@
 </p>
 
 # set.js
-`setprotocol.js` is a library for interacting with Set Protocol V1 smart contracts.
+`set.js` is a library for interacting with Set Protocol V2 smart contracts.
 This library enables you to create, issue, redeem, and trade for Sets
 
 #### Take a look at our [developer portal](https://docs.tokensets.com/) for the fastest way to get up and running.
