@@ -22,6 +22,8 @@ import {
   bytesSchema,
   numberSchema,
   wholeNumberSchema,
+  jsNumberSchema,
+  stringSchema
 } from './commonSchemas';
 
 export const schemas = {
@@ -30,4 +32,6 @@ export const schemas = {
   bytesSchema,
   bytes32Schema,
   wholeNumberSchema,
+  jsNumberSchema,
+  stringSchema,
 };

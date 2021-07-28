@@ -46,3 +46,13 @@ export const wholeNumberSchema = {
   type: 'object',
   format: 'wholeBigNumber',
 };
+
+export const jsNumberSchema = {
+  id: '/JsNumber',
+  type: 'number',
+};
+
+export const stringSchema = {
+  id: '/String',
+  type: 'string',
+};

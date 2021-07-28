@@ -123,7 +123,7 @@ class Set {
       assertions
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
-    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress);
+    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey);
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);

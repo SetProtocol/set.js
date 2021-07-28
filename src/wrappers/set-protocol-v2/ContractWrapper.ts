@@ -169,6 +169,16 @@ export default class ContractWrapper {
   }
 
   /**
+   * Load TradeModule contract without signer (for running populateTransaction)
+   *
+   * @param  tradeModuleAddress           Address of the trade module
+   * @return                              TradeModule contract instance
+   */
+  public loadTradeModuleWithoutSigner(tradeModuleAddress: Address): TradeModule {
+      return TradeModule__factory.connect(tradeModuleAddress);
+  }
+
+  /**
    * Load NavIssuanceModule contract
    *
    * @param  navIssuanceModuleAddress     Address of the NAV issuance module

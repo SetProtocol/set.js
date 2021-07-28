@@ -8,6 +8,11 @@ import TradeAPI from './TradeAPI';
 import NavIssuanceAPI from './NavIssuanceAPI';
 import PriceOracleAPI from './PriceOracleAPI';
 import DebtIssuanceAPI from './DebtIssuanceAPI';
+import {
+  TradeQuoter,
+  CoinGeckoDataService,
+  GasOracleService
+} from './utils';
 
 export {
   BlockchainAPI,
@@ -20,4 +25,7 @@ export {
   NavIssuanceAPI,
   PriceOracleAPI,
   DebtIssuanceAPI,
+  TradeQuoter,
+  CoinGeckoDataService,
+  GasOracleService
 };

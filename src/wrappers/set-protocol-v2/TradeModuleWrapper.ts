@@ -111,4 +111,49 @@ export default class TradeModuleWrapper {
       txOptions
     );
   }
+
+  /**
+   * Estimate gas cost for executing a trade on a supported DEX.
+   *
+   * @dev Although the SetToken units are passed in for the send and receive quantities, the total quantity
+   * sent and received is the quantity of SetToken units multiplied by the SetToken totalSupply.
+   *
+   * @param setTokenAddress             Address of the SetToken to trade
+   * @param exchangeName                Human readable name of the exchange in the integrations registry
+   * @param sendTokenAddress            Address of the token to be sent to the exchange
+   * @param sendQuantity                Units of token in SetToken sent to the exchange
+   * @param receiveTokenAddress         Address of the token that will be received from the exchange
+   * @param minReceiveQuantity          Min units of token in SetToken to be received from the exchange
+   * @param data                        Arbitrary bytes to be used to construct trade call data
+   * @param callerAddress               Address of caller
+   *
+   * @return                            Transaction hash of the trade transaction
+   */
+  public async estimateGasForTradeAsync(
+    setTokenAddress: Address,
+    exchangeName: string,
+    sendTokenAddress: Address,
+    sendQuantity: BigNumber,
+    receiveTokenAddress: Address,
+    minReceivedQuantity: BigNumber,
+    data: string,
+    callerAddress: Address
+  ): Promise<BigNumber> {
+    const tradeModuleInstance = this.contracts.loadTradeModuleWithoutSigner(
+      this.tradeModuleAddress,
+    );
+
+    const tx = await tradeModuleInstance.populateTransaction.trade(
+      setTokenAddress,
+      exchangeName,
+      sendTokenAddress,
+      sendQuantity,
+      receiveTokenAddress,
+      minReceivedQuantity,
+      data,
+      { from: callerAddress }
+    );
+
+    return this.provider.estimateGas(tx);
+  }
 }
