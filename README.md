@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://circleci.com/gh/SetProtocol/set.js/tree/master" target="_blank" rel="noopener">
-    <img src="https://img.shields.io/circleci/project/github/SetProtocol/set.js/master.svg" />
+    <img src="https://circleci.com/gh/SetProtocol/set.js.svg?style=shield" />
   </a>
   <a href='https://github.com/SetProtocol/set.js/blob/master/LICENSE' target="_blank" rel="noopener">
     <img src='https://img.shields.io/badge/License-Apache%202.0-blue.svg' alt='License' />
