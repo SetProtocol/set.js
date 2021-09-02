@@ -153,6 +153,47 @@ export const tradeQuoteFixtures = {
     },
   },
 
+  // Endpoint used by UniswapV3
+  arbitrumBridgeTokenRequest: 'https://bridge.arbitrum.io/token-list-42161.json',
+  arbitrumBridgeTokenResponse: {
+    data: {
+      tokens: [{
+        'chainId': 42161,
+        'address': '0x0e15258734300290a651FdBAe8dEb039a8E7a2FA',
+        'name': 'Alchemy',
+        'symbol': 'ALCH',
+        'decimals': 18,
+        'logoURI': '',
+        'extensions': {
+            'l1Address': '0x0000A1c00009A619684135B824Ba02f7FbF3A572',
+            'l1GatewayAddress': '0xa3A7B6F88361F48403514059F1F16C8E78d60EeC',
+        },
+      }, {
+        'chainId': 42161,
+        'address': '0xBfa641051Ba0a0Ad1b0AcF549a89536A0D76472E',
+        'name': 'Badger',
+        'symbol': 'BADGER',
+        'decimals': 18,
+        'logoURI': '',
+        'extensions': {
+            'l1Address': '0x3472A5A71965499acd81997a54BBA8D852C6E53d',
+            'l1GatewayAddress': '0xa3A7B6F88361F48403514059F1F16C8E78d60EeC',
+        },
+      }, {
+        'chainId': 42161,
+        'address': '0x040d1EdC9569d4Bab2D15287Dc5A4F10F56a56B8',
+        'name': 'Balancer',
+        'symbol': 'BAL',
+        'decimals': 18,
+        'logoURI': '',
+        'extensions': {
+            'l1Address': '0xba100000625a3754423978a60c9317c58a424e3D',
+            'l1GatewayAddress': '0xa3A7B6F88361F48403514059F1F16C8E78d60EeC',
+        },
+      }],
+    },
+  },
+
   coinGeckoPricesRequestEth: 'https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2,0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e&vs_currencies=usd,usd,usd',
   coinGeckoPricesResponseEth: {
     data: {

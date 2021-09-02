@@ -43,8 +43,10 @@ export const ETH_CURRENCY_CODE = 'eth';
  * @title CoinGeckoDataService
  * @author Set Protocol
  *
- * A utility library for fetching token metadata and coin prices from Coingecko for Ethereum
- * and Polygon chains
+ * A utility library for fetching token metadata and coin prices from Coingecko
+ * + Ethereum: (1)
+ * + Polygon (137)
+ * + Arbitrum (42161)
  */
 export class CoinGeckoDataService {
   chainId: number;
@@ -102,6 +104,9 @@ export class CoinGeckoDataService {
       case 137:
         this.tokenList = await this.fetchPolygonTokenList();
         break;
+      case 42161:
+        this.tokenList = await this.fetchArbitrumTokenList();
+        break;
     }
     this.tokenMap = this.convertTokenListToAddressMap(this.tokenList);
 
@@ -136,6 +141,7 @@ export class CoinGeckoDataService {
     switch (this.chainId) {
       case 1: return 'ethereum';
       case 137: return 'polygon-pos';
+      case 42161: return 'arbitrum';
       default: return '';
     }
   }
@@ -243,5 +249,11 @@ export class CoinGeckoDataService {
 
     const data = (await axios.get(url)).data;
     return data;
+  }
+
+  private async fetchArbitrumTokenList(): Promise<CoinGeckoTokenData[]> {
+    const url = 'https://bridge.arbitrum.io/token-list-42161.json';
+    const response = await axios.get(url);
+    return response.data.tokens;
   }
 }
