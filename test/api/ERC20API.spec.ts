@@ -188,7 +188,7 @@ describe('ERC20API', () => {
       nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
-    async function subject(): Promise<BigNumber> {
+    async function subject(): Promise<number> {
       return await erc20API.getDecimalsAsync(
         subjectTokenAddress,
         nullCallerAddress,

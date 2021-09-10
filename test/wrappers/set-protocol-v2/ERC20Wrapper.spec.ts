@@ -58,7 +58,7 @@ describe('ERC20Wrapper', () => {
     const tokenSupply: BigNumber = ether(1000000000);
     const tokenName: string = 'Token';
     const tokenSymbol: string = 'Symbol';
-    const tokenDecimals: BigNumber = BigNumber.from(18);
+    const tokenDecimals: number = 18;
 
     let subjectTokenAddress: Address;
 
@@ -71,7 +71,7 @@ describe('ERC20Wrapper', () => {
       name: string,
       symbol: string,
       supply: BigNumber,
-      decimals: BigNumber,
+      decimals: number,
     }> {
       const name = await erc20Wrapper.name(subjectTokenAddress);
       const symbol = await erc20Wrapper.symbol(subjectTokenAddress);
@@ -87,7 +87,7 @@ describe('ERC20Wrapper', () => {
       expect(name).to.eql(tokenName);
       expect(symbol).to.eql(tokenSymbol);
       expect(supply.toString()).to.eql(tokenSupply.toString());
-      expect(decimals.toString()).to.eql(tokenDecimals.toString());
+      expect(decimals).to.eql(tokenDecimals);
     });
   });
 

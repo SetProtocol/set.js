@@ -216,7 +216,13 @@ export default class DebtIssuanceAPI {
     quantity: BigNumber,
     isIssue: boolean,
     callerAddress: Address = undefined,
-  ): Promise<(BigNumber)[][]> {
+  ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        totalQuantity: BigNumber;
+        managerFee: BigNumber;
+        protocolFee: BigNumber;
+      }
+    > {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
     this.assert.common.isNotUndefined(isIssue, 'isIssue arg must be a boolean.');
 
