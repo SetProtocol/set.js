@@ -38,13 +38,6 @@
     "engines": {
         "node": ">=10.16.0"
     },
-    "resolutions": {
-        "@ethersproject/abi": "5.4.1",
-        "@ethersproject/bignumber": "5.4.1",
-        "@ethersproject/hdnode": "5.4.0",
-        "@ethersproject/transactions": "5.4.0",
-        "@ethersproject/providers": "5.4.5"
-    },
     "devDependencies": {
         "@types/node": "^14.0.23",
         "chai": "^4.2.0",
