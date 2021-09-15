@@ -525,7 +525,13 @@ describe('DebtIssuanceModuleWrapper', () => {
       subjectCaller = functionCaller;
     });
 
-    async function subject(): Promise<(BigNumber)[][]> {
+    async function subject(): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        totalQuantity: BigNumber;
+        managerFee: BigNumber;
+        protocolFee: BigNumber;
+      }
+    > {
       await debtIssuanceModule.initialize(
         subjectSetTokenAddress,
         subjectMaxManagerFee,

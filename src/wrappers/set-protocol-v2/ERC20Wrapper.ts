@@ -128,7 +128,7 @@ export default class ERC20Wrapper {
   public async decimals(
     tokenAddress: Address,
     callerAddress: Address = undefined
-  ): Promise<BigNumber> {
+  ): Promise<number> {
     const tokenInstance = await this.contracts.loadERC20Async(
       tokenAddress,
       callerAddress

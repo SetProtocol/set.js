@@ -87,7 +87,7 @@ export default class SetTokenAPI {
     symbol: string,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
-  ): Promise<Address[]> {
+  ): Promise<ContractTransaction> {
     this.assert.common.isNotEmptyArray(componentAddresses, 'Component addresses must contain at least one component.');
     this.assert.common.isEqualLength(componentAddresses, units, 'Component addresses and units must be equal length.');
     this.assert.schema.isValidAddressList('componentAddresses', componentAddresses);

@@ -24,7 +24,6 @@ import {
   BasicIssuanceModule,
   DebtIssuanceModule,
   Controller,
-  ERC20,
   ProtocolViewer,
   SetToken,
   SetTokenCreator,
@@ -32,7 +31,7 @@ import {
   TradeModule,
   NavIssuanceModule,
   PriceOracle,
-} from '@setprotocol/set-protocol-v2/dist/utils/contracts';
+} from '@setprotocol/set-protocol-v2/typechain';
 import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
 import { DebtIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModule__factory';
 import { Controller__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/Controller__factory';
@@ -71,7 +70,7 @@ export default class ContractWrapper {
   public async loadControllerContractAsync(
     controllerAddress: Address,
     signer: Signer,
-  ): Controller {
+  ): Promise<Controller> {
     const cacheKey = `Controller_${controllerAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
@@ -97,12 +96,12 @@ export default class ContractWrapper {
   public async loadERC20Async(
     tokenAddress: Address,
     callerAddress?: Address,
-  ): SetToken {
+  ): Promise<SetToken> {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `ERC20_${tokenAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
-      return this.cache[cacheKey] as ERC20;
+      return this.cache[cacheKey] as SetToken;
     } else {
       const tokenContract = ERC20__factory.connect(
         tokenAddress,
@@ -124,7 +123,7 @@ export default class ContractWrapper {
   public async loadBasicIssuanceModuleAsync(
     basicIssuanceModuleAddress: Address,
     callerAddress?: Address,
-  ): BasicIssuanceModule {
+  ): Promise<BasicIssuanceModule> {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `BasicIssuance_${basicIssuanceModuleAddress}_${await signer.getAddress()}`;
 
@@ -151,7 +150,7 @@ export default class ContractWrapper {
   public async loadTradeModuleAsync(
     tradeModuleAddress: Address,
     callerAddress?: Address,
-  ): TradeModule {
+  ): Promise<TradeModule> {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `TradeModule_${tradeModuleAddress}_${await signer.getAddress()}`;
 
@@ -188,7 +187,7 @@ export default class ContractWrapper {
   public async loadNavIssuanceModuleAsync(
     navIssuanceModuleAddress: Address,
     callerAddress?: Address,
-  ): NavIssuanceModule {
+  ): Promise<NavIssuanceModule> {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `NavIssuanceModule_${navIssuanceModuleAddress}_${await signer.getAddress()}`;
 
@@ -215,7 +214,7 @@ export default class ContractWrapper {
   public async loadMasterPriceOracleAsync(
     masterOracleAddress: Address,
     callerAddress?: Address,
-  ): PriceOracle {
+  ): Promise<PriceOracle> {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `MasterPriceOracle_${masterOracleAddress}_${await signer.getAddress()}`;
 
@@ -242,7 +241,7 @@ export default class ContractWrapper {
   public async loadSetTokenAsync(
     setTokenAddress: Address,
     callerAddress?: Address,
-  ): SetToken {
+  ): Promise<SetToken> {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `SetToken_${setTokenAddress}_${await signer.getAddress()}`;
 
@@ -269,7 +268,7 @@ export default class ContractWrapper {
   public async loadSetTokenCreatorAsync(
     setTokenCreatorAddress: Address,
     signer: Signer,
-  ): SetTokenCreator {
+  ): Promise<SetTokenCreator> {
     const cacheKey = `SetTokenCreator_${setTokenCreatorAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
@@ -295,7 +294,7 @@ export default class ContractWrapper {
   public async loadStreamingFeeModuleAsync(
     streamingFeeModuleAddress: Address,
     callerAddress?: Address,
-  ): StreamingFeeModule {
+  ): Promise<StreamingFeeModule> {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `StreamingFeeModule_${streamingFeeModuleAddress}_${await signer.getAddress()}`;
 
@@ -322,7 +321,7 @@ export default class ContractWrapper {
   public async loadProtocolViewerContractAsync(
     protocolViewerAddress: Address,
     signer: Signer,
-  ): ProtocolViewer {
+  ): Promise<ProtocolViewer> {
     const cacheKey = `ProtocolViewer_${protocolViewerAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {
@@ -349,7 +348,7 @@ export default class ContractWrapper {
   public async loadDebtIssuanceModuleAsync(
     debtIssuanceModuleAddress: Address,
     callerAddress?: Address,
-  ): DebtIssuanceModule {
+  ): Promise<DebtIssuanceModule> {
     const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `DebtIssuanceModule_${debtIssuanceModuleAddress}_${await signer.getAddress()}`;
 

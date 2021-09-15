@@ -120,7 +120,7 @@ export default class ERC20API {
   public async getDecimalsAsync(
     tokenAddress: Address,
     callerAddress: Address = undefined
-  ): Promise<BigNumber> {
+  ): Promise<number> {
     this.assert.schema.isValidAddress('tokenAddress', tokenAddress);
 
     return this.erc20Wrapper.decimals(tokenAddress, callerAddress);

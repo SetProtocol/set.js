@@ -312,7 +312,13 @@ describe('DebtIssuanceAPI', () => {
       subjectCallerAddress = '0x0e2298E3B3390e3b945a5456fBf59eCc3f55DA16';
     });
 
-    async function subject(): Promise<(Address|BigNumber)[][]> {
+    async function subject(): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        totalQuantity: BigNumber;
+        managerFee: BigNumber;
+        protocolFee: BigNumber;
+      }
+    > {
       return await debtIssuanceAPI.calculateTotalFeesAsync(
         subjectSetTokenAddress,
         subjectQuantity,

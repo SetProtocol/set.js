@@ -121,7 +121,7 @@ describe('SetTokenAPI', () => {
       subjectTransactionOptions = {};
     });
 
-    async function subject(): Promise<Address[]> {
+    async function subject(): Promise<ContractTransaction> {
       return await setTokenAPI.createAsync(
         subjectComponentAddresses,
         subjectUnits,

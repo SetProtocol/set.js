@@ -222,7 +222,13 @@ export default class DebtIssuanceModuleWrapper {
     quantity: BigNumber,
     isIssue: boolean,
     callerAddress: Address = undefined,
-  ): Promise<(BigNumber)[][]> {
+  ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        totalQuantity: BigNumber;
+        managerFee: BigNumber;
+        protocolFee: BigNumber;
+      }
+    > {
     const debtIssuanceModuleInstance = await this.contracts.loadDebtIssuanceModuleAsync(
       this.debtIssuanceModuleAddress,
       callerAddress
