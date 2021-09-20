@@ -211,27 +211,21 @@ export class CoinGeckoDataService {
     return tokens;
   }
 
-  private async fetchPolygonMappedTokenList(): Promise<PolygonMappedTokenData> {
-    let offset = 0;
+  private async fetchPolygonMappedTokenList() {
     const tokens: PolygonMappedTokenData = {};
+    const url = 'https://api.thegraph.com/subgraphs/name/maticnetwork/mainnet-root-subgraphs';
+    const properties = ['id', 'rootToken', 'childToken'];
 
-    const url = 'https://tokenmapper.api.matic.today/api/v1/mapping?';
-    const params = 'map_type=[%22POS%22]&chain_id=137&limit=200&offset=';
+    const response = await pageResults({
+      api: url,
+      query: {
+        entity: 'tokenMappings',
+        properties: properties,
+      },
+    });
 
-    while (true) {
-      const response = await axios.get(`${url}${params}${offset}`);
-
-      if (response.data.message === 'success') {
-        for (const token of response.data.data.mapping) {
-          tokens[token.child_token.toLowerCase()] = token.root_token.toLowerCase();
-        }
-
-        if (response.data.data.has_next_page === true) {
-          offset += 200;
-          continue;
-        }
-      }
-      break;
+    for (const tokenMapping of response) {
+      tokens[tokenMapping.childToken.toLowerCase()] = tokenMapping.rootToken.toLowerCase();
     }
 
     return tokens;
