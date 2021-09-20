@@ -218,6 +218,7 @@ export const tradeQuoteFixtures = {
     }],
   },
 
+  sushiSubgraphRequestPoly: 'https://api.thegraph.com/subgraphs/name/sushiswap/matic-exchange',
   sushiSubgraphResponsePoly: [
     {
       id: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
@@ -267,8 +268,8 @@ export const tradeQuoteFixtures = {
       volumeUSD: 123000000.123 },
   ],
 
-  maticMapperRequestPoly: 'https://api.thegraph.com/subgraphs/name/sushiswap/matic-exchange',
-  maticMapperResponsePoly: {
+  maticMappingSubgraphRequestPoly: 'https://api.thegraph.com/subgraphs/name/maticnetwork/mainnet-root-subgraphs',
+  maticMappingSubgraphResponsePoly: {
     data: {
       tokenMappings: [{
         rootToken: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',

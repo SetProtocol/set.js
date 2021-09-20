@@ -57,12 +57,16 @@ axios.get.mockImplementation(val => {
     case fixture.coinGeckoTokenRequestPoly: return fixture.coinGeckoTokenResponsePoly;
     case fixture.coinGeckoPricesRequestEth: return fixture.coinGeckoPricesResponseEth;
     case fixture.coinGeckoPricesRequestPoly: return fixture.coinGeckoPricesResponsePoly;
-    case fixture.maticMapperRequestPoly: return fixture.maticMapperResponsePoly;
     case fixture.quickswapRequestPoly: return fixture.quickswapResponsePoly;
   }
 });
 
-pageResults.mockImplementation(() => fixture.sushiSubgraphResponsePoly);
+pageResults.mockImplementation(val => {
+  switch (val.api) {
+    case fixture.sushiSubgraphRequestPoly: return fixture.sushiSubgraphResponsePoly;
+    case fixture.maticMappingSubgraphRequestPoly: return fixture.maticMappingSubgraphResponsePoly;
+  }
+});
 
 describe('TradeAPI', () => {
   let tradeModuleAddress: Address;
