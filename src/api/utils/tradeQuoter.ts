@@ -35,7 +35,7 @@ import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { GasOracleService } from './gasOracle';
 import { ZeroExTradeQuoter } from './zeroex';
 
-export const ZERO_EX_ADAPTER_NAME = 'ZeroExApiAdapterV3';
+export const ZERO_EX_ADAPTER_NAME = 'ZeroExApiAdapterV4';
 
 const SCALE = BigNumber.from(10).pow(18);
 
