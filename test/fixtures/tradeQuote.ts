@@ -218,7 +218,6 @@ export const tradeQuoteFixtures = {
     }],
   },
 
-  sushiSubgraphRequestPoly: 'https://api.thegraph.com/subgraphs/name/sushiswap/matic-exchange',
   sushiSubgraphResponsePoly: [
     {
       id: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
@@ -268,18 +267,44 @@ export const tradeQuoteFixtures = {
       volumeUSD: 123000000.123 },
   ],
 
-  maticMappingSubgraphRequestPoly: 'https://api.thegraph.com/subgraphs/name/maticnetwork/mainnet-root-subgraphs',
-  maticMappingSubgraphResponsePoly: {
+  maticMapperRequestPoly: 'https://tokenmapper.api.matic.today/api/v1/mapping?map_type=[%22POS%22]&chain_id=137&limit=200&offset=0',
+  maticMapperResponsePoly: {
     data: {
-      tokenMappings: [{
-        rootToken: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-        childToken: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
-        id: 104,
+      message: 'success',
+      data: {
+        mapping: [{
+          root_token: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+          child_token: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+          mintable: false,
+          map_type: 'POS',
+          token_type: 'ERC20',
+          decimals: 8,
+          name: 'Wrapped BTC',
+          symbol: 'WBTC',
+          child_address_passed_by_user: true,
+          deleted: false,
+          chainId: 137,
+          id: 104,
+        },
+        { root_token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          child_token: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+          mintable: false,
+          map_type: 'POS',
+          token_type: 'ERC20',
+          decimals: 6,
+          name: 'USD Coin',
+          symbol: 'USDC',
+          child_address_passed_by_user: true,
+          deleted: false,
+          chainId: 137,
+          id: 95,
+        }],
+        limit: 200,
+        offset: 800,
+        has_next_page: false,
       },
-      { rootToken: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-        childToken: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
-        id: 95,
-      }],
+      mappedCount: 831,
+      requestsCount: 7,
     },
   },
 
