@@ -127,4 +127,7 @@ export type GasNowData = {
 
 export type GasOracleSpeed = 'average' | 'fast' | 'fastest';
 
-
+// TODO 
+export type ChevronData = {
+  suggestedPrice: number
+};

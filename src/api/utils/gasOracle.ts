@@ -19,6 +19,7 @@ import axios from 'axios';
 import Assertions from '../../assertions';
 
 import {
+  ChevronData,
   GasNowData,
   GasOracleSpeed,
 } from '../../types';
@@ -54,12 +55,34 @@ export class GasOracleService {
     this.assert.common.includes(['average', 'fast', 'fastest'], speed, 'Unsupported speed');
 
     switch (this.chainId) {
-      case 1: return this.getEthereumGasPrice(speed);
+      case 1: {
+        this.getChevronPrice(speed);
+        return this.getEthereumGasPrice(speed);
+      }
       case 137: return this.getPolygonGasPrice(speed);
 
       // This case should never run because chainId is validated
       // Needed to stop TS complaints about return sig
       default: return 0;
+    }
+  }
+
+  private async getChevronPrice(speed: GasOracleSpeed): Promise<nubmer> {
+    const url = 'https://chevron-production.tokensetsapi.com/twirp/twirp.setprotocol.chevron.Gas/GetGasPrice';
+
+    try {
+      const data: ChevronData = (await axios.post(
+        url,
+        {
+          Speed: speed,
+        }
+      ));
+
+      return data.suggestedPrice
+
+    } catch (err) {
+      // TODO - what's the best way to log in set.js? 
+      return
     }
   }
 
