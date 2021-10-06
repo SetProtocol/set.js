@@ -354,7 +354,10 @@ export class TradeQuoter {
     decimals: number,
     coinPrices: CoinGeckoCoinPrices
   ): string {
-    const coinPrice = coinPrices[address][USD_CURRENCY_CODE];
+    const coinPrice = (coinPrices[address])
+      ? coinPrices[address][USD_CURRENCY_CODE]
+      : 0;
+
     const normalizedAmount = this.normalizeTokenAmount(amount, decimals) * coinPrice;
     return new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(normalizedAmount);
   }
@@ -375,7 +378,11 @@ export class TradeQuoter {
   ): string {
     const totalGasCost = this.totalGasCost(gasPrice, gas);
     const chainCurrencyAddress = this.chainCurrencyAddress(chainId);
-    const coinPrice = coinPrices[chainCurrencyAddress][USD_CURRENCY_CODE];
+
+    const coinPrice = (coinPrices[chainCurrencyAddress])
+      ? coinPrices[chainCurrencyAddress][USD_CURRENCY_CODE]
+      : 0;
+
     const cost = totalGasCost * coinPrice;
 
     // Polygon prices are low - using 4 significant digits here so something besides zero appears
@@ -439,13 +446,23 @@ export class TradeQuoter {
     toTokenDecimals: number,
     coinPrices: CoinGeckoCoinPrices
   ): string {
-    const fromTokenPriceUsd = coinPrices[fromTokenAddress][USD_CURRENCY_CODE];
-    const toTokenPriceUsd = coinPrices[toTokenAddress][USD_CURRENCY_CODE];
+    const fromTokenPriceUsd = (coinPrices[fromTokenAddress])
+      ? (coinPrices[fromTokenAddress])[USD_CURRENCY_CODE]
+      : 0;
+
+    const toTokenPriceUsd = (coinPrices[toTokenAddress])
+      ? coinPrices[toTokenAddress][USD_CURRENCY_CODE]
+      : 0;
 
     const fromTokenTotalUsd = this.normalizeTokenAmount(fromTokenAmount, fromTokenDecimals) * fromTokenPriceUsd;
     const toTokenTotalUsd = this.normalizeTokenAmount(toTokenAmount, toTokenDecimals) * toTokenPriceUsd;
 
-    const slippageRaw = (fromTokenTotalUsd - toTokenTotalUsd) / fromTokenTotalUsd;
+    let slippageRaw = (fromTokenTotalUsd - toTokenTotalUsd) / fromTokenTotalUsd;
+
+    if (isNaN(slippageRaw)) {
+      slippageRaw = 0;
+    }
+
     return this.formatAsPercentage(slippageRaw * 100);
   }
 
