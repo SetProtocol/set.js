@@ -31,11 +31,29 @@ export type SetDetails = {
   totalSupply: BigNumber;
 };
 
+/**
+ * The base definition of a SetToken Position
+ */
 export type Position = {
+  /**
+   * Address of token in the Position
+   */
   component: string;
+  /**
+   * If not in default state, the address of associated module
+   */
   module: Address;
+  /**
+   * Each unit is the # of components per 10^18 of a SetToken
+   */
   unit: BigNumber;
+  /**
+   * The type of position denoted as a uint8
+   */
   positionState: number;
+  /**
+   * Arbitrary data
+   */
   data: string;
 };
 
