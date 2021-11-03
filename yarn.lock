@@ -849,10 +849,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@setprotocol/set-protocol-v2@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.1.1.tgz#26eb788f9ff1a2fe98e36951c21778b6f261d0cd"
-  integrity sha512-ZXCDdJjIP1/kqFbcKOESU4vu7SnF5mZVR4/7S61zN/NMRsnmo/6Udzno63igHVbFxpXuScYMQ3+PqtawJ0bm1g==
+"@setprotocol/set-protocol-v2@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.1.2.tgz#c88f3e3d4a3e059a543b221ab572b138ca4fc0f4"
+  integrity sha512-ZwvngLyQs7WXTENAA5Dx4UBI+gBlLsL+Hp192cUhuRcMmPCCxMpKTgj5ORu3iHk80NzlNHQ+U88+4BpbSScMjA==
   dependencies:
     ethers "^5.4.6"
     fs-extra "^5.0.0"
