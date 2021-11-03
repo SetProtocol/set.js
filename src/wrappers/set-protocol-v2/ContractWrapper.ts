@@ -23,6 +23,7 @@ import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import {
   BasicIssuanceModule,
   DebtIssuanceModule,
+  DebtIssuanceModuleV2,
   Controller,
   ProtocolViewer,
   SetToken,
@@ -34,6 +35,7 @@ import {
 } from '@setprotocol/set-protocol-v2/typechain';
 import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
 import { DebtIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModule__factory';
+import { DebtIssuanceModuleV2__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModuleV2__factory';
 import { Controller__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/Controller__factory';
 import { ERC20__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ERC20__factory';
 import { ProtocolViewer__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ProtocolViewer__factory';
@@ -362,6 +364,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = debtIssuanceModuleContract;
       return debtIssuanceModuleContract;
+    }
+  }
+
+  /**
+   * Load DebtIssuanceModuleV2 contract
+   *
+   * @param  debtIssuanceModuleV2Address    Address of the token contract
+   * @param  callerAddress                Address of caller, uses first one on node if none provided.
+   * @return                              DebtIssuanceModuleV2 contract instance
+   */
+   public async loadDebtIssuanceModuleV2Async(
+    debtIssuanceModuleV2Address: Address,
+    callerAddress?: Address,
+  ): Promise<DebtIssuanceModuleV2> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `DebtIssuanceModuleV2_${debtIssuanceModuleV2Address}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as DebtIssuanceModuleV2;
+    } else {
+      const debtIssuanceModuleV2Contract = DebtIssuanceModuleV2__factory.connect(
+        debtIssuanceModuleV2Address,
+        signer
+      );
+
+      this.cache[cacheKey] = debtIssuanceModuleV2Contract;
+      return debtIssuanceModuleV2Contract;
     }
   }
 }
