@@ -14,7 +14,10 @@ import DeployHelper from '@setprotocol/set-protocol-v2/dist/utils/deploys';
 import { SystemFixture } from '@setprotocol/set-protocol-v2/dist/utils/fixtures/systemFixture';
 import {
   DebtIssuanceModuleV2,
+  DebtModuleMock,
+  ModuleIssuanceHookMock,
   SetToken,
+  StandardTokenWithRoundingErrorMock,
 } from '@setprotocol/set-protocol-v2/dist/utils/contracts';
 
 import DebtIssuanceModuleV2Wrapper from '@src/wrappers/set-protocol-v2/DebtIssuanceModuleV2Wrapper';
@@ -25,6 +28,7 @@ const blockchain = new Blockchain(provider);
 
 describe('DebtIssuanceModuleV2Wrapper', () => {
   let owner: Address;
+  let manager: Address;
   let recipient: Address;
   let functionCaller: Address;
   let randomAddress: Address;
@@ -35,12 +39,17 @@ describe('DebtIssuanceModuleV2Wrapper', () => {
   let deployer: DeployHelper;
   let setup: SystemFixture;
 
+  let tokenWithRoundingError: StandardTokenWithRoundingErrorMock;
+  let debtModule: DebtModuleMock;
+  let externalPositionModule: ModuleIssuanceHookMock;
+
   beforeAll(async() => {
     [
       owner,
       recipient,
       functionCaller,
       randomAddress,
+      manager,
     ] = await provider.listAccounts();
 
     deployer = new DeployHelper(provider.getSigner(owner));
@@ -53,7 +62,13 @@ describe('DebtIssuanceModuleV2Wrapper', () => {
     await setup.initialize();
 
     debtIssuanceModuleV2 = await deployer.modules.deployDebtIssuanceModuleV2(setup.controller.address);
+    tokenWithRoundingError = await deployer.mocks.deployTokenWithErrorMock(owner, ether(1000000), ZERO);
+    debtModule = await deployer.mocks.deployDebtModuleMock(setup.controller.address, debtIssuanceModuleV2.address);
+    externalPositionModule = await deployer.mocks.deployModuleIssuanceHookMock();
+
     await setup.controller.addModule(debtIssuanceModuleV2.address);
+    await setup.controller.addModule(debtModule.address);
+    await setup.controller.addModule(externalPositionModule.address);
 
     debtIssuanceModuleV2Wrapper = new DebtIssuanceModuleV2Wrapper(provider, debtIssuanceModuleV2.address);
   });
@@ -333,6 +348,7 @@ describe('DebtIssuanceModuleV2Wrapper', () => {
 
   describe('#getRequiredComponentIssuanceUnits', () => {
     let setToken: SetToken;
+    let setTokenWithRoundingError: SetToken;
 
     let subjectSetTokenAddress: Address;
     let subjectMaxManagerFee: BigNumber;
@@ -349,6 +365,17 @@ describe('DebtIssuanceModuleV2Wrapper', () => {
         [ether(1), bitcoin(2)],
         [debtIssuanceModuleV2.address]
       );
+
+      setTokenWithRoundingError = await setup.createSetToken(
+        [tokenWithRoundingError.address],
+        [ether(1)],
+        [setup.issuanceModule.address, debtIssuanceModuleV2.address,
+          debtModule.address, externalPositionModule.address],
+        manager,
+        'DebtToken',
+        'DBT'
+      );
+      await externalPositionModule.initialize(setTokenWithRoundingError.address);
 
       subjectSetTokenAddress = setToken.address;
       subjectMaxManagerFee = ether(1);
@@ -412,19 +439,60 @@ describe('DebtIssuanceModuleV2Wrapper', () => {
       });
     });
 
-    describe('when a few blocks mine and interest accrues', async () => {
-      beforeEach(() => {
+    describe('when a few blocks mine and interest accrues', () => {
+      let subjectSetToken: Address;
+      let subjectQuantity: BigNumber;
+
+      const debtUnits: BigNumber = ether(100);
+      const accruedBalance = ether(.00001);
+      const issueFee = ether(0.005);
+      const preIssueHook = ADDRESS_ZERO;
+      const maxFee = ether(0.02);
+      const redeemFee = ether(0.005);
+
+      beforeEach(async () => {
+        await debtIssuanceModuleV2.connect(provider.getSigner(manager)).initialize(
+          setTokenWithRoundingError.address,
+          maxFee,
+          issueFee,
+          redeemFee,
+          recipient,
+          preIssueHook
+        );
+        await debtModule.connect(provider.getSigner(manager)).initialize(setTokenWithRoundingError.address);
+        await debtModule.addDebt(setTokenWithRoundingError.address, setup.dai.address, debtUnits);
+        await setup.dai.transfer(debtModule.address, ether(100.5));
+
+        const [, equityFlows ] = await debtIssuanceModuleV2.getRequiredComponentIssuanceUnits(
+          setTokenWithRoundingError.address,
+          ether(1));
+        await tokenWithRoundingError.approve(debtIssuanceModuleV2.address, equityFlows[0].mul(ether(1.005)));
+
+        subjectSetToken = setTokenWithRoundingError.address;
+        subjectQuantity = ether(1);
+
+        await tokenWithRoundingError.setError(accruedBalance);
+
         blockchain.waitBlocksAsync(100);
       });
 
-      it('should return the correct required quantity after syncing', async () => {
-        const [components, equityFlows, debtFlows] = await subject();
-        const wethFlows = preciseMul(subjectIssuanceQuantity, ether(1));
-        const wbtcFlows = preciseMulCeil(subjectIssuanceQuantity, bitcoin(2));
+      async function subject(): Promise<any> {
+        return debtIssuanceModuleV2.getRequiredComponentIssuanceUnits(
+          subjectSetToken,
+          subjectQuantity
+        );
+      }
 
-        const expectedComponents = await setToken.getComponents();
-        const expectedEquityFlows = [wethFlows, wbtcFlows];
-        const expectedDebtFlows = [ZERO, ZERO];
+      it('should return the correct issue token amounts', async () => {
+        const [components, equityFlows, debtFlows] = await subject();
+
+        const mintQuantity = preciseMul(subjectQuantity, ether(1).add(issueFee));
+        const daiFlows = preciseMulCeil(mintQuantity, debtUnits);
+        const wethFlows = preciseMul(mintQuantity, ether(1));
+
+        const expectedComponents = await setTokenWithRoundingError.getComponents();
+        const expectedEquityFlows = [wethFlows, ZERO];
+        const expectedDebtFlows = [ZERO, daiFlows];
 
         expect(JSON.stringify(expectedComponents)).to.eq(JSON.stringify(components));
         expect(JSON.stringify(expectedEquityFlows)).to.eq(JSON.stringify(equityFlows));
