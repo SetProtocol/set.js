@@ -339,7 +339,6 @@ export default class ContractWrapper {
     }
   }
 
-
   /**
    * Load DebtIssuanceModule contract
    *

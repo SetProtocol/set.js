@@ -29,6 +29,7 @@ import {
   NavIssuanceAPI,
   PriceOracleAPI,
   DebtIssuanceAPI,
+  DebtIssuanceV2API,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -97,6 +98,13 @@ class Set {
   public debtIssuance: DebtIssuanceAPI;
 
   /**
+   * An instance of the DebtIssuanceV2API class. Contains interfaces for interacting
+   * with the DebtIssuanceModuleV2 contract to issue and redeem tokens that accrue interest.
+   * Primarily used for ALM.
+   */
+  public debtIssuanceV2: DebtIssuanceV2API;
+
+  /**
    * An instance of the BlockchainAPI class. Contains interfaces for
    * interacting with the blockchain
    */
@@ -127,6 +135,7 @@ class Set {
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
+    this.debtIssuanceV2 = new DebtIssuanceV2API(ethersProvider, config.debtIssuanceModuleV2Address);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
   }
 }
