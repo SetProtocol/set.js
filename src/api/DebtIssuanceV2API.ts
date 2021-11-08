@@ -27,7 +27,7 @@ import DebtIssuanceModuleV2Wrapper from '../wrappers/set-protocol-v2/DebtIssuanc
 import Assertions from '../assertions';
 
 /**
- * @title  AlmIssuanceAPI
+ * @title  DebtIssuanceV2API
  * @author Set Protocol
  *
  * The DebtIssuanceModuleV2API exposes issue and redeem functionality for Sets that contain poitions that accrue
@@ -37,7 +37,7 @@ import Assertions from '../assertions';
  * in the manager hook, as well as specify issue and redeem fees.
  *
  */
-export default class AlmIssuanceAPI {
+export default class DebtIssuanceV2API {
   private debtIssuanceModuleV2Wrapper: DebtIssuanceModuleV2Wrapper;
   private assert: Assertions;
 
@@ -71,6 +71,7 @@ export default class AlmIssuanceAPI {
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
     this.assert.schema.isValidAddress('feeRecipient', feeRecipient);
+    this.assert.schema.isValidAddress('managerIssuanceHook', managerIssuanceHook);
 
     return await this.debtIssuanceModuleV2Wrapper.initialize(
       setTokenAddress,
