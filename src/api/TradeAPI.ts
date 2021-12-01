@@ -145,7 +145,7 @@ export default class TradeAPI {
    * @param  rawAmount            String quantity of token to sell (ex: "0.5")
    * @param  fromAddress          SetToken address which holds the buy / sell components
    * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from GasNow)
+   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
    * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0

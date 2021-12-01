@@ -119,10 +119,11 @@ export type ZeroExTradeQuote = {
   calldata: string
 };
 
-export type GasNowData = {
-  standard: number,
+export type EthGasStationData = {
   fast: number,
-  rapid: number
+  fastest: number,
+  safeLow: number,
+  average: number
 };
 
 export type GasOracleSpeed = 'average' | 'fast' | 'fastest';
