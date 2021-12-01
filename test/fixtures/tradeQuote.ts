@@ -71,25 +71,13 @@ export const tradeQuoteFixtures = {
     },
   },
 
-  ethGasStationRequest: 'https://ethgasstation.info/json/ethgasAPI.json',
+  ethGasStationRequest: 'https://ethgasstation.info/api/ethgasAPI.json',
   ethGasStationResponse: {
     data: {
       fast: 610,
       fastest: 610,
       safeLow: 178,
       average: 178,
-    },
-  },
-
-  gasNowRequest: 'https://www.gasnow.org/api/v3/gas/price',
-  gasNowResponse: {
-    data: {
-      data: {
-        rapid: 61000000000,
-        fast: 61000000000,
-        standard: 17800000000,
-        slow: 17800000000,
-      },
     },
   },
 

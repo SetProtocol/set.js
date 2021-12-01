@@ -51,7 +51,7 @@ jest.mock('graph-results-pager');
 // @ts-ignore
 axios.get.mockImplementation(val => {
   switch (val) {
-    case fixture.gasNowRequest: return fixture.gasNowResponse;
+    case fixture.ethGasStationRequest: return fixture.ethGasStationResponse;
     case fixture.maticGasStationRequest: return fixture.maticGasStationResponse;
     case fixture.coinGeckoTokenRequestEth: return fixture.coinGeckoTokenResponseEth;
     case fixture.coinGeckoTokenRequestPoly: return fixture.coinGeckoTokenResponsePoly;
@@ -503,7 +503,7 @@ describe('TradeAPI', () => {
       });
 
       it('should get gas price for the correct network', async() => {
-        const expectedGasPrice = fixture.gasNowResponse.data.data.fast / 1e9;
+        const expectedGasPrice = fixture.ethGasStationResponse.data.fast / 10;
         const gasPrice = await subject();
         expect(gasPrice).to.equal(expectedGasPrice);
       });
