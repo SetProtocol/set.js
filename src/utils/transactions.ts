@@ -7,7 +7,7 @@ export async function generateTxOpts(
   return {
     gasLimit: DEFAULT_GAS_LIMIT,
     // Do not set the gasPrice if EIP-1559 transaction overrides are being set.
-    ...((!txOverrides?.maxPriorityFeePerGas && !txOverrides?.maxFeePerGas) && {
+    ...(txOverrides?.type !== 2 && {
       gasPrice: DEFAULT_GAS_PRICE,
     }),
     ...txOverrides,
