@@ -24,6 +24,7 @@ import {
   BasicIssuanceModule,
   DebtIssuanceModule,
   DebtIssuanceModuleV2,
+  SlippageIssuanceModule,
   Controller,
   ProtocolViewer,
   SetToken,
@@ -36,6 +37,7 @@ import {
 import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
 import { DebtIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModule__factory';
 import { DebtIssuanceModuleV2__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModuleV2__factory';
+import { SlippageIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/SlippageIssuanceModule__factory';
 import { Controller__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/Controller__factory';
 import { ERC20__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ERC20__factory';
 import { ProtocolViewer__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ProtocolViewer__factory';
@@ -390,6 +392,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = debtIssuanceModuleV2Contract;
       return debtIssuanceModuleV2Contract;
+    }
+  }
+
+  /**
+   * Load SlippageIssuanceModule contract
+   *
+   * @param  slippageIssuanceModuleAddress    Address of the token contract
+   * @param  callerAddress                    Address of caller, uses first one on node if none provided.
+   * @return                                  SlippageIssuanceModule contract instance
+   */
+   public async loadSlippageIssuanceModuleAsync(
+    slippageIssuanceModuleAddress: Address,
+    callerAddress?: Address,
+  ): Promise<SlippageIssuanceModule> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `SlippageIssuanceModule_${slippageIssuanceModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as SlippageIssuanceModule;
+    } else {
+      const slippageIssuanceModuleContract = SlippageIssuanceModule__factory.connect(
+        slippageIssuanceModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = slippageIssuanceModuleContract;
+      return slippageIssuanceModuleContract;
     }
   }
 }
