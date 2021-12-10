@@ -38,6 +38,12 @@ export class CommonAssertions {
     }
   }
 
+  public isUniqueList(array: any[], errorMessage: string) {
+    if ((new Set(array)).size !== array.length) {
+      throw new Error(errorMessage);
+    }
+  }
+
   public isGreaterThan(quantity1: BigNumber, quantity2: BigNumber, errorMessage: string) {
     if (quantity1.lte(quantity2)) {
       throw new Error(errorMessage);

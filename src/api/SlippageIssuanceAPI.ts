@@ -23,31 +23,31 @@ import { ADDRESS_ZERO } from '@setprotocol/set-protocol-v2/dist/utils/constants'
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/lib/ethers';
 
-import DebtIssuanceModuleV2Wrapper from '../wrappers/set-protocol-v2/DebtIssuanceModuleV2Wrapper';
+import SlippageIssuanceModuleWrapper from '../wrappers/set-protocol-v2/SlippageIssuanceModuleWrapper';
 import Assertions from '../assertions';
 
 /**
- * @title  DebtIssuanceV2API
+ * @title  SlippageIssuanceAPI
  * @author Set Protocol
  *
- * The DebtIssuanceModuleV2API exposes issue and redeem functionality for Sets that contain poitions that accrue
+ * The SlippageIssuanceModuleAPI exposes issue and redeem functionality for Sets that contain poitions that accrue
  * interest per block. The getter function syncs the position balance to the current block, so subsequent blocks
  * will cause the position value to be slightly out of sync (a buffer is needed). This API is primarily used for Sets
  * that rely on the ALM contracts to manage debt. The manager can define arbitrary issuance logic
  * in the manager hook, as well as specify issue and redeem fees.
  *
  */
-export default class DebtIssuanceV2API {
-  private debtIssuanceModuleV2Wrapper: DebtIssuanceModuleV2Wrapper;
+export default class SlippageIssuanceAPI {
+  private slippageIssuanceModuleWrapper: SlippageIssuanceModuleWrapper;
   private assert: Assertions;
 
-  public constructor(provider: Provider, debtIssuanceModuleV2Address: Address, assertions?: Assertions) {
-    this.debtIssuanceModuleV2Wrapper = new DebtIssuanceModuleV2Wrapper(provider, debtIssuanceModuleV2Address);
+  public constructor(provider: Provider, slippageIssuanceModuleAddress: Address, assertions?: Assertions) {
+    this.slippageIssuanceModuleWrapper = new SlippageIssuanceModuleWrapper(provider, slippageIssuanceModuleAddress);
     this.assert = assertions || new Assertions();
   }
 
   /**
-   * Initializes the DebtIssuanceModuleV2 to the SetToken. Only callable by the SetToken's manager.
+   * Initializes the SlippageIssuanceModule to the SetToken. Only callable by the SetToken's manager.
    *
    * @param setTokenAddress             Address of the SetToken to initialize
    * @param maxManagerFee               Maximum fee that can be charged on issue and redeem
@@ -73,7 +73,7 @@ export default class DebtIssuanceV2API {
     this.assert.schema.isValidAddress('feeRecipient', feeRecipient);
     this.assert.schema.isValidAddress('managerIssuanceHook', managerIssuanceHook);
 
-    return await this.debtIssuanceModuleV2Wrapper.initialize(
+    return await this.slippageIssuanceModuleWrapper.initialize(
       setTokenAddress,
       maxManagerFee,
       managerIssueFee,
@@ -90,23 +90,34 @@ export default class DebtIssuanceV2API {
    *
    * @param  setTokenAddress             Address of the SetToken contract to issue
    * @param  quantity                    Quantity to issue
+   * @param  checkedComponents           Array of components to be checked to verify required collateral doesn't
+   *                                       exceed defined max. Each entry must be unique.
+   * @param  maxTokenAmountsIn           Max amount of component willing to transfer in to collateralize quantity
+   *                                       amount of setToken.
    * @param  setTokenRecipientAddress    Address of the recipient of the issued SetToken
    * @param  callerAddress               Address of caller (optional)
    * @return                             Transaction hash of the issuance transaction
    */
-  public async issueAsync(
+  public async issueWithSlippageAsync(
     setTokenAddress: Address,
     quantity: BigNumber,
+    checkedComponents: Address[],
+    maxTokenAmountsIn: BigNumber[],
     setTokenRecipientAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
     this.assert.schema.isValidAddress('setTokenRecipientAddress', setTokenRecipientAddress);
+    this.assert.common.isUniqueList(checkedComponents, 'checkedComponents List needs to be unique');
+    this.assert.common.isEqualLength(checkedComponents, maxTokenAmountsIn,
+      'checkedComponents and maxTokenAmountsIn need to be equal length');
 
-    return await this.debtIssuanceModuleV2Wrapper.issue(
+    return await this.slippageIssuanceModuleWrapper.issueWithSlippage(
       setTokenAddress,
       quantity,
+      checkedComponents,
+      maxTokenAmountsIn,
       setTokenRecipientAddress,
       callerAddress,
       txOpts
@@ -118,23 +129,34 @@ export default class DebtIssuanceV2API {
    *
    * @param  setTokenAddress           Address of the SetToken contract
    * @param  quantity                  Quantity to redeem
+   * @param  checkedComponents         Array of components to be checked to verify required collateral doesn't
+   *                                     exceed defined max. Each entry must be unique.
+   * @param  minTokenAmountsOut        Min amount of component willing to receive to redeem quantity
+   *                                     amount of setToken.
    * @param  setTokenRecipientAddress  Address of recipient of component tokens from redemption
    * @param  callerAddress             Address of caller (optional)
    * @return                           Transaction hash of the redemption transaction
    */
-  public async redeemAsync(
+  public async redeemWithSlippageAsync(
     setTokenAddress: Address,
     quantity: BigNumber,
+    checkedComponents: Address[],
+    minTokenAmountsOut: BigNumber[],
     setTokenRecipientAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
     this.assert.schema.isValidAddress('setTokenRecipientAddress', setTokenRecipientAddress);
+    this.assert.common.isUniqueList(checkedComponents, 'checkedComponents List needs to be unique');
+    this.assert.common.isEqualLength(checkedComponents, minTokenAmountsOut,
+      'checkedComponents and minTokenAmountsOut need to be equal length');
 
-    return await this.debtIssuanceModuleV2Wrapper.redeem(
+    return await this.slippageIssuanceModuleWrapper.redeemWithSlippage(
       setTokenAddress,
       quantity,
+      checkedComponents,
+      minTokenAmountsOut,
       setTokenRecipientAddress,
       callerAddress,
       txOpts
@@ -163,7 +185,7 @@ export default class DebtIssuanceV2API {
   ): Promise<(Address|BigNumber)[][]> {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
 
-    return await this.debtIssuanceModuleV2Wrapper.getRequiredComponentIssuanceUnits(
+    return await this.slippageIssuanceModuleWrapper.getRequiredComponentIssuanceUnits(
       setTokenAddress,
       quantity,
       callerAddress,
@@ -191,7 +213,7 @@ export default class DebtIssuanceV2API {
   ): Promise<(Address|BigNumber)[][]> {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
 
-    return await this.debtIssuanceModuleV2Wrapper.getRequiredComponentRedemptionUnits(
+    return await this.slippageIssuanceModuleWrapper.getRequiredComponentRedemptionUnits(
       setTokenAddress,
       quantity,
       callerAddress,
@@ -228,7 +250,7 @@ export default class DebtIssuanceV2API {
     this.assert.schema.isValidAddress('setAddress', setTokenAddress);
     this.assert.common.isNotUndefined(isIssue, 'isIssue arg must be a boolean.');
 
-    return await this.debtIssuanceModuleV2Wrapper.calculateTotalFees(
+    return await this.slippageIssuanceModuleWrapper.calculateTotalFees(
       setTokenAddress,
       quantity,
       isIssue,
