@@ -20,6 +20,7 @@ export interface SetJSConfig {
   debtIssuanceModuleAddress: Address;
   zeroExApiKey?: string;
   debtIssuanceModuleV2Address: Address;
+  slippageIssuanceModuleAddress: Address;
 }
 
 export type SetDetails = {

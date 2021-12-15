@@ -30,6 +30,7 @@ import {
   PriceOracleAPI,
   DebtIssuanceAPI,
   DebtIssuanceV2API,
+  SlippageIssuanceAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -105,6 +106,13 @@ class Set {
   public debtIssuanceV2: DebtIssuanceV2API;
 
   /**
+   * An instance of the SlippageIssuanceAPI class. Contains interfaces for interacting
+   * with the SlippageIssuanceAPI contract to to trade into/from tokens during the issuance and
+   * redemption step. Initially used for Perpetual Leverage Tokens.
+   */
+  public slippageIssuance: SlippageIssuanceAPI;
+
+  /**
    * An instance of the BlockchainAPI class. Contains interfaces for
    * interacting with the blockchain
    */
@@ -136,6 +144,7 @@ class Set {
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
     this.debtIssuanceV2 = new DebtIssuanceV2API(ethersProvider, config.debtIssuanceModuleV2Address);
+    this.slippageIssuance = new SlippageIssuanceAPI(ethersProvider, config.slippageIssuanceModuleAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
   }
 }
