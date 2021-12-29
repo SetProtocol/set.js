@@ -23,7 +23,6 @@ import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper
 import { TradeQuoter, CoinGeckoDataService } from '@src/api/utils';
 import { tradeQuoteFixtures as fixture } from '../fixtures/tradeQuote';
 import { expect } from '@test/utils/chai';
-const pageResults = require('graph-results-pager');
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
@@ -57,14 +56,6 @@ axios.get.mockImplementation(val => {
     case fixture.coinGeckoTokenRequestPoly: return fixture.coinGeckoTokenResponsePoly;
     case fixture.coinGeckoPricesRequestEth: return fixture.coinGeckoPricesResponseEth;
     case fixture.coinGeckoPricesRequestPoly: return fixture.coinGeckoPricesResponsePoly;
-    case fixture.quickswapRequestPoly: return fixture.quickswapResponsePoly;
-  }
-});
-
-pageResults.mockImplementation(val => {
-  switch (val.api) {
-    case fixture.sushiSubgraphRequestPoly: return fixture.sushiSubgraphResponsePoly;
-    case fixture.maticMappingSubgraphRequestPoly: return fixture.maticMappingSubgraphResponsePoly;
   }
 });
 

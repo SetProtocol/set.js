@@ -116,7 +116,7 @@ export const tradeQuoteFixtures = {
   },
 
   // This is actually an eth call...we use the eth list for image resources
-  coinGeckoTokenRequestPoly: 'https://tokens.coingecko.com/uniswap/all.json',
+  coinGeckoTokenRequestPoly: 'https://tokens.coingecko.com/polygon-pos/all.json',
   coinGeckoTokenResponsePoly: {
     data: {
       tokens: [
@@ -127,13 +127,13 @@ export const tradeQuoteFixtures = {
          decimals: 18,
          logoURI: '' },
          { chainId: 1,
-         address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+         address: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
          name: 'Wrapped BTC',
          symbol: 'WBTC',
-         decimals: 18,
+         decimals: 8,
          logoURI: '' },
        { chainId: 1,
-         address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+         address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
          name: 'USD Coin',
          symbol: 'USDC',
          decimals: 6,
@@ -182,92 +182,6 @@ export const tradeQuoteFixtures = {
        gasCostsChainCurrency: '0.0192150 ETH',
        feePercentage: '1.00%',
        slippage: '-1.10%',
-    },
-  },
-
-  quickswapRequestPoly: 'https://raw.githubusercontent.com/sameepsi/quickswap-default-token-list/master/src/tokens/mainnet.json',
-  quickswapResponsePoly: {
-    data: [{
-      name: 'Wrapped BTC',
-      address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
-      symbol: 'WBTC',
-      decimals: 8,
-      chainId: 137,
-      logoURI:
-       'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png' },
-    {
-      name: 'USD Coin',
-      address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
-      symbol: 'USDC',
-      decimals: 6,
-      chainId: 137,
-      logoURI:
-       'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-    }],
-  },
-
-  sushiSubgraphRequestPoly: 'https://api.thegraph.com/subgraphs/name/sushiswap/matic-exchange',
-  sushiSubgraphResponsePoly: [
-    {
-      id: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
-      name: 'Matic Token',
-      symbol: 'MATIC',
-      decimals: 18,
-      volumeUSD: '123000000.123',
-    },
-    {
-      id: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
-      name: 'Wrapped BTC',
-      symbol: 'WBTC',
-      decimals: 8,
-      volumeUSD: '222000000.123',
-    },
-    {
-      id: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-      name: 'USD Coin',
-      symbol: 'USDC',
-      decimals: 6,
-      volumeUSD: '333000000.123',
-    },
-  ],
-
-  fetchTokenListResponsePoly: [
-    { chainId: 137,
-      address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-      symbol: 'USDC',
-      name: 'USD Coin',
-      decimals: 6,
-      volumeUSD: 333000000.123,
-      logoURI:
-       'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png' },
-    { chainId: 137,
-      address: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
-      symbol: 'WBTC',
-      name: 'Wrapped BTC',
-      decimals: 8,
-      volumeUSD: 222000000.123,
-      logoURI:
-       'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png' },
-    { chainId: 137,
-      address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
-      symbol: 'MATIC',
-      name: 'Matic Token',
-      decimals: 18,
-      volumeUSD: 123000000.123 },
-  ],
-
-  maticMappingSubgraphRequestPoly: 'https://api.thegraph.com/subgraphs/name/maticnetwork/mainnet-root-subgraphs',
-  maticMappingSubgraphResponsePoly: {
-    data: {
-      tokenMappings: [{
-        rootToken: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-        childToken: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
-        id: 104,
-      },
-      { rootToken: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-        childToken: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
-        id: 95,
-      }],
     },
   },
 

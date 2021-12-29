@@ -114,6 +114,7 @@ export class ZeroExTradeQuoter {
   private getHostForChain(chainId: number) {
     switch (chainId) {
       case 1: return 'https://api.0x.org';
+      case 10: return 'https://optimism.api.0x.org';
       case 137: return 'https://polygon.api.0x.org';
     }
   }

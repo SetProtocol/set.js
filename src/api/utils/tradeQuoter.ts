@@ -338,6 +338,7 @@ export class TradeQuoter {
   private chainCurrencyAddress(chainId: number): Address {
     switch (chainId) {
       case 1:   return '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'; // WETH
+      case 10:  return '0x4200000000000000000000000000000000000006'; // Optimism WETH
       case 137: return '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'; // WMATIC
       default: throw new Error(`chainId: ${chainId} is not supported`);
     }

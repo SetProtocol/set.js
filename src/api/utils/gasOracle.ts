@@ -55,6 +55,7 @@ export class GasOracleService {
 
     switch (this.chainId) {
       case 1: return this.getEthereumGasPrice(speed);
+      case 10: return this.getOptimismGasPrice();
       case 137: return this.getPolygonGasPrice(speed);
 
       // This case should never run because chainId is validated
@@ -73,6 +74,14 @@ export class GasOracleService {
       case GasOracleService.FAST:    return data.fast / 10;
       case GasOracleService.FASTEST: return data.fastest / 10;
     }
+  }
+
+  private async getOptimismGasPrice(): Promise<number> {
+    const url = 'https://api-optimistic.etherscan.io/api?module=proxy&action=eth_gasPrice';
+    const data = (await axios.get(url)).data;
+    const price = Number(data.result);
+
+    return price;
   }
 
   private async getPolygonGasPrice(speed: GasOracleSpeed): Promise<number> {
