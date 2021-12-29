@@ -18,7 +18,6 @@
 
 import BigDecimal from 'js-big-decimal';
 import { BigNumber, FixedNumber, utils as ethersUtils } from 'ethers';
-import { Provider } from '@ethersproject/providers';
 import type TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
 
 import {
@@ -56,11 +55,9 @@ export class TradeQuoter {
   private isFirmQuote: boolean = true;
   private slippagePercentage: number = 2;
   private excludedSources: string[] = ['Kyber', 'Eth2Dai', 'Mesh'];
-  private provider: Provider;
   private zeroExApiKey: string;
 
-  constructor(provider: Provider, zeroExApiKey: string = '') {
-    this.provider = provider;
+  constructor(zeroExApiKey: string = '') {
     this.zeroExApiKey = zeroExApiKey;
   }
 
@@ -148,7 +145,7 @@ export class TradeQuoter {
     });
 
     if (!options.gasPrice) {
-      const gasOracle = new GasOracleService(chainId, this.provider);
+      const gasOracle = new GasOracleService(chainId);
       options.gasPrice = await gasOracle.fetchGasPrice();
     }
 

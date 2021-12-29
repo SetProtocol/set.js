@@ -96,7 +96,7 @@ describe('TradeQuoter', () => {
     beforeEach(async () => {
       coingecko = new CoinGeckoDataService(1);
       tokenMap = await coingecko.fetchTokenMap();
-      tradeQuoter = new TradeQuoter(provider, 'xyz');
+      tradeQuoter = new TradeQuoter('xyz');
     });
 
     describe('generate a quote', () => {
@@ -153,7 +153,7 @@ describe('TradeQuoter', () => {
     beforeEach(async () => {
       coingecko = new CoinGeckoDataService(137);
       tokenMap = await coingecko.fetchTokenMap();
-      tradeQuoter = new TradeQuoter(provider, 'xyz');
+      tradeQuoter = new TradeQuoter('xyz');
     });
 
     describe('generate a quote', () => {

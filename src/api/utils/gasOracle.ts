@@ -22,7 +22,6 @@ import {
   EthGasStationData,
   GasOracleSpeed,
 } from '../../types';
-import { Provider } from '@ethersproject/providers';
 
 /**
  * @title GasOracleService
@@ -32,18 +31,16 @@ import { Provider } from '@ethersproject/providers';
  */
 export class GasOracleService {
   chainId: number;
-  private provider: Provider;
   private assert: Assertions;
 
   static AVERAGE: GasOracleSpeed = 'average';
   static FAST: GasOracleSpeed = 'fast';
   static FASTEST: GasOracleSpeed = 'fastest';
 
-  constructor(chainId: number, provider: Provider) {
+  constructor(chainId: number) {
     this.assert = new Assertions();
     this.assert.common.isSupportedChainId(chainId);
     this.chainId = chainId;
-    this.provider = provider;
   }
 
   /**
@@ -80,9 +77,11 @@ export class GasOracleService {
   }
 
   private async getOptimismGasPrice(): Promise<number> {
-    const price =  await this.provider.getGasPrice();
+    const url = 'https://api-optimistic.etherscan.io/api?module=proxy&action=eth_gasPrice';
+    const data = (await axios.get(url)).data;
+    const price = Number(data.result);
 
-    return price.toNumber();
+    return price;
   }
 
   private async getPolygonGasPrice(speed: GasOracleSpeed): Promise<number> {
