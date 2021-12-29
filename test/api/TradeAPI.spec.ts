@@ -15,7 +15,6 @@
 */
 
 import axios from 'axios';
-const pageResults = require('graph-results-pager');
 
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/lib/ethers';
@@ -57,14 +56,6 @@ axios.get.mockImplementation(val => {
     case fixture.coinGeckoTokenRequestPoly: return fixture.coinGeckoTokenResponsePoly;
     case fixture.coinGeckoPricesRequestEth: return fixture.coinGeckoPricesResponseEth;
     case fixture.coinGeckoPricesRequestPoly: return fixture.coinGeckoPricesResponsePoly;
-    case fixture.quickswapRequestPoly: return fixture.quickswapResponsePoly;
-  }
-});
-
-pageResults.mockImplementation(val => {
-  switch (val.api) {
-    case fixture.sushiSubgraphRequestPoly: return fixture.sushiSubgraphResponsePoly;
-    case fixture.maticMappingSubgraphRequestPoly: return fixture.maticMappingSubgraphResponsePoly;
   }
 });
 
@@ -360,7 +351,7 @@ describe('TradeAPI', () => {
 
       it('should fetch correct token data for network', async() => {
         const tokenData = await subject();
-        await expect(tokenData).to.deep.equal(fixture.fetchTokenListResponsePoly);
+        await expect(tokenData).to.deep.equal(fixture.coinGeckoTokenResponsePoly.data.tokens);
       });
     });
 
@@ -402,7 +393,7 @@ describe('TradeAPI', () => {
 
     describe('when the chain is polygon (137)', () => {
       beforeEach(async () => {
-        subjectChainId = 1;
+        subjectChainId = 137;
         provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
         subjectCoinGecko = new CoinGeckoDataService(subjectChainId);
         subjectTokenList = await tradeAPI.fetchTokenListAsync();
