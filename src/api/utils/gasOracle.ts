@@ -22,6 +22,7 @@ import {
   EthGasStationData,
   GasOracleSpeed,
 } from '../../types';
+import { Provider } from '@ethersproject/providers';
 
 /**
  * @title GasOracleService
@@ -31,16 +32,18 @@ import {
  */
 export class GasOracleService {
   chainId: number;
+  private provider: Provider;
   private assert: Assertions;
 
   static AVERAGE: GasOracleSpeed = 'average';
   static FAST: GasOracleSpeed = 'fast';
   static FASTEST: GasOracleSpeed = 'fastest';
 
-  constructor(chainId: number) {
+  constructor(chainId: number, provider: Provider) {
     this.assert = new Assertions();
     this.assert.common.isSupportedChainId(chainId);
     this.chainId = chainId;
+    this.provider = provider;
   }
 
   /**
@@ -55,6 +58,7 @@ export class GasOracleService {
 
     switch (this.chainId) {
       case 1: return this.getEthereumGasPrice(speed);
+      case 10: return this.getOptimismGasPrice();
       case 137: return this.getPolygonGasPrice(speed);
 
       // This case should never run because chainId is validated
@@ -73,6 +77,12 @@ export class GasOracleService {
       case GasOracleService.FAST:    return data.fast / 10;
       case GasOracleService.FASTEST: return data.fastest / 10;
     }
+  }
+
+  private async getOptimismGasPrice(): Promise<number> {
+    const price =  await this.provider.getGasPrice();
+
+    return price.toNumber();
   }
 
   private async getPolygonGasPrice(speed: GasOracleSpeed): Promise<number> {

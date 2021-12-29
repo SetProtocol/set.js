@@ -64,7 +64,7 @@ export default class TradeAPI {
     this.provider = provider;
     this.tradeModuleWrapper = new TradeModuleWrapper(provider, tradeModuleAddress);
     this.assert = new Assertions();
-    this.tradeQuoter = new TradeQuoter(zeroExApiKey);
+    this.tradeQuoter = new TradeQuoter(provider, zeroExApiKey);
   }
 
   /**
@@ -248,7 +248,7 @@ export default class TradeAPI {
    */
   public async fetchGasPriceAsync(speed?: GasOracleSpeed): Promise<number> {
     await this.initializeForChain();
-    const oracle = new GasOracleService(this.chainId);
+    const oracle = new GasOracleService(this.chainId, this.provider);
     return oracle.fetchGasPrice(speed);
   }
 

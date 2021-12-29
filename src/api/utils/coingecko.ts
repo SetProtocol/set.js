@@ -99,6 +99,9 @@ export class CoinGeckoDataService {
       case 1:
         this.tokenList = await this.fetchEthereumTokenList();
         break;
+      case 10:
+        this.tokenList = await this.fetchOptimismTokenList();
+        break;
       case 137:
         this.tokenList = await this.fetchPolygonTokenList();
         break;
@@ -135,6 +138,7 @@ export class CoinGeckoDataService {
   private getPlatform(): string {
     switch (this.chainId) {
       case 1: return 'ethereum';
+      case 10: return 'optimistic-ethereum';
       case 137: return 'polygon-pos';
       default: return '';
     }
@@ -142,6 +146,12 @@ export class CoinGeckoDataService {
 
   private async fetchEthereumTokenList(): Promise<CoinGeckoTokenData[]> {
     const url = 'https://tokens.coingecko.com/uniswap/all.json';
+    const response = await axios.get(url);
+    return response.data.tokens;
+  }
+
+  private async fetchOptimismTokenList(): Promise<CoinGeckoTokenData[]> {
+    const url = 'https://tokens.coingecko.com/optimistic-ethereum/all.json';
     const response = await axios.get(url);
     return response.data.tokens;
   }
