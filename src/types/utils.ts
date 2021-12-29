@@ -21,10 +21,6 @@ export type CoinGeckoTokenData = {
   logoURI?: string,
 };
 
-export type SushiswapTokenData = CoinGeckoTokenData & {
-  volumeUSD: number
-};
-
 export type CoinGeckoTokenMap = {
   [key: string]: CoinGeckoTokenData
 };
@@ -32,10 +28,6 @@ export type CoinGeckoTokenMap = {
 export type CoinPricesParams = {
   contractAddresses: string[],
   vsCurrencies: string[]
-};
-
-export type PolygonMappedTokenData = {
-  [key: string]: string,
 };
 
 export type QuoteOptions = {
