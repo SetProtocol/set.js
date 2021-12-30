@@ -1016,10 +1016,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.4.1-solc-0.7-2.tgz#371c67ebffe50f551c3146a9eec5fe6ffe862e92"
   integrity sha512-tAG9LWg8+M2CMu7hIsqHPaTyG4uDzjr6mhvH96LvOpLZZj6tgzTluBt+LsCf1/QaYrlis6pITvpIaIhE+iZB+Q==
 
-"@setprotocol/set-protocol-v2@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.1.5.tgz#c6c559f749866b5a95b5871bb1447fa4d8f7a9c2"
-  integrity sha512-UcbIxfFAARcCi9Yt4xde1Gc7xKrhMpCSGMgzpxEVBJFZPEYiYny1tv4W9lFopxQ9o81ZC7/SO6oZvYdMEuUZzQ==
+"@setprotocol/set-protocol-v2@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.1.8.tgz#d936be0807edd7fdfd6310b124fd6f28f63d950e"
+  integrity sha512-4Tu+UGfJjpHwVZukE9WnA1gke7DR7ba48LY/A66Z87yQDs+I/VfRE9lG5yCL7g8SpOpvQ2DoL9lq3NunsuITog==
   dependencies:
     "@uniswap/v3-sdk" "^3.5.1"
     ethers "^5.5.2"
