@@ -192,7 +192,7 @@ export default class SlippageIssuanceModuleV2Wrapper {
       callerAddress
     );
 
-    return await slippageIssuanceModuleInstance.getRequiredComponentIssuanceUnits(
+    return await slippageIssuanceModuleInstance.callStatic.getRequiredComponentIssuanceUnitsOffChain(
       setTokenAddress,
       quantity,
     );
@@ -222,7 +222,7 @@ export default class SlippageIssuanceModuleV2Wrapper {
       callerAddress
     );
 
-    return await slippageIssuanceModuleInstance.getRequiredComponentRedemptionUnits(
+    return await slippageIssuanceModuleInstance.callStatic.getRequiredComponentRedemptionUnitsOffChain(
       setTokenAddress,
       quantity,
     );
