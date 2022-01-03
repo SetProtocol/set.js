@@ -79,7 +79,7 @@ export class GasOracleService {
   private async getOptimismGasPrice(): Promise<number> {
     const url = 'https://api-optimistic.etherscan.io/api?module=proxy&action=eth_gasPrice';
     const data = (await axios.get(url)).data;
-    const price = Number(data.result);
+    const price = Number(data.result) / 1000000000; // wei to gwei
 
     return price;
   }
