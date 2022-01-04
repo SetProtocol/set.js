@@ -75,7 +75,7 @@ export class CommonAssertions {
   }
 
   public isNotUndefined(value: any, errorMessage: string) {
-    if (!value) {
+    if (value === undefined) {
       throw new Error(errorMessage);
     }
   }
