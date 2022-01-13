@@ -32,6 +32,7 @@ import {
   StreamingFeeModule,
   TradeModule,
   NavIssuanceModule,
+  PerpV2LeverageModule,
   PriceOracle,
 } from '@setprotocol/set-protocol-v2/typechain';
 import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
@@ -46,6 +47,7 @@ import { SetTokenCreator__factory } from '@setprotocol/set-protocol-v2/dist/type
 import { StreamingFeeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/StreamingFeeModule__factory';
 import { TradeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/TradeModule__factory';
 import { NavIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/NavIssuanceModule__factory';
+import { PerpV2LeverageModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PerpV2LeverageModule__factory';
 import { PriceOracle__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PriceOracle__factory';
 
 /**
@@ -419,6 +421,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = slippageIssuanceModuleContract;
       return slippageIssuanceModuleContract;
+    }
+  }
+
+  /**
+   * Load PerpV2LeverageModule contract
+   *
+   * @param  perpV2LeverageModuleAddress     Address of the Perp V2 Leverage module
+   * @param  callerAddress                   Address of caller, uses first one on node if none provided.
+   * @return                                 PerpV2LeverageModule contract instance
+   */
+   public async loadPerpV2LeverageModuleAsync(
+    perpV2LeverageModuleAddress: Address,
+    callerAddress?: Address,
+  ): Promise<PerpV2LeverageModule> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `PerpV2LeverageModule_${perpV2LeverageModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as PerpV2LeverageModule;
+    } else {
+      const perpV2LeverageModuleContract = PerpV2LeverageModule__factory.connect(
+        perpV2LeverageModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = perpV2LeverageModuleContract;
+      return perpV2LeverageModuleContract;
     }
   }
 }
