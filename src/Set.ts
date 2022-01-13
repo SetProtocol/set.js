@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 Set Labs Inc.
+  Copyright 2022 Set Labs Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import {
   DebtIssuanceV2API,
   SlippageIssuanceAPI,
 } from './api/index';
+import PerpV2LeverageAPI from './api/PerpV2LeverageAPI';
 
 const ethersProviders = require('ethers').providers;
 
@@ -113,6 +114,13 @@ class Set {
   public slippageIssuance: SlippageIssuanceAPI;
 
   /**
+   * An instance of the PerpV2LeverageAPI class. Contains getters for fetching
+   * positional (per Set) and notional (across all Sets) units for collateral, vAssets, and debt.
+   * Initially used for Perpetual Leverage Tokens.
+   */
+  public perpV2Leverage: PerpV2LeverageAPI;
+
+  /**
    * An instance of the BlockchainAPI class. Contains interfaces for
    * interacting with the blockchain
    */
@@ -145,6 +153,7 @@ class Set {
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
     this.debtIssuanceV2 = new DebtIssuanceV2API(ethersProvider, config.debtIssuanceModuleV2Address);
     this.slippageIssuance = new SlippageIssuanceAPI(ethersProvider, config.slippageIssuanceModuleAddress);
+    this.perpV2Leverage = new PerpV2LeverageAPI(ethersProvider, config.perpV2LeverageModuleAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
   }
 }
