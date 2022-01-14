@@ -1,5 +1,5 @@
 /*
-  Copyright 2021 Set Labs Inc.
+  Copyright 2022 Set Labs Inc.
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
@@ -24,13 +24,13 @@ import { generateTxOpts } from '../../utils/transactions';
 import ContractWrapper from './ContractWrapper';
 
 /**
- * @title  SlippageIssuanceModuleV2Wrapper
+ * @title  SlippageIssuanceModuleWrapper
  * @author Set Protocol
  *
- * The SlippageIssuanceModuleV2Wrapper forwards functionality from the SlippageIssuanceModule contract
+ * The SlippageIssuanceModuleWrapper forwards functionality from the SlippageIssuanceModule contract
  *
  */
-export default class SlippageIssuanceModuleV2Wrapper {
+export default class SlippageIssuanceModuleWrapper {
   private provider: Provider;
   private contracts: ContractWrapper;
 
