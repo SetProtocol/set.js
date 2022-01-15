@@ -100,7 +100,7 @@ describe('PerpV2LeverageAPI', () => {
     });
   });
 
-  describe('#getcollateralDecimalsAsync', () => {
+  describe('#getCollateralDecimalsAsync', () => {
     let nullCallerAddress: Address;
 
     beforeEach(async () => {
@@ -108,7 +108,7 @@ describe('PerpV2LeverageAPI', () => {
     });
 
     async function subject(): Promise<Number> {
-      return await perpV2LeverageAPI.getcollateralDecimalsAsync(
+      return await perpV2LeverageAPI.getCollateralDecimalsAsync(
         nullCallerAddress,
       );
     }

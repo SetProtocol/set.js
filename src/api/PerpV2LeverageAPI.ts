@@ -86,7 +86,7 @@ export default class PerpV2LeverageAPI {
    * @param  callerAddress            The address of user transferring from (optional)
    * @return                          The decimals of the ERC20 collateral token
    */
-  public async getcollateralDecimalsAsync(
+  public async getCollateralDecimalsAsync(
     callerAddress: Address = undefined,
   ): Promise<Number> {
     return await this.perpV2LeverageModuleWrapper.collateralDecimals(callerAddress);
