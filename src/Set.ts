@@ -31,8 +31,9 @@ import {
   DebtIssuanceAPI,
   DebtIssuanceV2API,
   SlippageIssuanceAPI,
+  PerpV2LeverageAPI,
+  PerpV2LeverageViewerAPI,
 } from './api/index';
-import PerpV2LeverageAPI from './api/PerpV2LeverageAPI';
 
 const ethersProviders = require('ethers').providers;
 
@@ -116,9 +117,16 @@ class Set {
   /**
    * An instance of the PerpV2LeverageAPI class. Contains getters for fetching
    * positional (per Set) and notional (across all Sets) units for collateral, vAssets, and debt.
-   * Initially used for Perpetual Leverage Tokens.
+   * Getters return low level data; for more abstracted data use the PerpV2LeverageViewerAPI.
    */
   public perpV2Leverage: PerpV2LeverageAPI;
+
+  /**
+   * An instance of the PerpV2LeverageViewerAPI class. Contains getters for fetching total
+   * collateral balance (which includes PnL and funding), virtual component leverage ratios,
+   * and maximum issuance quantity computed from token supply.
+   */
+  public perpV2LeverageViewer: PerpV2LeverageViewerAPI;
 
   /**
    * An instance of the BlockchainAPI class. Contains interfaces for
@@ -154,6 +162,7 @@ class Set {
     this.debtIssuanceV2 = new DebtIssuanceV2API(ethersProvider, config.debtIssuanceModuleV2Address);
     this.slippageIssuance = new SlippageIssuanceAPI(ethersProvider, config.slippageIssuanceModuleAddress);
     this.perpV2Leverage = new PerpV2LeverageAPI(ethersProvider, config.perpV2LeverageModuleAddress);
+    this.perpV2LeverageViewer = new PerpV2LeverageViewerAPI(ethersProvider, config.perpV2LeverageModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
   }
 }

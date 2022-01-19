@@ -17,36 +17,38 @@
 import { ethers } from 'ethers';
 import { BigNumber, ContractTransaction } from 'ethers/lib/ethers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
+import { VAssetDisplayInfo } from '@src/types';
 
-import PerpV2LeverageAPI from '@src/api/PerpV2LeverageAPI';
-import PerpV2LeverageModuleWrapper from '@src/wrappers/set-protocol-v2/PerpV2LeverageModuleWrapper';
+import PerpV2LeverageViewerAPI from '@src/api/PerpV2LeverageViewerAPI';
+import PerpV2LeverageModuleViewerWrapper from '@src/wrappers/set-protocol-v2/PerpV2LeverageModuleViewerWrapper';
 import { expect } from '../utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
-jest.mock('@src/wrappers/set-protocol-v2/PerpV2LeverageModuleWrapper');
+jest.mock('@src/wrappers/set-protocol-v2/PerpV2LeverageModuleViewerWrapper');
 
-describe('PerpV2LeverageAPI', () => {
-  let perpV2LeverageModuleAddress: Address;
+describe('PerpV2LeverageViewerAPI', () => {
+  let perpV2LeverageModuleViewerAddress: Address;
   let setTokenAddress: Address;
   let owner: Address;
 
-  let perpV2LeverageAPI: PerpV2LeverageAPI;
-  let perpV2LeverageModuleWrapper: PerpV2LeverageModuleWrapper;
+  let perpV2LeverageViewerAPI: PerpV2LeverageViewerAPI;
+  let perpV2LeverageModuleViewerWrapper: PerpV2LeverageModuleViewerWrapper;
 
   beforeEach(async () => {
     [
       owner,
-      perpV2LeverageModuleAddress,
+      perpV2LeverageModuleViewerAddress,
       setTokenAddress,
     ] = await provider.listAccounts();
 
-    perpV2LeverageAPI = new PerpV2LeverageAPI(provider, perpV2LeverageModuleAddress);
-    perpV2LeverageModuleWrapper = (PerpV2LeverageModuleWrapper as any).mock.instances[0];
+    perpV2LeverageViewerAPI = new PerpV2LeverageViewerAPI(provider, perpV2LeverageModuleViewerAddress);
+    perpV2LeverageModuleViewerWrapper = (PerpV2LeverageModuleViewerWrapper as any).mock.instances[0];
   });
 
   afterEach(() => {
-    (PerpV2LeverageModuleWrapper as any).mockClear();
+    (PerpV2LeverageModuleViewerWrapper as any).mockClear();
   });
 
   describe('#initializeAsync', () => {
@@ -62,17 +64,17 @@ describe('PerpV2LeverageAPI', () => {
     });
 
     async function subject(): Promise<ContractTransaction> {
-      return perpV2LeverageAPI.initializeAsync(
+      return perpV2LeverageViewerAPI.initializeAsync(
         subjectSetTokenAddress,
         subjectCallerAddress,
         subjectTransactionOptions,
       );
     }
 
-    it('should call initialize on the PerpV2LeverageModuleWrapper', async () => {
+    it('should call initialize on the PerpV2LeverageModuleViewerWrapper', async () => {
       await subject();
 
-      expect(perpV2LeverageModuleWrapper.initialize).to.have.beenCalledWith(
+      expect(perpV2LeverageModuleViewerWrapper.initialize).to.have.beenCalledWith(
         subjectSetTokenAddress,
         subjectCallerAddress,
         subjectTransactionOptions,
@@ -88,38 +90,41 @@ describe('PerpV2LeverageAPI', () => {
     });
 
     async function subject(): Promise<string> {
-      return await perpV2LeverageAPI.getCollateralTokenAsync(
+      return await perpV2LeverageViewerAPI.getCollateralTokenAsync(
         nullCallerAddress,
       );
     }
 
-    it('should call the PerpV2LeverageModuleWrapper with correct params', async () => {
+    it('should call the PerpV2LeverageModuleViewerWrapper with correct params', async () => {
       await subject();
 
-      expect(perpV2LeverageModuleWrapper.collateralToken).to.have.beenCalledWith(nullCallerAddress);
+      expect(perpV2LeverageModuleViewerWrapper.collateralToken).to.have.beenCalledWith(nullCallerAddress);
     });
   });
 
-  describe('#getPositionNotionalInfoAsync', () => {
+  describe('#getMaximumSetTokenIssueAmountAsync', () => {
     let subjectTokenAddress: Address;
+    let slippage: BigNumber;
     let nullCallerAddress: Address;
 
     beforeEach(async () => {
       subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      slippage = ether(2);
       nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
-    async function subject(): Promise<(Address|BigNumber)[][]> {
-      return await perpV2LeverageAPI.getPositionNotionalInfoAsync(
+    async function subject(): Promise<BigNumber> {
+      return await perpV2LeverageViewerAPI.getMaximumSetTokenIssueAmountAsync(
         subjectTokenAddress,
+        slippage,
         nullCallerAddress,
       );
     }
 
-    it('should call the PerpV2LeverageModuleWrapper with correct params', async () => {
+    it('should call the PerpV2LeverageModuleViewerWrapper with correct params', async () => {
       await subject();
 
-      expect(perpV2LeverageModuleWrapper.getPositionNotionalInfo).to.have.beenCalledWith(
+      expect(perpV2LeverageModuleViewerWrapper.getMaximumSetTokenIssueAmount).to.have.beenCalledWith(
         subjectTokenAddress,
         nullCallerAddress,
       );
@@ -136,7 +141,7 @@ describe('PerpV2LeverageAPI', () => {
     });
   });
 
-  describe('#getPositionUnitInfoAsync', () => {
+  describe('#getTotalCollateralUnitAsync', () => {
     let subjectTokenAddress: Address;
     let nullCallerAddress: Address;
 
@@ -145,17 +150,17 @@ describe('PerpV2LeverageAPI', () => {
       nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
-    async function subject(): Promise<(Address|BigNumber)[][]> {
-      return await perpV2LeverageAPI.getPositionUnitInfoAsync(
+    async function subject(): Promise<[Address, BigNumber]> {
+      return await perpV2LeverageViewerAPI.getTotalCollateralUnitAsync(
         subjectTokenAddress,
         nullCallerAddress,
       );
     }
 
-    it('should call the PerpV2LeverageModuleWrapper with correct params', async () => {
+    it('should call the PerpV2LeverageModuleViewerWrapper with correct params', async () => {
       await subject();
 
-      expect(perpV2LeverageModuleWrapper.getPositionUnitInfo).to.have.beenCalledWith(
+      expect(perpV2LeverageModuleViewerWrapper.getTotalCollateralUnit).to.have.beenCalledWith(
         subjectTokenAddress,
         nullCallerAddress,
       );
@@ -172,7 +177,7 @@ describe('PerpV2LeverageAPI', () => {
     });
   });
 
-  describe('#getAccountInfoAsync', () => {
+  describe('#getVirtualAssetsDisplayInfoAsync', () => {
     let subjectTokenAddress: Address;
     let nullCallerAddress: Address;
 
@@ -181,17 +186,20 @@ describe('PerpV2LeverageAPI', () => {
       nullCallerAddress = '0x0000000000000000000000000000000000000000';
     });
 
-    async function subject(): Promise<BigNumber[]> {
-      return await perpV2LeverageAPI.getAccountInfoAsync(
+    async function subject(): Promise<VAssetDisplayInfo[]> {
+      return await perpV2LeverageViewerAPI.getVirtualAssetsDisplayInfoAsync(
         subjectTokenAddress,
         nullCallerAddress,
       );
     }
 
-    it('should call the PerpV2LeverageModuleWrapper with correct params', async () => {
+    it('should call the PerpV2LeverageModuleViewerWrapper with correct params', async () => {
       await subject();
 
-      expect(perpV2LeverageModuleWrapper.getAccountInfo).to.have.beenCalledWith(subjectTokenAddress, nullCallerAddress);
+      expect(perpV2LeverageModuleViewerWrapper.getVirtualAssetsDisplayInfo).to.have.beenCalledWith(
+        subjectTokenAddress,
+        nullCallerAddress,
+      );
     });
 
     describe('when the SetToken address is invalid', () => {

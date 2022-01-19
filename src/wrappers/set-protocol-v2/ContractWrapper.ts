@@ -33,6 +33,7 @@ import {
   TradeModule,
   NavIssuanceModule,
   PerpV2LeverageModule,
+  PerpV2LeverageModuleViewer,
   PriceOracle,
 } from '@setprotocol/set-protocol-v2/typechain';
 import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
@@ -48,6 +49,7 @@ import { StreamingFeeModule__factory } from '@setprotocol/set-protocol-v2/dist/t
 import { TradeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/TradeModule__factory';
 import { NavIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/NavIssuanceModule__factory';
 import { PerpV2LeverageModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PerpV2LeverageModule__factory';
+import { PerpV2LeverageModuleViewer__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PerpV2LeverageModuleViewer__factory';
 import { PriceOracle__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PriceOracle__factory';
 
 /**
@@ -448,6 +450,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = perpV2LeverageModuleContract;
       return perpV2LeverageModuleContract;
+    }
+  }
+
+  /**
+   * Load PerpV2LeverageModuleViewer contract
+   *
+   * @param  perpV2LeverageModuleViewerAddress     Address of the Perp V2 Leverage module viewer
+   * @param  callerAddress                         Address of caller, uses first one on node if none provided.
+   * @return                                       PerpV2LeverageModuleViewer contract instance
+   */
+   public async loadPerpV2LeverageModuleViewerAsync(
+    perpV2LeverageModuleViewerAddress: Address,
+    callerAddress?: Address,
+  ): Promise<PerpV2LeverageModuleViewer> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `PerpV2LeverageModuleViewer_${perpV2LeverageModuleViewerAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as PerpV2LeverageModuleViewer;
+    } else {
+      const perpV2LeverageModuleViewerContract = PerpV2LeverageModuleViewer__factory.connect(
+        perpV2LeverageModuleViewerAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = perpV2LeverageModuleViewerContract;
+      return perpV2LeverageModuleViewerContract;
     }
   }
 }

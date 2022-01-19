@@ -22,6 +22,7 @@ export interface SetJSConfig {
   debtIssuanceModuleV2Address: Address;
   slippageIssuanceModuleAddress: Address;
   perpV2LeverageModuleAddress: Address;
+  perpV2LeverageModuleViewerAddress: Address;
 }
 
 export type SetDetails = {
@@ -89,3 +90,12 @@ export enum ModuleState {
   'PENDING',
   'INITIALIZED',
 }
+
+// For PerpV2LeverageModuleViewerWrapper
+export type VAssetDisplayInfo = {
+  symbol: string;
+  address: Address;
+  positionUnit: BigNumber;
+  indexPrice: BigNumber;
+  currentLeverageRatio: BigNumber;
+};
