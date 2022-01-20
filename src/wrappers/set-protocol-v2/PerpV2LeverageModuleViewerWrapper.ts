@@ -14,10 +14,8 @@
 'use strict';
 
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
-import { BigNumber, ContractTransaction } from 'ethers';
-import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { BigNumber } from 'ethers';
 import { Provider } from '@ethersproject/providers';
-import { generateTxOpts } from '../../utils/transactions';
 import { VAssetDisplayInfo } from '../../types';
 
 import ContractWrapper from './ContractWrapper';
@@ -39,30 +37,6 @@ export default class PerpV2LeverageModuleViewerWrapper {
     this.provider = provider;
     this.contracts = new ContractWrapper(this.provider);
     this.perpV2LeverageModuleViewerAddress = perpV2LeverageModuleViewerAddress;
-  }
-
-  /**
-   * Initializes this module to the SetToken. Only callable by the SetToken's manager.
-   *
-   * @param setTokenAddress             Address of the SetToken to initialize
-   * @param callerAddress               Address of caller (optional)
-   * @param txOpts                      Overrides for transaction (optional)
-   */
-  public async initialize(
-    setTokenAddress: Address,
-    callerAddress: Address = undefined,
-    txOpts: TransactionOverrides = {}
-  ): Promise<ContractTransaction> {
-    const txOptions = await generateTxOpts(txOpts);
-    const perpV2LeverageModuleViewerInstance = await this.contracts.loadPerpV2LeverageModuleViewerAsync(
-      this.perpV2LeverageModuleViewerAddress,
-      callerAddress
-    );
-
-    return await perpV2LeverageModuleViewerInstance.initialize(
-      setTokenAddress,
-      txOptions,
-    );
   }
 
   /**
@@ -94,7 +68,7 @@ export default class PerpV2LeverageModuleViewerWrapper {
    * @param slippage                  Expected slippage from entering position in precise units (1% = 10^16)
    * @param callerAddress             Address of the method caller
    *
-   * @return                          Maximum amount of Sets that can be issued
+   * @return                          Maximum amount of Sets that can be issued (10^18 decimals)
    */
   public async getMaximumSetTokenIssueAmount(
     setTokenAddress: Address,
@@ -119,7 +93,7 @@ export default class PerpV2LeverageModuleViewerWrapper {
    * @param callerAddress             Address of the method caller
    *
    * @return                          Collateral token address
-   * @return                          Total collateral value position unit
+   * @return                          Total collateral value position unit (10^18 decimals)
    */
   public async getTotalCollateralUnit(
     setTokenAddress: Address,
@@ -143,7 +117,7 @@ export default class PerpV2LeverageModuleViewerWrapper {
    * @param setTokenAddress           Instance of the SetToken
    * @param callerAddress             Address of the method caller
    *
-   * @return                          Array of info concerning size and leverage of current vAsset positions
+   * @return                          VAssetDisplayInfo array containing size/leverage of current vAsset positions
    */
   public async getVirtualAssetsDisplayInfo(
     setTokenAddress: Address,

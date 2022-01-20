@@ -16,10 +16,8 @@
 
 'use strict';
 
-import { ContractTransaction } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
-import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BigNumber } from 'ethers/lib/ethers';
 import { VAssetDisplayInfo } from '../types';
 
@@ -47,29 +45,6 @@ export default class PerpV2LeverageViewerAPI {
       perpV2LeverageModuleViewerAddress
     );
     this.assert = assertions || new Assertions();
-  }
-
-  /**
-   * Initializes the PerpV2LeverageModuleViewer to the SetToken. Only callable by the SetToken's manager.
-   *
-   * @param setTokenAddress             Address of the SetToken to initialize
-   * @param callerAddress               The address of user transferring from (optional)
-   * @param txOpts                      Overrides for transaction (optional)
-   *
-   * @return                            Transaction hash of the initialize transaction
-   */
-  public async initializeAsync(
-    setTokenAddress: Address,
-    callerAddress: Address = undefined,
-    txOpts: TransactionOverrides = {}
-  ): Promise<ContractTransaction> {
-    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
-
-    return await this.perpV2LeverageModuleViewerWrapper.initialize(
-      setTokenAddress,
-      callerAddress,
-      txOpts,
-    );
   }
 
   /**

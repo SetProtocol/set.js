@@ -15,7 +15,7 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber, ContractTransaction } from 'ethers/lib/ethers';
+import { BigNumber } from 'ethers/lib/ethers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 import { VAssetDisplayInfo } from '@src/types';
@@ -30,17 +30,13 @@ jest.mock('@src/wrappers/set-protocol-v2/PerpV2LeverageModuleViewerWrapper');
 
 describe('PerpV2LeverageViewerAPI', () => {
   let perpV2LeverageModuleViewerAddress: Address;
-  let setTokenAddress: Address;
-  let owner: Address;
 
   let perpV2LeverageViewerAPI: PerpV2LeverageViewerAPI;
   let perpV2LeverageModuleViewerWrapper: PerpV2LeverageModuleViewerWrapper;
 
   beforeEach(async () => {
     [
-      owner,
       perpV2LeverageModuleViewerAddress,
-      setTokenAddress,
     ] = await provider.listAccounts();
 
     perpV2LeverageViewerAPI = new PerpV2LeverageViewerAPI(provider, perpV2LeverageModuleViewerAddress);
@@ -49,37 +45,6 @@ describe('PerpV2LeverageViewerAPI', () => {
 
   afterEach(() => {
     (PerpV2LeverageModuleViewerWrapper as any).mockClear();
-  });
-
-  describe('#initializeAsync', () => {
-    let subjectSetTokenAddress: Address;
-    let subjectCallerAddress: Address;
-
-    let subjectTransactionOptions: any;
-
-    beforeEach(async () => {
-      subjectSetTokenAddress = setTokenAddress;
-      subjectCallerAddress = owner;
-      subjectTransactionOptions = {};
-    });
-
-    async function subject(): Promise<ContractTransaction> {
-      return perpV2LeverageViewerAPI.initializeAsync(
-        subjectSetTokenAddress,
-        subjectCallerAddress,
-        subjectTransactionOptions,
-      );
-    }
-
-    it('should call initialize on the PerpV2LeverageModuleViewerWrapper', async () => {
-      await subject();
-
-      expect(perpV2LeverageModuleViewerWrapper.initialize).to.have.beenCalledWith(
-        subjectSetTokenAddress,
-        subjectCallerAddress,
-        subjectTransactionOptions,
-      );
-    });
   });
 
   describe('#getCollateralTokenAsync', () => {
@@ -126,6 +91,7 @@ describe('PerpV2LeverageViewerAPI', () => {
 
       expect(perpV2LeverageModuleViewerWrapper.getMaximumSetTokenIssueAmount).to.have.beenCalledWith(
         subjectTokenAddress,
+        slippage,
         nullCallerAddress,
       );
     });

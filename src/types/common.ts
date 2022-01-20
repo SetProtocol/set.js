@@ -94,8 +94,8 @@ export enum ModuleState {
 // For PerpV2LeverageModuleViewerWrapper
 export type VAssetDisplayInfo = {
   symbol: string;
-  address: Address;
-  positionUnit: BigNumber;
-  indexPrice: BigNumber;
-  currentLeverageRatio: BigNumber;
+  vAssetAddress: Address;
+  positionUnit: BigNumber; // 10^18 decimals
+  indexPrice: BigNumber; // 10^18 decimals
+  currentLeverageRatio: BigNumber; // 10^18 decimals
 };
