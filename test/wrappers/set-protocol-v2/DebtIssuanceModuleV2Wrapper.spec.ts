@@ -63,7 +63,7 @@ describe('DebtIssuanceModuleV2Wrapper', () => {
 
     debtIssuanceModuleV2 = await deployer.modules.deployDebtIssuanceModuleV2(setup.controller.address);
     tokenWithRoundingError = await deployer.mocks.deployTokenWithErrorMock(owner, ether(1000000), ZERO);
-    debtModule = await deployer.mocks.deployDebtModuleMock(setup.controller.address, debtIssuanceModuleV2.address);
+    debtModule = await deployer.mocks.deployDebtModuleMock(setup.controller.address);
     externalPositionModule = await deployer.mocks.deployModuleIssuanceHookMock();
 
     await setup.controller.addModule(debtIssuanceModuleV2.address);
@@ -459,7 +459,10 @@ describe('DebtIssuanceModuleV2Wrapper', () => {
           recipient,
           preIssueHook
         );
-        await debtModule.connect(provider.getSigner(manager)).initialize(setTokenWithRoundingError.address);
+        await debtModule.connect(provider.getSigner(manager)).initialize(
+          setTokenWithRoundingError.address,
+          debtIssuanceModuleV2.address,
+        );
         await debtModule.addDebt(setTokenWithRoundingError.address, setup.dai.address, debtUnits);
         await setup.dai.transfer(debtModule.address, ether(100.5));
 

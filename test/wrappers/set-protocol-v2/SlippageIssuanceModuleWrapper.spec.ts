@@ -67,7 +67,7 @@ describe('SlippageIssuanceModuleWrapper', () => {
     await setup.initialize();
 
     slippageIssuanceModule = await deployer.modules.deploySlippageIssuanceModule(setup.controller.address);
-    debtModule = await deployer.mocks.deployDebtModuleMock(setup.controller.address, slippageIssuanceModule.address);
+    debtModule = await deployer.mocks.deployDebtModuleMock(setup.controller.address);
     externalPositionModule = await deployer.mocks.deployModuleIssuanceHookMock();
 
     await setup.controller.addModule(slippageIssuanceModule.address);
@@ -245,7 +245,10 @@ describe('SlippageIssuanceModuleWrapper', () => {
         subjectManagerIssuanceHook,
       );
 
-      await debtModule.connect(provider.getSigner(manager)).initialize(setToken.address);
+      await debtModule.connect(provider.getSigner(manager)).initialize(
+        setToken.address,
+        slippageIssuanceModule.address,
+      );
 
       await debtModule.addDebt(setToken.address, setup.dai.address, debtUnits);
       await setup.dai.transfer(debtModule.address, ether(100.5));
@@ -324,7 +327,10 @@ describe('SlippageIssuanceModuleWrapper', () => {
         subjectManagerIssuanceHook,
       );
 
-      await debtModule.connect(provider.getSigner(manager)).initialize(setToken.address);
+      await debtModule.connect(provider.getSigner(manager)).initialize(
+        setToken.address,
+        slippageIssuanceModule.address,
+      );
 
       await debtModule.addDebt(setToken.address, setup.dai.address, debtUnits);
       await setup.dai.transfer(debtModule.address, ether(100.5));
