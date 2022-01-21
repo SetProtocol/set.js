@@ -82,23 +82,6 @@ export default class PerpV2LeverageModuleWrapper {
   }
 
   /**
-   * Gets decimals of the collateral token
-   *
-   * @param  callerAddress            Address of the method caller
-   * @return                          The decimals of the ERC20 collateral token
-   */
-  public async collateralDecimals(
-    callerAddress: Address = undefined,
-  ): Promise<Number> {
-    const perpV2LeverageModuleInstance = await this.contracts.loadPerpV2LeverageModuleAsync(
-      this.perpV2LeverageModuleAddress,
-      callerAddress
-    );
-
-    return await perpV2LeverageModuleInstance.collateralDecimals();
-  }
-
-  /**
    * Returns a tuple of arrays representing all positions open for the SetToken.
    *
    * @param _setToken                 Instance of SetToken
