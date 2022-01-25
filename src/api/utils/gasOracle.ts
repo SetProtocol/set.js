@@ -19,7 +19,7 @@ import axios from 'axios';
 import Assertions from '../../assertions';
 
 import {
-  GasNowData,
+  EthGasStationData,
   GasOracleSpeed,
 } from '../../types';
 
@@ -55,6 +55,7 @@ export class GasOracleService {
 
     switch (this.chainId) {
       case 1: return this.getEthereumGasPrice(speed);
+      case 10: return this.getOptimismGasPrice();
       case 137: return this.getPolygonGasPrice(speed);
 
       // This case should never run because chainId is validated
@@ -64,14 +65,23 @@ export class GasOracleService {
   }
 
   private async getEthereumGasPrice(speed: GasOracleSpeed): Promise<number> {
-    const url = 'https://www.gasnow.org/api/v3/gas/price';
-    const data: GasNowData = (await axios.get(url)).data.data;
+    const url = 'https://ethgasstation.info/api/ethgasAPI.json';
+    const data: EthGasStationData = (await axios.get(url)).data;
 
     switch (speed) {
-      case GasOracleService.AVERAGE: return data.standard / 1e9;
-      case GasOracleService.FAST:    return data.fast / 1e9;
-      case GasOracleService.FASTEST: return data.rapid / 1e9;
+      // Units in 10 Gwei so divide by 10 to get gwei
+      case GasOracleService.AVERAGE: return data.average / 10;
+      case GasOracleService.FAST:    return data.fast / 10;
+      case GasOracleService.FASTEST: return data.fastest / 10;
     }
+  }
+
+  private async getOptimismGasPrice(): Promise<number> {
+    const url = 'https://api-optimistic.etherscan.io/api?module=proxy&action=eth_gasPrice';
+    const data = (await axios.get(url)).data;
+    const price = Number(data.result) / 1000000000; // wei to gwei
+
+    return price;
   }
 
   private async getPolygonGasPrice(speed: GasOracleSpeed): Promise<number> {

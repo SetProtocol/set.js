@@ -16,18 +16,14 @@
 
 'use strict';
 
-const pageResults = require('graph-results-pager');
-
 import axios from 'axios';
 import Assertions from '../../assertions';
 
 import {
   CoinGeckoCoinPrices,
   CoinGeckoTokenData,
-  SushiswapTokenData,
   CoinGeckoTokenMap,
   CoinPricesParams,
-  PolygonMappedTokenData
 } from '../../types';
 
 /**
@@ -95,14 +91,8 @@ export class CoinGeckoDataService {
   async fetchTokenList(): Promise<CoinGeckoTokenData[]> {
     if (this.tokenList !== undefined) return this.tokenList;
 
-    switch (this.chainId) {
-      case 1:
-        this.tokenList = await this.fetchEthereumTokenList();
-        break;
-      case 137:
-        this.tokenList = await this.fetchPolygonTokenList();
-        break;
-    }
+    const url = this.getCoingeckoUrl();
+    this.tokenList = await this.fetchCoingeckoTokenList(url);
     this.tokenMap = this.convertTokenListToAddressMap(this.tokenList);
 
     return this.tokenList!;
@@ -135,107 +125,22 @@ export class CoinGeckoDataService {
   private getPlatform(): string {
     switch (this.chainId) {
       case 1: return 'ethereum';
+      case 10: return 'optimistic-ethereum';
       case 137: return 'polygon-pos';
       default: return '';
     }
   }
 
-  private async fetchEthereumTokenList(): Promise<CoinGeckoTokenData[]> {
-    const url = 'https://tokens.coingecko.com/uniswap/all.json';
+  private getCoingeckoUrl(): string {
+    switch (this.chainId) {
+      case 1: return 'https://tokens.coingecko.com/uniswap/all.json';
+      case 10: return 'https://tokens.coingecko.com/optimistic-ethereum/all.json';
+      case 137: return 'https://tokens.coingecko.com/polygon-pos/all.json';
+    }
+  }
+
+  private async fetchCoingeckoTokenList(url: string): Promise<CoinGeckoTokenData[]> {
     const response = await axios.get(url);
     return response.data.tokens;
-  }
-
-  private async fetchPolygonTokenList(): Promise<CoinGeckoTokenData[]> {
-    const coingeckoEthereumTokens = await this.fetchEthereumTokenList();
-    const polygonMappedTokens = await this.fetchPolygonMappedTokenList();
-    const sushiPolygonTokenList = await this.fetchSushiPolygonTokenList();
-    const quickswapPolygonTokenList = await this.fetchQuickswapPolygonTokenList();
-
-    for (const token of sushiPolygonTokenList) {
-      const quickswapToken = quickswapPolygonTokenList.find(t => t.address.toLowerCase() === token.address);
-
-      if (quickswapToken) {
-        token.logoURI = quickswapToken.logoURI;
-        continue;
-      }
-
-      const ethereumAddress = polygonMappedTokens[token.address];
-
-      if (ethereumAddress !== undefined) {
-        const ethereumToken = coingeckoEthereumTokens.find(t => t.address.toLowerCase() === ethereumAddress);
-
-        if (ethereumToken) {
-          token.logoURI = ethereumToken.logoURI;
-        }
-      }
-    }
-
-    return sushiPolygonTokenList;
-  }
-
-  private async fetchSushiPolygonTokenList() {
-    let tokens: SushiswapTokenData[] = [];
-    const url = 'https://api.thegraph.com/subgraphs/name/sushiswap/matic-exchange';
-    const properties = [
-      'id',
-      'symbol',
-      'name',
-      'decimals',
-      'volumeUSD',
-    ];
-
-    const response = await pageResults({
-      api: url,
-      query: {
-        entity: 'tokens',
-        properties: properties,
-      },
-    });
-
-    for (const token of response) {
-      tokens.push({
-        chainId: 137,
-        address: token.id,
-        symbol: token.symbol,
-        name: token.name,
-        decimals: parseInt(token.decimals),
-        volumeUSD: parseFloat(token.volumeUSD),
-      });
-    }
-
-    // Sort by volume and filter out untraded tokens
-    tokens.sort((a, b) => b.volumeUSD - a.volumeUSD);
-    tokens = tokens.filter(t => t.volumeUSD > 0);
-
-    return tokens;
-  }
-
-  private async fetchPolygonMappedTokenList() {
-    const tokens: PolygonMappedTokenData = {};
-    const url = 'https://api.thegraph.com/subgraphs/name/maticnetwork/mainnet-root-subgraphs';
-    const properties = ['id', 'rootToken', 'childToken'];
-
-    const response = await pageResults({
-      api: url,
-      query: {
-        entity: 'tokenMappings',
-        properties: properties,
-      },
-    });
-
-    for (const tokenMapping of response) {
-      tokens[tokenMapping.childToken.toLowerCase()] = tokenMapping.rootToken.toLowerCase();
-    }
-
-    return tokens;
-  }
-
-  private async fetchQuickswapPolygonTokenList(): Promise<CoinGeckoTokenData[]> {
-    const url = 'https://raw.githubusercontent.com/sameepsi/' +
-                'quickswap-default-token-list/master/src/tokens/mainnet.json';
-
-    const data = (await axios.get(url)).data;
-    return data;
   }
 }

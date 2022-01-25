@@ -8,6 +8,10 @@ import TradeAPI from './TradeAPI';
 import NavIssuanceAPI from './NavIssuanceAPI';
 import PriceOracleAPI from './PriceOracleAPI';
 import DebtIssuanceAPI from './DebtIssuanceAPI';
+import DebtIssuanceV2API from './DebtIssuanceV2API';
+import SlippageIssuanceAPI from './SlippageIssuanceAPI';
+import PerpV2LeverageAPI from './PerpV2LeverageAPI';
+import PerpV2LeverageViewerAPI from './PerpV2LeverageViewerAPI';
 import {
   TradeQuoter,
   CoinGeckoDataService,
@@ -25,6 +29,10 @@ export {
   NavIssuanceAPI,
   PriceOracleAPI,
   DebtIssuanceAPI,
+  DebtIssuanceV2API,
+  SlippageIssuanceAPI,
+  PerpV2LeverageAPI,
+  PerpV2LeverageViewerAPI,
   TradeQuoter,
   CoinGeckoDataService,
   GasOracleService

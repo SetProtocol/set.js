@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 Set Labs Inc.
+  Copyright 2022 Set Labs Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -29,6 +29,10 @@ import {
   NavIssuanceAPI,
   PriceOracleAPI,
   DebtIssuanceAPI,
+  DebtIssuanceV2API,
+  SlippageIssuanceAPI,
+  PerpV2LeverageAPI,
+  PerpV2LeverageViewerAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -97,6 +101,34 @@ class Set {
   public debtIssuance: DebtIssuanceAPI;
 
   /**
+   * An instance of the DebtIssuanceV2API class. Contains interfaces for interacting
+   * with the DebtIssuanceModuleV2 contract to issue and redeem tokens that accrue interest.
+   * Primarily used for ALM.
+   */
+  public debtIssuanceV2: DebtIssuanceV2API;
+
+  /**
+   * An instance of the SlippageIssuanceAPI class. Contains interfaces for interacting
+   * with the SlippageIssuanceAPI contract to to trade into/from tokens during the issuance and
+   * redemption step. Initially used for Perpetual Leverage Tokens.
+   */
+  public slippageIssuance: SlippageIssuanceAPI;
+
+  /**
+   * An instance of the PerpV2LeverageAPI class. Contains getters for fetching
+   * positional (per Set) and notional (across all Sets) units for collateral, vAssets, and debt.
+   * Getters return low level data; for more abstracted data use the PerpV2LeverageViewerAPI.
+   */
+  public perpV2Leverage: PerpV2LeverageAPI;
+
+  /**
+   * An instance of the PerpV2LeverageViewerAPI class. Contains getters for fetching total
+   * collateral balance (which includes PnL and funding), virtual component leverage ratios,
+   * and maximum issuance quantity computed from token supply.
+   */
+  public perpV2LeverageViewer: PerpV2LeverageViewerAPI;
+
+  /**
    * An instance of the BlockchainAPI class. Contains interfaces for
    * interacting with the blockchain
    */
@@ -127,6 +159,10 @@ class Set {
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
+    this.debtIssuanceV2 = new DebtIssuanceV2API(ethersProvider, config.debtIssuanceModuleV2Address);
+    this.slippageIssuance = new SlippageIssuanceAPI(ethersProvider, config.slippageIssuanceModuleAddress);
+    this.perpV2Leverage = new PerpV2LeverageAPI(ethersProvider, config.perpV2LeverageModuleAddress);
+    this.perpV2LeverageViewer = new PerpV2LeverageViewerAPI(ethersProvider, config.perpV2LeverageModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
   }
 }

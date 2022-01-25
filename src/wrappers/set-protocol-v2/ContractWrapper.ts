@@ -23,6 +23,8 @@ import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import {
   BasicIssuanceModule,
   DebtIssuanceModule,
+  DebtIssuanceModuleV2,
+  SlippageIssuanceModule,
   Controller,
   ProtocolViewer,
   SetToken,
@@ -30,10 +32,14 @@ import {
   StreamingFeeModule,
   TradeModule,
   NavIssuanceModule,
+  PerpV2LeverageModule,
+  PerpV2LeverageModuleViewer,
   PriceOracle,
 } from '@setprotocol/set-protocol-v2/typechain';
 import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
 import { DebtIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModule__factory';
+import { DebtIssuanceModuleV2__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModuleV2__factory';
+import { SlippageIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/SlippageIssuanceModule__factory';
 import { Controller__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/Controller__factory';
 import { ERC20__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ERC20__factory';
 import { ProtocolViewer__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/ProtocolViewer__factory';
@@ -42,6 +48,8 @@ import { SetTokenCreator__factory } from '@setprotocol/set-protocol-v2/dist/type
 import { StreamingFeeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/StreamingFeeModule__factory';
 import { TradeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/TradeModule__factory';
 import { NavIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/NavIssuanceModule__factory';
+import { PerpV2LeverageModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PerpV2LeverageModule__factory';
+import { PerpV2LeverageModuleViewer__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PerpV2LeverageModuleViewer__factory';
 import { PriceOracle__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/PriceOracle__factory';
 
 /**
@@ -337,7 +345,6 @@ export default class ContractWrapper {
     }
   }
 
-
   /**
    * Load DebtIssuanceModule contract
    *
@@ -362,6 +369,114 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = debtIssuanceModuleContract;
       return debtIssuanceModuleContract;
+    }
+  }
+
+  /**
+   * Load DebtIssuanceModuleV2 contract
+   *
+   * @param  debtIssuanceModuleV2Address    Address of the token contract
+   * @param  callerAddress                Address of caller, uses first one on node if none provided.
+   * @return                              DebtIssuanceModuleV2 contract instance
+   */
+   public async loadDebtIssuanceModuleV2Async(
+    debtIssuanceModuleV2Address: Address,
+    callerAddress?: Address,
+  ): Promise<DebtIssuanceModuleV2> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `DebtIssuanceModuleV2_${debtIssuanceModuleV2Address}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as DebtIssuanceModuleV2;
+    } else {
+      const debtIssuanceModuleV2Contract = DebtIssuanceModuleV2__factory.connect(
+        debtIssuanceModuleV2Address,
+        signer
+      );
+
+      this.cache[cacheKey] = debtIssuanceModuleV2Contract;
+      return debtIssuanceModuleV2Contract;
+    }
+  }
+
+  /**
+   * Load SlippageIssuanceModule contract
+   *
+   * @param  slippageIssuanceModuleAddress    Address of the token contract
+   * @param  callerAddress                    Address of caller, uses first one on node if none provided.
+   * @return                                  SlippageIssuanceModule contract instance
+   */
+   public async loadSlippageIssuanceModuleAsync(
+    slippageIssuanceModuleAddress: Address,
+    callerAddress?: Address,
+  ): Promise<SlippageIssuanceModule> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `SlippageIssuanceModule_${slippageIssuanceModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as SlippageIssuanceModule;
+    } else {
+      const slippageIssuanceModuleContract = SlippageIssuanceModule__factory.connect(
+        slippageIssuanceModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = slippageIssuanceModuleContract;
+      return slippageIssuanceModuleContract;
+    }
+  }
+
+  /**
+   * Load PerpV2LeverageModule contract
+   *
+   * @param  perpV2LeverageModuleAddress     Address of the Perp V2 Leverage module
+   * @param  callerAddress                   Address of caller, uses first one on node if none provided.
+   * @return                                 PerpV2LeverageModule contract instance
+   */
+   public async loadPerpV2LeverageModuleAsync(
+    perpV2LeverageModuleAddress: Address,
+    callerAddress?: Address,
+  ): Promise<PerpV2LeverageModule> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `PerpV2LeverageModule_${perpV2LeverageModuleAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as PerpV2LeverageModule;
+    } else {
+      const perpV2LeverageModuleContract = PerpV2LeverageModule__factory.connect(
+        perpV2LeverageModuleAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = perpV2LeverageModuleContract;
+      return perpV2LeverageModuleContract;
+    }
+  }
+
+  /**
+   * Load PerpV2LeverageModuleViewer contract
+   *
+   * @param  perpV2LeverageModuleViewerAddress     Address of the Perp V2 Leverage module viewer
+   * @param  callerAddress                         Address of caller, uses first one on node if none provided.
+   * @return                                       PerpV2LeverageModuleViewer contract instance
+   */
+   public async loadPerpV2LeverageModuleViewerAsync(
+    perpV2LeverageModuleViewerAddress: Address,
+    callerAddress?: Address,
+  ): Promise<PerpV2LeverageModuleViewer> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `PerpV2LeverageModuleViewer_${perpV2LeverageModuleViewerAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as PerpV2LeverageModuleViewer;
+    } else {
+      const perpV2LeverageModuleViewerContract = PerpV2LeverageModuleViewer__factory.connect(
+        perpV2LeverageModuleViewerAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = perpV2LeverageModuleViewerContract;
+      return perpV2LeverageModuleViewerContract;
     }
   }
 }

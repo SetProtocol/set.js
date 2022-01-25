@@ -21,10 +21,6 @@ export type CoinGeckoTokenData = {
   logoURI?: string,
 };
 
-export type SushiswapTokenData = CoinGeckoTokenData & {
-  volumeUSD: number
-};
-
 export type CoinGeckoTokenMap = {
   [key: string]: CoinGeckoTokenData
 };
@@ -32,10 +28,6 @@ export type CoinGeckoTokenMap = {
 export type CoinPricesParams = {
   contractAddresses: string[],
   vsCurrencies: string[]
-};
-
-export type PolygonMappedTokenData = {
-  [key: string]: string,
 };
 
 export type QuoteOptions = {
@@ -119,10 +111,11 @@ export type ZeroExTradeQuote = {
   calldata: string
 };
 
-export type GasNowData = {
-  standard: number,
+export type EthGasStationData = {
   fast: number,
-  rapid: number
+  fastest: number,
+  safeLow: number,
+  average: number
 };
 
 export type GasOracleSpeed = 'average' | 'fast' | 'fastest';

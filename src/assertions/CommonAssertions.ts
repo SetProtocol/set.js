@@ -38,6 +38,12 @@ export class CommonAssertions {
     }
   }
 
+  public isUniqueList(array: any[], errorMessage: string) {
+    if ((new Set(array)).size !== array.length) {
+      throw new Error(errorMessage);
+    }
+  }
+
   public isGreaterThan(quantity1: BigNumber, quantity2: BigNumber, errorMessage: string) {
     if (quantity1.lte(quantity2)) {
       throw new Error(errorMessage);
@@ -69,7 +75,7 @@ export class CommonAssertions {
   }
 
   public isNotUndefined(value: any, errorMessage: string) {
-    if (!value) {
+    if (value === undefined) {
       throw new Error(errorMessage);
     }
   }
@@ -117,7 +123,7 @@ export class CommonAssertions {
   }
 
   public isSupportedChainId(chainId: number) {
-    const validChainIds = [1, 137];
+    const validChainIds = [1, 10, 137];
 
     if ( !validChainIds.includes(chainId)) {
       throw new Error(`Unsupported chainId: ${chainId}. Must be one of ${validChainIds}`);
