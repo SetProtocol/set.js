@@ -20,9 +20,35 @@ This library enables you to create, issue, redeem, and trade for Sets.
 ## Getting Started
 
 1. Add this package to your project: `yarn install set.js`
-1. Configure your Set.js instance to read & write to [Ethereum, Polygon, or Optimism contracts](https://docs.tokensets.com/developers/contracts/deployed/protocol).
-1. Pass in an ethereum provider to your Set.js instance (either an [ethers.js](https://docs.ethers.io/v5/) or [web3.js](https://web3js.readthedocs.io/en/v1.7.0/) will work).
-1. Begin using the Set Protocol. Try this command to see if your instance has been set up correctly (for ethereum production mainnet):
+2. Configure your Set.js instance to read from & write to [Ethereum, Polygon, or Optimism contracts](https://docs.tokensets.com/developers/contracts/deployed/protocol).
+   Your configuration for Ethereum Mainnet (Production) might look like this:
+
+```
+const SetJsEthereumMainnetAddresses = {
+  controllerAddress: "0xF1B12A7b1f0AF744ED21eEC7d3E891C48Fd3c329",
+  setTokenCreatorAddress: "0x026d25C2B70Ddbb8D759f1f38d6fD6e23b60B6DF",
+  basicIssuanceModuleAddress: "0x508910aA6fF3D029Dc358dD0f775877A355BA35B",
+  debtIssuanceModuleAddress: "0x338BEf3f37794dd199d6910E6109125D3eCa6048",
+  debtIssuanceModuleV2Address: "0x3C0CC7624B1c408cF2cF11b3961301949f2F7820",
+  streamingFeeModuleAddress: "0x3D8d14b7eFb8e342189ee14c3d40dCe005EB901B",
+  tradeModuleAddress: "0x45D67b9dbEA9bd51ED2B67832addEAF839628fAa",
+  navIssuanceModuleAddress: "0x33f6184b1695a8Fe344Ea6b7De11aA35A74Ec300",
+  protocolViewerAddress: "0x15D860670b7DC211714282f1583CF591Cc3A945E"
+}
+```
+
+3. Pass in an ethereum provider to your Set.js instance (either an [ethers.js](https://docs.ethers.io/v5/) or [web3.js](https://web3js.readthedocs.io/en/v1.7.0/) will work). Your Set.js initialization might look like this:
+
+```
+const SetJsConfig = {
+  ethersProvider: new ethers.providers.Web3Provider(myProvider),
+  ...SetJsEthereumMainnetAddresses,
+};
+
+const SetJsInstance = new SetJs(setJsConfig);
+```
+
+4. Begin using the Set Protocol. Try this command to see if your instance has been set up correctly (for ethereum production mainnet):
 
 ```
 mySetJsInstance
@@ -33,7 +59,5 @@ mySetJsInstance
     myAccount
   )
 ```
-
-A list of all of Set's protocol contracts for mainnet [can be found here.](https://docs.tokensets.com/developers/contracts/deployed/protocol)
 
 #### Take a look at our [developer portal](https://docs.tokensets.com/) for more information on Set Protocol.
