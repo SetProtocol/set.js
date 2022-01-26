@@ -5,6 +5,12 @@ import { BigNumber } from 'ethers/lib/ethers';
 
 export { TransactionReceipt } from 'ethereum-types';
 
+/**
+ * SetJSConfig is needed to initialize a new Set instance. SetJSConfig needs an
+ * Ethereum provider (either ethers or web3). SetJSConfig also needs Set module
+ * addresses which can be found on
+ * https://docs.tokensets.com/contracts/deployed/protocol
+ */
 export interface SetJSConfig {
   ethersProvider?: Provider;
   web3Provider?: Web3CoreProvider;
@@ -62,20 +68,61 @@ export type Position = {
 };
 
 export type StreamingFeeInfo = {
+  /**
+   * Address to accrue fees to
+   */
   feeRecipient: string;
+  /**
+   * Percent of Set accruing to manager annually (1% = 1e16, 100% = 1e18)
+   */
   streamingFeePercentage: BigNumber;
+  /**
+   * The amount of streaming fees that haven't been actualized to the fee receipient yet
+   */
   unaccruedFees: BigNumber;
 };
 
 export type SetDetailsWithStreamingInfo = {
+  /**
+   * Set name (e.g. "DeFi Pulse Index")
+   */
   name: string;
+  /**
+   * Set symbol (e.g. "DPI")
+   */
   symbol: string;
+  /**
+   * The address of the set manager
+   */
   manager: string;
+  /**
+   * List of module addresses that have been abled on this set
+   */
   modules: Address[];
+  /**
+   * Status of each module represented as 0, 1, or 2. Every element in this list
+   * corresponds to an element of the same index in modules.
+   *
+   * 0 => NONE
+   * 1 => PENDING
+   * 2 => INITIALIZED
+   */
   moduleStatuses: number[];
+  /**
+   * A list of positions that compose this Set
+   */
   positions: Position[];
+  /**
+   * Address to accrue fees to
+   */
   feeRecipient: string;
+  /**
+   * Percent of Set accruing to manager annually (1% = 1e16, 100% = 1e18)
+   */
   streamingFeePercentage: BigNumber;
+  /**
+   * The amount of streaming fees that haven't been actualized to the fee receipient yet
+   */
   unaccruedFees: BigNumber;
 };
 
