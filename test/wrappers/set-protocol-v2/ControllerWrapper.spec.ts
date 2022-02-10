@@ -185,4 +185,37 @@ describe('ControllerWrapper', () => {
       });
     });
   });
+
+  describe('#isSet', () => {
+    let subjectCaller: Address;
+
+    beforeEach(async () => {
+      subjectCaller = functionCaller;
+    });
+
+    async function subject(): Promise<boolean> {
+      return controllerWrapper.isSet(mockSetTokenAddress, subjectCaller);
+    }
+
+    it('returns false', async () => {
+      const isSet = await subject();
+
+      expect(isSet).to.eq(false);
+    });
+
+    describe('when the SetToken is added to the factory', () => {
+      beforeEach(async () => {
+        await controller.addFactory(mockSetTokenFactory);
+
+        controller = controller.connect(provider.getSigner(mockSetTokenFactory));
+        await controller.addSet(mockSetTokenAddress);
+      });
+
+      it('returns true', async () => {
+        const isSet = await subject();
+
+        expect(isSet).to.eq(true);
+      });
+    });
+  });
 });
