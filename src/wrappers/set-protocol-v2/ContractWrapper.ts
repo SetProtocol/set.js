@@ -77,8 +77,9 @@ export default class ContractWrapper {
    */
   public async loadControllerContractAsync(
     controllerAddress: Address,
-    signer: Signer,
+    callerAddress?: Address,
   ): Promise<Controller> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
     const cacheKey = `Controller_${controllerAddress}_${await signer.getAddress()}`;
 
     if (cacheKey in this.cache) {

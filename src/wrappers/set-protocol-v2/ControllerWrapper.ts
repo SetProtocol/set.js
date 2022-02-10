@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { Provider, JsonRpcProvider } from '@ethersproject/providers';
+import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import ContractWrapper from './ContractWrapper';
@@ -36,7 +36,7 @@ export default class ControllerWrapper {
 
   public constructor(provider: Provider, controllerAddress: Address) {
     this.provider = provider;
-    this.contracts = new ContractWrapper(provider);
+    this.contracts = new ContractWrapper(this.provider);
     this.controllerAddress = controllerAddress;
   }
 
@@ -51,7 +51,7 @@ export default class ControllerWrapper {
   ): Promise<Address[]> {
     const controller = await this.contracts.loadControllerContractAsync(
       this.controllerAddress,
-      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+      callerAddress,
     );
 
     return controller.getFactories();
@@ -68,7 +68,7 @@ export default class ControllerWrapper {
   ): Promise<Address[]> {
     const controller = await this.contracts.loadControllerContractAsync(
       this.controllerAddress,
-      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+      callerAddress,
     );
 
     return controller.getModules();
@@ -85,7 +85,7 @@ export default class ControllerWrapper {
   ): Promise<Address[]> {
     const controller = await this.contracts.loadControllerContractAsync(
       this.controllerAddress,
-      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+      callerAddress,
     );
 
     return controller.getResources();
@@ -102,9 +102,27 @@ export default class ControllerWrapper {
   ): Promise<Address[]> {
     const controller = await this.contracts.loadControllerContractAsync(
       this.controllerAddress,
-      (this.provider as JsonRpcProvider).getSigner(callerAddress)
+      callerAddress,
     );
 
     return controller.getSets();
+  }
+
+  /**
+   * Returns whether or not an address is a SetToken
+   *
+   * @param address            Address to check
+   * @return                   boolean
+   */
+  public async isSet(
+    address: Address,
+    callerAddress?: Address,
+  ): Promise<boolean> {
+    const controller = await this.contracts.loadControllerContractAsync(
+      this.controllerAddress,
+      callerAddress,
+    );
+
+    return controller.isSet(address);
   }
 }

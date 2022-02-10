@@ -91,4 +91,27 @@ describe('SystemAPI', () => {
       expect(controllerWrapper.getSets).to.have.beenCalled;
     });
   });
+
+  describe('#isSetAsync', () => {
+    let subjectAddress: Address;
+    let nullCallerAddress: Address;
+
+    beforeEach(async () => {
+      subjectAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
+      nullCallerAddress = '0x0000000000000000000000000000000000000000';
+    });
+
+    async function subject(): Promise<boolean> {
+      return await systemAPI.isSetAsync(subjectAddress, nullCallerAddress);
+    }
+
+    it('should call the ControllerWrapper with correct params', async () => {
+      await subject();
+
+      expect(controllerWrapper.isSet).to.have.beenCalledWith(
+        subjectAddress,
+        nullCallerAddress,
+      );
+    });
+  });
 });

@@ -71,4 +71,14 @@ export default class SystemAPI {
   public async getSetsAsync(callerAddress?: Address): Promise<Address[]> {
     return await this.controllerWrapper.getSets(callerAddress);
   }
+
+  /**
+   * Returns whether or not an address is a SetToken
+   *
+   * @param address            Address to check
+   * @return                   boolean
+   */
+  public async isSetAsync(address, callerAddress?: Address): Promise<boolean> {
+    return await this.controllerWrapper.isSet(address, callerAddress);
+  }
 }
