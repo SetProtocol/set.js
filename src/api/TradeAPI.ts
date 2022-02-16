@@ -169,6 +169,7 @@ export default class TradeAPI {
     feeRecipient?: Address,
     excludedSources?: string[],
     skipAmountVerification?: boolean,
+    simulatedChainId?: number,
   ): Promise<TradeQuote> {
     this.assert.schema.isValidAddress('fromToken', fromToken);
     this.assert.schema.isValidAddress('toToken', toToken);
@@ -177,7 +178,9 @@ export default class TradeAPI {
     this.assert.schema.isValidJsNumber('toTokenDecimals', toTokenDecimals);
     this.assert.schema.isValidString('rawAmount', rawAmount);
 
-    const chainId = (await this.provider.getNetwork()).chainId;
+    const chainId = (simulatedChainId !== undefined)
+      ? simulatedChainId
+      : (await this.provider.getNetwork()).chainId;
 
     return this.tradeQuoter.generate({
       fromToken,
