@@ -129,17 +129,20 @@ export class TradeQuoter {
       toUnits
     );
 
-    const gas = await this.estimateGasCost(
-      options.tradeModule,
-      fromTokenAddress,
-      fromUnits,
-      toTokenAddress,
-      toUnits,
-      exchangeAdapterName,
-      fromAddress,
-      calldata,
-      setOnChainDetails.manager
-    );
+    // We should use the zeroex estimates plus a constant...
+    const gas = (options.gasEstimate !== undefined)
+      ? options.gasEstimate
+      : await this.estimateGasCost(
+          options.tradeModule,
+          fromTokenAddress,
+          fromUnits,
+          toTokenAddress,
+          toUnits,
+          exchangeAdapterName,
+          fromAddress,
+          calldata,
+          setOnChainDetails.manager
+        );
 
     const coinGecko = new CoinGeckoDataService(chainId);
     const coinPrices = await coinGecko.fetchCoinPrices({

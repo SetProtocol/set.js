@@ -170,6 +170,7 @@ export default class TradeAPI {
     excludedSources?: string[],
     skipAmountVerification?: boolean,
     simulatedChainId?: number,
+    gasEstimate?: number,
   ): Promise<TradeQuote> {
     this.assert.schema.isValidAddress('fromToken', fromToken);
     this.assert.schema.isValidAddress('toToken', toToken);
@@ -200,6 +201,7 @@ export default class TradeAPI {
       feeRecipient,
       excludedSources,
       skipAmountVerification,
+      gasEstimate,
     });
   }
 

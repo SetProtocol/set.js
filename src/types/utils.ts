@@ -47,7 +47,8 @@ export type QuoteOptions = {
   feePercentage?: number,
   feeRecipient?: Address,
   excludedSources?: string[],
-  skipAmountVerification?: boolean
+  skipAmountVerification?: boolean,
+  gasEstimate?: number
 };
 
 export type ZeroExQuote = {
