@@ -91,11 +91,14 @@ export class TradeQuoter {
       fromAddress, [fromTokenAddress, toTokenAddress]
     );
 
-    const fromTokenRequestAmount = this.calculateFromTokenAmount(
-      setOnChainDetails,
-      fromTokenAddress,
-      amount
-    );
+
+    const fromTokenRequestAmount = options.skipAmountVerification
+      ? amount
+      : this.calculateFromTokenAmount(
+          setOnChainDetails,
+          fromTokenAddress,
+          amount
+        );
 
     const {
       fromTokenAmount,
