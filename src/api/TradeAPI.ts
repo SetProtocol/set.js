@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { ContractTransaction } from 'ethers';
+import { ContractTransaction, constants as EthersConstants } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
@@ -35,6 +35,7 @@ import {
 import {
   TradeQuote,
   SwapQuote,
+  SwapOrderPairs,
   CoinGeckoTokenData,
   CoinGeckoTokenMap,
   GasOracleSpeed,
@@ -151,7 +152,7 @@ export default class TradeAPI {
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0
    * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
-   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Uniswap', 'Mesh'])
+   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Mesh'])
    * @param  simulatedChainId     (Optional) ChainId of target network (useful when using a forked development client)
    *
    * @return {Promise<TradeQuote>}
@@ -217,7 +218,7 @@ export default class TradeAPI {
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0
    * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
-   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Uniswap', 'Mesh'])
+   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Mesh'])
    * @param  simulatedChainId     (Optional) ChainId of target network (useful when using a forked development client)
    *
    * @return {Promise<TradeQuote>}
@@ -260,6 +261,88 @@ export default class TradeAPI {
       feeRecipient,
       excludedSources,
     });
+  }
+
+  /**
+   * Call 0x API to generate a trade quote for two SetToken components.
+   *
+   * @param  orderPairs           SwapOrderPairs array
+   * @param  fromAddress          SetToken address which holds the buy / sell components
+   * @param  setToken             SetTokenAPI instance
+   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
+   * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
+   * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
+   * @param  feePercentage        (Optional) Default: 0
+   * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
+   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Mesh'])
+   * @param  simulatedChainId     (Optional) ChainId of target network (useful when using a forked development client)
+   *
+   * @return {Promise<TradeQuote>}
+   */
+  public async batchFetchSwapQuoteAsync(
+    orderPairs: SwapOrderPairs[],
+    fromAddress: Address,
+    setToken: SetTokenAPI,
+    gasPrice?: number,
+    slippagePercentage?: number,
+    isFirmQuote?: boolean,
+    feePercentage?: number,
+    feeRecipient?: Address,
+    excludedSources?: string[],
+    simulatedChainId?: number,
+  ): Promise<SwapQuote[]> {
+    this.assert.schema.isValidAddress('fromAddress', fromAddress);
+
+    for (const pair of orderPairs) {
+      this.assert.schema.isValidAddress('fromToken', pair.fromToken);
+      this.assert.schema.isValidAddress('toToken', pair.toToken);
+      this.assert.schema.isValidString('rawAmount', pair.rawAmount);
+    }
+
+    // The forked Hardhat network has a chainId of 31337 so we can't rely on autofetching this value
+    const chainId = (simulatedChainId !== undefined)
+      ? simulatedChainId
+      : (await this.provider.getNetwork()).chainId;
+
+    const orders = [];
+
+    for (const pair of orderPairs) {
+      let order;
+
+      // We can't get a quote when `to` and `from` tokens are the same but it's helpful to be able
+      // to stub in null order calldata for use-cases where contract methods expect components and data
+      // array lengths to match. (This is a common SetProtocol design pattern)
+      if (pair.ignore === true) {
+        order = {
+          fromTokenAmount: 0,
+          toTokenAmount: 0,
+          calldata: EthersConstants.HashZero,
+        };
+      } else {
+        order = await this.tradeQuoter.generateForSwap({
+          fromToken: pair.fromToken,
+          toToken: pair.toToken,
+          rawAmount: pair.rawAmount,
+          fromAddress,
+          chainId,
+          setToken,
+          gasPrice,
+          slippagePercentage,
+          isFirmQuote,
+          feePercentage,
+          feeRecipient,
+          excludedSources,
+        });
+
+        if (order === null) {
+          return [];
+        }
+      }
+
+      orders.push(order);
+    }
+
+    return orders;
   }
 
   /**

@@ -64,6 +64,13 @@ export type SwapQuoteOptions = {
   excludedSources?: string[],
 };
 
+export type SwapOrderPairs = {
+  fromToken: Address,
+  toToken: Address,
+  rawAmount: string,
+  ignore?: boolean
+};
+
 export type ZeroExQuote = {
   fromTokenAmount: BigNumber,
   fromUnits: BigNumber,
