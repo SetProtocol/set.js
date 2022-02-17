@@ -195,7 +195,7 @@ describe('ProtocolViewerWrapper', () => {
 
     beforeEach(async () => {
       subjectSetTokens = [setTokenOne.address, setTokenTwo.address];
-      subjectTimeFastForward = ONE_YEAR_IN_SECONDS;
+      subjectTimeFastForward = ONE_YEAR_IN_SECONDS.toNumber();
     });
 
     async function subject(): Promise<any> {

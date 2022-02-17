@@ -476,7 +476,7 @@ describe('DebtIssuanceModuleV2Wrapper', () => {
 
         await tokenWithRoundingError.setError(accruedBalance);
 
-        blockchain.waitBlocksAsync(100);
+        await blockchain.waitBlocksAsync(100);
       });
 
       async function subject(): Promise<any> {
