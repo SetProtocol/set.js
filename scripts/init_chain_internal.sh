@@ -6,6 +6,7 @@ rm -rf blockchain && cp -r snapshots/0x-Kyber-Compound blockchain
 
 ganache \
   --chain.networkId 50 \
+  --chain.vmErrorsOnRPCResponse \
   --miner.blockGasLimit 20000000 \
   --wallet.totalAccounts 20  \
   --wallet.defaultBalance 10000000000 \
