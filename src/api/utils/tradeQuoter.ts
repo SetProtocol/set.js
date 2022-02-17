@@ -22,8 +22,10 @@ import type TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWr
 
 import {
   CoinGeckoCoinPrices,
-  QuoteOptions,
+  TradeQuoteOptions,
+  SwapQuoteOptions,
   TradeQuote,
+  SwapQuote
 } from '../../types/index';
 
 import {
@@ -62,14 +64,13 @@ export class TradeQuoter {
   }
 
   /**
-   * Generates a trade quote for a token pair in a SetToken. This method requires
-   * a token metadata map (passed with the options) which can be generated using
-   * the CoinGeckoDataService in '.api/utils/coingecko.ts'.
+   * Generates a trade quote for a token pair in a SetToken. This method is useful for
+   * operations like rebalancing where the ratio of existing SetToken components is modified.
    *
-   * @param  options  QuoteOptions: options / config to generate the quote
+   * @param  options  TradeQuoteOptions: options / config to generate the trade quote
    * @return          TradeQuote: trade quote object
    */
-  async generate(options: QuoteOptions): Promise<TradeQuote> {
+  async generateForTrade(options: TradeQuoteOptions): Promise<TradeQuote> {
     const chainId = options.chainId;
     const feePercentage = options.feePercentage || this.feePercentage;
     const isFirmQuote = (options.isFirmQuote === false) ? false : this.isFirmQuote;
@@ -91,14 +92,11 @@ export class TradeQuoter {
       fromAddress, [fromTokenAddress, toTokenAddress]
     );
 
-
-    const fromTokenRequestAmount = options.skipAmountVerification
-      ? amount
-      : this.calculateFromTokenAmount(
-          setOnChainDetails,
-          fromTokenAddress,
-          amount
-        );
+    const fromTokenRequestAmount = this.calculateFromTokenAmount(
+      setOnChainDetails,
+      fromTokenAddress,
+      amount
+    );
 
     const {
       fromTokenAmount,
@@ -106,7 +104,7 @@ export class TradeQuoter {
       toTokenAmount,
       toUnits,
       calldata,
-    } = await this.fetchZeroExQuote( // fetchQuote (and switch...)
+    } = await this.fetchZeroExQuoteForTradeModule( // fetchQuote (and switch...)
       fromTokenAddress,
       toTokenAddress,
       fromTokenRequestAmount,
@@ -130,19 +128,17 @@ export class TradeQuoter {
     );
 
     // We should use the zeroex estimates plus a constant...
-    const gas = (options.gasEstimate !== undefined)
-      ? options.gasEstimate
-      : await this.estimateGasCost(
-          options.tradeModule,
-          fromTokenAddress,
-          fromUnits,
-          toTokenAddress,
-          toUnits,
-          exchangeAdapterName,
-          fromAddress,
-          calldata,
-          setOnChainDetails.manager
-        );
+    const gas = await this.estimateGasCost(
+      options.tradeModule,
+      fromTokenAddress,
+      fromUnits,
+      toTokenAddress,
+      toUnits,
+      exchangeAdapterName,
+      fromAddress,
+      calldata,
+      setOnChainDetails.manager
+    );
 
     const coinGecko = new CoinGeckoDataService(chainId);
     const coinPrices = await coinGecko.fetchCoinPrices({
@@ -200,6 +196,62 @@ export class TradeQuoter {
     };
   }
 
+  /**
+   * Generates a ZeroEx swap quote for any token pair. This method is useful for operations
+   * like ExchangeIssuance where a liquid token or native chain currency is used to acquire a
+   * SetToken component that will be supplied to a SetToken issuance flow.
+   *
+   * @param  options  SwapQuoteOptions: options / config to generate the swap quote
+   * @return          SwapQuote: swap quote object
+   */
+  async generateForSwap(options: SwapQuoteOptions): Promise<SwapQuote> {
+    const chainId = options.chainId;
+    const feePercentage = options.feePercentage || this.feePercentage;
+    const isFirmQuote = (options.isFirmQuote === false) ? false : this.isFirmQuote;
+    const slippagePercentage = options.slippagePercentage || this.slippagePercentage;
+    const feeRecipient = options.feeRecipient || this.feeRecipient;
+    const excludedSources = options.excludedSources || this.excludedSources;
+
+    const {
+      fromTokenAddress,
+      toTokenAddress,
+      fromAddress,
+    } = this.sanitizeAddress(options.fromToken, options.toToken, options.fromAddress);
+
+    const amount = BigNumber.from(options.rawAmount);
+
+    const setManager = await options.setToken.getManagerAddressAsync(fromAddress);
+
+    const zeroEx = new ZeroExTradeQuoter({
+      chainId: chainId,
+      zeroExApiKey: this.zeroExApiKey,
+    });
+
+    const quote = await zeroEx.fetchTradeQuote(
+      fromTokenAddress,
+      toTokenAddress,
+      amount,
+      setManager,
+      isFirmQuote,
+      (slippagePercentage / 100),
+      feeRecipient,
+      excludedSources,
+      (feePercentage / 100)
+    );
+
+    return {
+      from: fromAddress,
+      fromTokenAddress,
+      toTokenAddress,
+      calldata: quote.calldata,
+      gas: quote.gas.toString(),
+      gasPrice: options.gasPrice.toString(),
+      slippagePercentage: this.formatAsPercentage(slippagePercentage),
+      fromTokenAmount: quote.sellAmount.toString(),
+      toTokenAmount: quote.buyAmount.toString(),
+    };
+  }
+
   private sanitizeAddress(fromToken: Address, toToken: Address, fromAddress: Address) {
     return {
       fromTokenAddress: fromToken.toLowerCase(),
@@ -212,7 +264,7 @@ export class TradeQuoter {
     return ethersUtils.parseUnits(rawAmount, decimals);
   }
 
-  private async fetchZeroExQuote(
+  private async fetchZeroExQuoteForTradeModule(
     fromTokenAddress: Address,
     toTokenAddress: Address,
     fromTokenRequestAmount: BigNumber,
