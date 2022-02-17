@@ -64,7 +64,7 @@ jobs:
           no_output_timeout: 30m
           command: |
             mkdir -p /tmp/test-results
-            TEST_FILES="$(circleci tests glob "./test/**/*.spec.ts")"
+            TEST_FILES="$(circleci tests glob "./test/**/*.spec.ts" | circleci tests split)"
             echo $TEST_FILES
             yarn test --findRelatedTests ${TEST_FILES}
           when: always
