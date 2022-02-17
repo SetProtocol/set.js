@@ -3,7 +3,7 @@ version: 2
 jobs:
   checkout_and_compile:
     docker:
-      - image: circleci/node:12.22.10
+      - image: circleci/node:12.22
     working_directory: ~/set.js
     steps:
       - checkout
@@ -43,7 +43,7 @@ jobs:
             - ~/set.js
   test:
     docker:
-      - image: circleci/node:12.22.10
+      - image: circleci/node:12.22
     working_directory: ~/set.js
     parallelism: 2
     steps:
