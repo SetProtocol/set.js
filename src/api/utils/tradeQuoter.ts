@@ -70,7 +70,7 @@ export class TradeQuoter {
    * @param  options  TradeQuoteOptions: options / config to generate the trade quote
    * @return          TradeQuote: trade quote object
    */
-  async generateForTrade(options: TradeQuoteOptions): Promise<TradeQuote> {
+  async generateQuoteForTrade(options: TradeQuoteOptions): Promise<TradeQuote> {
     const chainId = options.chainId;
     const feePercentage = options.feePercentage || this.feePercentage;
     const isFirmQuote = (options.isFirmQuote === false) ? false : this.isFirmQuote;
@@ -204,7 +204,7 @@ export class TradeQuoter {
    * @param  options  SwapQuoteOptions: options / config to generate the swap quote
    * @return          SwapQuote: swap quote object
    */
-  async generateForSwap(options: SwapQuoteOptions): Promise<SwapQuote> {
+  async generateQuoteForSwap(options: SwapQuoteOptions): Promise<SwapQuote> {
     const chainId = options.chainId;
     const feePercentage = options.feePercentage || this.feePercentage;
     const isFirmQuote = (options.isFirmQuote === false) ? false : this.isFirmQuote;

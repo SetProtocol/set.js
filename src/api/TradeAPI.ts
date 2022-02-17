@@ -185,7 +185,7 @@ export default class TradeAPI {
       ? simulatedChainId
       : (await this.provider.getNetwork()).chainId;
 
-    return this.tradeQuoter.generateForTrade({
+    return this.tradeQuoter.generateQuoteForTrade({
       fromToken,
       toToken,
       fromTokenDecimals,
@@ -247,7 +247,7 @@ export default class TradeAPI {
       ? simulatedChainId
       : (await this.provider.getNetwork()).chainId;
 
-    return this.tradeQuoter.generateForSwap({
+    return this.tradeQuoter.generateQuoteForSwap({
       fromToken,
       toToken,
       rawAmount,
@@ -319,7 +319,7 @@ export default class TradeAPI {
           calldata: EthersConstants.HashZero,
         };
       } else {
-        order = await this.tradeQuoter.generateForSwap({
+        order = await this.tradeQuoter.generateQuoteForSwap({
           fromToken: pair.fromToken,
           toToken: pair.toToken,
           rawAmount: pair.rawAmount,

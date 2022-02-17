@@ -270,7 +270,7 @@ describe('TradeAPI', () => {
       };
       await subject();
 
-      expect(tradeQuoter.generate).to.have.beenCalledWith(expectedQuoteOptions);
+      expect(tradeQuoter.generateQuoteForTrade).to.have.beenCalledWith(expectedQuoteOptions);
     });
 
     describe('when the fromToken address is invalid', () => {

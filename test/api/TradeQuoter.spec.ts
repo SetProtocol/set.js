@@ -123,7 +123,7 @@ describe('TradeQuoter', () => {
       });
 
       async function subject(): Promise<TradeQuote> {
-        return await tradeQuoter.generate({
+        return await tradeQuoter.generateQuoteForTrade({
           fromToken: subjectFromToken,
           toToken: subjectToToken,
           fromTokenDecimals: subjectFromTokenDecimals,
@@ -180,7 +180,7 @@ describe('TradeQuoter', () => {
       });
 
       async function subject(): Promise<TradeQuote> {
-        return await tradeQuoter.generate({
+        return await tradeQuoter.generateQuoteForTrade({
           fromToken: subjectFromToken,
           toToken: subjectToToken,
           fromTokenDecimals: subjectFromTokenDecimals,
