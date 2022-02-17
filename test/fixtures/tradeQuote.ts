@@ -150,6 +150,11 @@ export const tradeQuoteFixtures = {
     },
   },
 
+  coinGeckoPricesRequestEthEmpty: 'https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2,0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2&vs_currencies=usd,usd,usd',
+  coinGeckoPricesResponseEmpty: {
+    data: {},
+  },
+
   coinGeckoPricesRequestPoly: 'https://api.coingecko.com/api/v3/simple/token_price/polygon-pos?contract_addresses=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270,0x2791bca1f2de4661ed88a30c99a7a9449aa84174,0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6&vs_currencies=usd,usd,usd',
   coinGeckoPricesResponsePoly: {
     data: {
@@ -210,4 +215,31 @@ export const tradeQuoteFixtures = {
        feePercentage: '0.00%',
        slippage: '1.11%' },
   },
+
+  setTradeQuoteEmptyPrice: {
+    from: '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b',
+    fromTokenAddress: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+    toTokenAddress: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+    exchangeAdapterName: 'ZeroExApiAdapterV4',
+    calldata: '0x415565b00000000000000000000000009f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+    gas: '315000',
+    gasPrice: '61',
+    slippagePercentage: '2.00%',
+    fromTokenAmount: '1126868991563',
+    toTokenAmount: '90314741816',
+    display: {
+      inputAmountRaw: '.5',
+      inputAmount: '500000000000000000',
+      quoteAmount: '499999999999793729',
+      fromTokenDisplayAmount: '0.4999999999997937',
+      toTokenDisplayAmount: '0.04131269116050703',
+      fromTokenPriceUsd: '$0.00',
+      toTokenPriceUsd: '$0.00',
+      gasCostsUsd: '$0.00',
+      gasCostsChainCurrency: '0.0192150 ETH',
+      feePercentage: '1.00%',
+      slippage: '0.00%',
+    },
+  },
+
 };

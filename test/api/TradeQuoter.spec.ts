@@ -55,6 +55,7 @@ axios.get.mockImplementation(val => {
     case fixture.coinGeckoTokenRequestEth: return fixture.coinGeckoTokenResponseEth;
     case fixture.coinGeckoTokenRequestPoly: return fixture.coinGeckoTokenResponsePoly;
     case fixture.coinGeckoPricesRequestEth: return fixture.coinGeckoPricesResponseEth;
+    case fixture.coinGeckoPricesRequestEthEmpty: return fixture.coinGeckoPricesResponseEmpty;
     case fixture.coinGeckoPricesRequestPoly: return fixture.coinGeckoPricesResponsePoly;
   }
 });
@@ -141,6 +142,19 @@ describe('TradeQuoter', () => {
       it('should generate a trade quote correctly', async () => {
         const quote = await subject();
         expect(quote).to.be.deep.equal(fixture.setTradeQuoteEth);
+      });
+
+      describe('when coingecko does not return a price', () => {
+        // Empty quote expects these duplicate tokens (they must be components on Set)
+        beforeEach(() => {
+          subjectFromToken = '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2';
+          subjectToToken = '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2';
+        });
+
+        it('should generate a trade quote correctly', async () => {
+          const quote = await subject();
+          expect(quote).to.be.deep.equal(fixture.setTradeQuoteEmptyPrice);
+        });
       });
     });
   });
