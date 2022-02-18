@@ -211,6 +211,8 @@ export default class TradeAPI {
    * @param  fromToken            Address of token being sold
    * @param  toToken              Address of token being bought
    * @param  rawAmount            String quantity of token to sell (ex: "0.5")
+   * @param  useBuyAmount         When true, amount is `buyAmount` of `toToken`,
+   *                              When false, amount is `sellAmount` of `fromToken`
    * @param  fromAddress          SetToken address which holds the buy / sell components
    * @param  setToken             SetTokenAPI instance
    * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
@@ -227,6 +229,7 @@ export default class TradeAPI {
     fromToken: Address,
     toToken: Address,
     rawAmount: string,
+    useBuyAmount: boolean,
     fromAddress: Address,
     setToken: SetTokenAPI,
     gasPrice?: number,
@@ -251,6 +254,7 @@ export default class TradeAPI {
       fromToken,
       toToken,
       rawAmount,
+      useBuyAmount,
       fromAddress,
       chainId,
       setToken,
@@ -267,6 +271,8 @@ export default class TradeAPI {
    * Call 0x API to generate a trade quote for two SetToken components.
    *
    * @param  orderPairs           SwapOrderPairs array
+   * @param  useBuyAmount         When true, amount is `buyAmount` of `toToken`,
+   *                              When false, amount is `sellAmount` of `fromToken`
    * @param  fromAddress          SetToken address which holds the buy / sell components
    * @param  setToken             SetTokenAPI instance
    * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
@@ -281,6 +287,7 @@ export default class TradeAPI {
    */
   public async batchFetchSwapQuoteAsync(
     orderPairs: SwapOrderPairs[],
+    useBuyAmount: boolean,
     fromAddress: Address,
     setToken: SetTokenAPI,
     gasPrice?: number,
@@ -323,6 +330,7 @@ export default class TradeAPI {
           fromToken: pair.fromToken,
           toToken: pair.toToken,
           rawAmount: pair.rawAmount,
+          useBuyAmount,
           fromAddress,
           chainId,
           setToken,

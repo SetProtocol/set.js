@@ -206,6 +206,7 @@ export class TradeQuoter {
    */
   async generateQuoteForSwap(options: SwapQuoteOptions): Promise<SwapQuote> {
     const chainId = options.chainId;
+    const useBuyAmount = options.useBuyAmount;
     const feePercentage = options.feePercentage || this.feePercentage;
     const isFirmQuote = (options.isFirmQuote === false) ? false : this.isFirmQuote;
     const slippagePercentage = options.slippagePercentage || this.slippagePercentage;
@@ -231,6 +232,7 @@ export class TradeQuoter {
       fromTokenAddress,
       toTokenAddress,
       amount,
+      useBuyAmount,
       setManager,
       isFirmQuote,
       (slippagePercentage / 100),
@@ -286,6 +288,7 @@ export class TradeQuoter {
       fromTokenAddress,
       toTokenAddress,
       fromTokenRequestAmount,
+      false, // Input amount is `sellAmount` of fromToken
       manager,
       isFirmQuote,
       (slippagePercentage / 100),

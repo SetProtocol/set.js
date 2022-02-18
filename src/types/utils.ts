@@ -53,6 +53,7 @@ export type SwapQuoteOptions = {
   fromToken: Address,
   toToken: Address,
   rawAmount: string,
+  useBuyAmount: boolean,
   fromAddress: Address,
   chainId: number,
   setToken: SetTokenAPI,
@@ -126,7 +127,8 @@ export type ZeroExTradeQuoterOptions = {
 export type ZeroExQueryParams = {
   sellToken: Address,
   buyToken: Address,
-  sellAmount: string,
+  sellAmount?: string,
+  buyAmount?: string,
   slippagePercentage: number,
   takerAddress: Address,
   excludedSources: string,
