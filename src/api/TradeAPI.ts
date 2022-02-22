@@ -318,11 +318,13 @@ export default class TradeAPI {
 
       // We can't get a quote when `to` and `from` tokens are the same but it's helpful to be able
       // to stub in null order calldata for use-cases where contract methods expect components and data
-      // array lengths to match. (This is a common SetProtocol design pattern)
+      // array lengths to match. (This is a common SetProtocol design pattern). We populate
+      // the from and to amounts to permit pre-trade accounting by the consumer of this method
+      // for issuance and redemption, respectively.
       if (pair.ignore === true) {
         order = {
-          fromTokenAmount: 0,
-          toTokenAmount: 0,
+          fromTokenAmount: pair.rawAmount,
+          toTokenAmount: pair.rawAmount,
           calldata: EthersConstants.HashZero,
         };
       } else {
