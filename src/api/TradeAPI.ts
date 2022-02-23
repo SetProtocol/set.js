@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { ContractTransaction, constants as EthersConstants } from 'ethers';
+import { ContractTransaction } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
@@ -27,19 +27,11 @@ import SetTokenAPI from './SetTokenAPI';
 import Assertions from '../assertions';
 
 import {
-  TradeQuoter,
-  CoinGeckoDataService,
-  GasOracleService
+  TradeQuoter
 } from './utils';
 
 import {
-  TradeQuote,
-  SwapQuote,
-  SwapOrderPairs,
-  CoinGeckoTokenData,
-  CoinGeckoTokenMap,
-  GasOracleSpeed,
-  CoinGeckoCoinPrices
+  TradeQuote
 } from '../types';
 
 /**
@@ -55,8 +47,6 @@ export default class TradeAPI {
   private assert: Assertions;
   private provider: Provider;
   private tradeQuoter: TradeQuoter;
-  private coinGecko: CoinGeckoDataService;
-  private chainId: number;
 
   public constructor(
     provider: Provider,
@@ -203,218 +193,5 @@ export default class TradeAPI {
       feeRecipient,
       excludedSources,
     });
-  }
-
-  /**
-   * Call 0x API to generate a trade quote for two SetToken components.
-   *
-   * @param  fromToken            Address of token being sold
-   * @param  toToken              Address of token being bought
-   * @param  rawAmount            String quantity of token to sell (ex: "0.5")
-   * @param  useBuyAmount         When true, amount is `buyAmount` of `toToken`,
-   *                              When false, amount is `sellAmount` of `fromToken`
-   * @param  fromAddress          SetToken address which holds the buy / sell components
-   * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
-   * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
-   * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
-   * @param  feePercentage        (Optional) Default: 0
-   * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
-   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Mesh'])
-   * @param  simulatedChainId     (Optional) ChainId of target network (useful when using a forked development client)
-   *
-   * @return {Promise<TradeQuote>}
-   */
-  public async fetchSwapQuoteAsync(
-    fromToken: Address,
-    toToken: Address,
-    rawAmount: string,
-    useBuyAmount: boolean,
-    fromAddress: Address,
-    setToken: SetTokenAPI,
-    gasPrice?: number,
-    slippagePercentage?: number,
-    isFirmQuote?: boolean,
-    feePercentage?: number,
-    feeRecipient?: Address,
-    excludedSources?: string[],
-    simulatedChainId?: number,
-  ): Promise<SwapQuote> {
-    this.assert.schema.isValidAddress('fromToken', fromToken);
-    this.assert.schema.isValidAddress('toToken', toToken);
-    this.assert.schema.isValidAddress('fromAddress', fromAddress);
-    this.assert.schema.isValidString('rawAmount', rawAmount);
-
-    // The forked Hardhat network has a chainId of 31337 so we can't rely on autofetching this value
-    const chainId = (simulatedChainId !== undefined)
-      ? simulatedChainId
-      : (await this.provider.getNetwork()).chainId;
-
-    return this.tradeQuoter.generateQuoteForSwap({
-      fromToken,
-      toToken,
-      rawAmount,
-      useBuyAmount,
-      fromAddress,
-      chainId,
-      setToken,
-      gasPrice,
-      slippagePercentage,
-      isFirmQuote,
-      feePercentage,
-      feeRecipient,
-      excludedSources,
-    });
-  }
-
-  /**
-   * Call 0x API to generate a trade quote for two SetToken components.
-   *
-   * @param  orderPairs           SwapOrderPairs array
-   * @param  useBuyAmount         When true, amount is `buyAmount` of `toToken`,
-   *                              When false, amount is `sellAmount` of `fromToken`
-   * @param  fromAddress          SetToken address which holds the buy / sell components
-   * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
-   * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
-   * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
-   * @param  feePercentage        (Optional) Default: 0
-   * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
-   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Mesh'])
-   * @param  simulatedChainId     (Optional) ChainId of target network (useful when using a forked development client)
-   *
-   * @return {Promise<TradeQuote>}
-   */
-  public async batchFetchSwapQuoteAsync(
-    orderPairs: SwapOrderPairs[],
-    useBuyAmount: boolean,
-    fromAddress: Address,
-    setToken: SetTokenAPI,
-    gasPrice?: number,
-    slippagePercentage?: number,
-    isFirmQuote?: boolean,
-    feePercentage?: number,
-    feeRecipient?: Address,
-    excludedSources?: string[],
-    simulatedChainId?: number,
-  ): Promise<SwapQuote[]> {
-    this.assert.schema.isValidAddress('fromAddress', fromAddress);
-
-    for (const pair of orderPairs) {
-      this.assert.schema.isValidAddress('fromToken', pair.fromToken);
-      this.assert.schema.isValidAddress('toToken', pair.toToken);
-      this.assert.schema.isValidString('rawAmount', pair.rawAmount);
-    }
-
-    // The forked Hardhat network has a chainId of 31337 so we can't rely on autofetching this value
-    const chainId = (simulatedChainId !== undefined)
-      ? simulatedChainId
-      : (await this.provider.getNetwork()).chainId;
-
-    const orders = [];
-
-    for (const pair of orderPairs) {
-      let order;
-
-      // We can't get a quote when `to` and `from` tokens are the same but it's helpful to be able
-      // to stub in null order calldata for use-cases where contract methods expect components and data
-      // array lengths to match. (This is a common SetProtocol design pattern). We populate
-      // the from and to amounts to permit pre-trade accounting by the consumer of this method
-      // for issuance and redemption, respectively.
-      if (pair.ignore === true) {
-        order = {
-          fromTokenAmount: pair.rawAmount,
-          toTokenAmount: pair.rawAmount,
-          calldata: EthersConstants.HashZero,
-        };
-      } else {
-        order = await this.tradeQuoter.generateQuoteForSwap({
-          fromToken: pair.fromToken,
-          toToken: pair.toToken,
-          rawAmount: pair.rawAmount,
-          useBuyAmount,
-          fromAddress,
-          chainId,
-          setToken,
-          gasPrice,
-          slippagePercentage,
-          isFirmQuote,
-          feePercentage,
-          feeRecipient,
-          excludedSources,
-        });
-
-        if (order === null) {
-          return [];
-        }
-      }
-
-      orders.push(order);
-    }
-
-    return orders;
-  }
-
-  /**
-   * Fetches a list of tokens and their metadata from CoinGecko. Each entry includes
-   * the token's address, proper name, decimals, exchange symbol and a logo URI if available.
-   * For Ethereum, this is a list of tokens tradeable on Uniswap, for Polygon it's a list of
-   * tokens tradeable on Sushiswap's Polygon exchange. Method is useful for acquiring token decimals
-   * necessary to generate a trade quote and images for representing available tokens in a UI.
-   *
-   * @return List of tradeable tokens for chain platform
-   */
-  public async fetchTokenListAsync(): Promise<CoinGeckoTokenData[]> {
-    await this.initializeForChain();
-    return this.coinGecko.fetchTokenList();
-  }
-
-  /**
-   * Fetches the same info as `fetchTokenList` in the form of a map indexed by address. Method is
-   * useful if you're cacheing the token list and want quick lookups for a variety of trades.
-   *
-   * @return Map of token addresses to token metadata
-   */
-  public async fetchTokenMapAsync(): Promise<CoinGeckoTokenMap> {
-    await this.initializeForChain();
-    return this.coinGecko.fetchTokenMap();
-  }
-
-  /**
-   * Fetches a list of prices vs currencies for the specified inputs from CoinGecko
-   *
-   * @param  contractAddresses         String array of contract addresses
-   * @param  vsCurrencies              String array of currency codes (see CoinGecko api for a complete list)
-   *
-   * @return                           List of prices vs currencies
-   */
-  public async fetchCoinPricesAsync(
-    contractAddresses: string[],
-    vsCurrencies: string[]
-  ): Promise<CoinGeckoCoinPrices> {
-    await this.initializeForChain();
-    return this.coinGecko.fetchCoinPrices({contractAddresses, vsCurrencies});
-  }
-
-  /**
-   * Fetches the recommended gas price for a specified execution speed.
-   *
-   * @param  speed                   (Optional) string value: "average" | "fast" | "fastest" (Default: fast)
-   *
-   * @return                         Number: gas price
-   */
-  public async fetchGasPriceAsync(speed?: GasOracleSpeed): Promise<number> {
-    await this.initializeForChain();
-    const oracle = new GasOracleService(this.chainId);
-    return oracle.fetchGasPrice(speed);
-  }
-
-
-  private async initializeForChain() {
-    if (this.coinGecko === undefined) {
-      const network = await this.provider.getNetwork();
-      this.chainId = network.chainId;
-      this.coinGecko = new CoinGeckoDataService(network.chainId);
-    }
   }
 }

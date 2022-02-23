@@ -18,7 +18,6 @@ import axios from 'axios';
 
 import { ethers, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers/lib/ethers';
-import { Network } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { EMPTY_BYTES } from '@setprotocol/set-protocol-v2/dist/utils/constants';
 import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
@@ -28,14 +27,10 @@ import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper
 import type SetTokenAPI from '@src/api/SetTokenAPI';
 import {
   TradeQuoter,
-  CoinGeckoDataService,
 } from '@src/api/utils';
 import { expect } from '@test/utils/chai';
 import {
   TradeQuote,
-  CoinGeckoTokenData,
-  CoinGeckoTokenMap,
-  CoinGeckoCoinPrices
 } from '@src/types';
 
 import { tradeQuoteFixtures as fixture } from '../fixtures/tradeQuote';
@@ -320,207 +315,6 @@ describe('TradeAPI', () => {
 
       it('should throw with invalid params', async () => {
         await expect(subject()).to.be.rejectedWith('Validation error');
-      });
-    });
-  });
-
-  describe('#fetchTokenListAsync', () => {
-    let subjectChainId;
-
-    async function subject(): Promise<CoinGeckoTokenData[]> {
-      return await tradeAPI.fetchTokenListAsync();
-    }
-
-    describe('when the chain is ethereum (1)', () => {
-      beforeEach(() => {
-        subjectChainId = 1;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should fetch correct token data for network', async() => {
-        const tokenData = await subject();
-        await expect(tokenData).to.deep.equal(fixture.coinGeckoTokenResponseEth.data.tokens);
-      });
-    });
-
-    describe('when the chain is polygon (137)', () => {
-      beforeEach(() => {
-        subjectChainId = 137;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should fetch correct token data for network', async() => {
-        const tokenData = await subject();
-        await expect(tokenData).to.deep.equal(fixture.coinGeckoTokenResponsePoly.data.tokens);
-      });
-    });
-
-    describe('when chain is invalid', () => {
-      beforeEach(() => {
-        subjectChainId = 1337;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should error', async() => {
-        await expect(subject()).to.be.rejectedWith(`Unsupported chainId: ${subjectChainId}`);
-      });
-    });
-  });
-
-  describe('#fetchTokenMapAsync', () => {
-    let subjectChainId;
-    let subjectTokenList;
-    let subjectCoinGecko;
-
-    async function subject(): Promise<CoinGeckoTokenMap> {
-      return await tradeAPI.fetchTokenMapAsync();
-    }
-
-    describe('when the chain is ethereum (1)', () => {
-      beforeEach(async () => {
-        subjectChainId = 1;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-        subjectCoinGecko = new CoinGeckoDataService(subjectChainId);
-        subjectTokenList = await tradeAPI.fetchTokenListAsync();
-      });
-
-      it('should fetch correct token data for network', async() => {
-        const expectedTokenMap = subjectCoinGecko.convertTokenListToAddressMap(subjectTokenList);
-        const tokenData = await subject();
-        await expect(tokenData).to.deep.equal(expectedTokenMap);
-      });
-    });
-
-    describe('when the chain is polygon (137)', () => {
-      beforeEach(async () => {
-        subjectChainId = 137;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-        subjectCoinGecko = new CoinGeckoDataService(subjectChainId);
-        subjectTokenList = await tradeAPI.fetchTokenListAsync();
-      });
-
-      it('should fetch correct token data for network', async() => {
-        const expectedTokenMap = subjectCoinGecko.convertTokenListToAddressMap(subjectTokenList);
-        const tokenData = await subject();
-        await expect(tokenData).to.deep.equal(expectedTokenMap);
-      });
-    });
-
-    describe('when chain is invalid', () => {
-      beforeEach(() => {
-        subjectChainId = 1337;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should error', async() => {
-        await expect(subject()).to.be.rejectedWith(`Unsupported chainId: ${subjectChainId}`);
-      });
-    });
-  });
-
-  describe('#fetchCoinPricesAsync', () => {
-    let subjectChainId;
-    let subjectContractAddresses;
-    let subjectVsCurrencies;
-
-    beforeEach(() => {
-      subjectVsCurrencies = ['usd,usd,usd'];
-    });
-
-    async function subject(): Promise<CoinGeckoCoinPrices> {
-      return await tradeAPI.fetchCoinPricesAsync(
-        subjectContractAddresses,
-        subjectVsCurrencies
-      );
-    }
-
-    describe('when the chain is ethereum (1)', () => {
-      beforeEach(() => {
-        subjectChainId = 1;
-        subjectContractAddresses = [
-          '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-          '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
-          '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-        ];
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should fetch correct coin prices for network', async() => {
-        const coinPrices = await subject();
-        await expect(coinPrices).to.deep.equal(fixture.coinGeckoPricesResponseEth.data);
-      });
-    });
-
-    describe('when the chain is polygon (137)', () => {
-      beforeEach(() => {
-        subjectChainId = 137;
-        subjectContractAddresses = [
-          '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-          '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-          '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
-        ];
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should fetch correct coin prices for network', async() => {
-        const coinPrices = await subject();
-        await expect(coinPrices).to.deep.equal(fixture.coinGeckoPricesResponsePoly.data);
-      });
-    });
-
-    describe('when chain is invalid', () => {
-      beforeEach(() => {
-        subjectChainId = 1337;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should error', async() => {
-        await expect(subject()).to.be.rejectedWith(`Unsupported chainId: ${subjectChainId}`);
-      });
-    });
-  });
-
-  describe('#fetchGasPricesAsync', () => {
-    let subjectChainId;
-
-    async function subject(): Promise<number> {
-      return await tradeAPI.fetchGasPriceAsync();
-    }
-
-    describe('when chain is Ethereum (1)', () => {
-      beforeEach(() => {
-        subjectChainId = 1;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should get gas price for the correct network', async() => {
-        const expectedGasPrice = fixture.ethGasStationResponse.data.fast / 10;
-        const gasPrice = await subject();
-        expect(gasPrice).to.equal(expectedGasPrice);
-      });
-    });
-
-    describe('when chain is Polygon (137)', () => {
-      beforeEach(() => {
-        subjectChainId = 137;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should get gas price for the correct network', async() => {
-        const expectedGasPrice = fixture.maticGasStationResponse.data.fast;
-        const gasPrice = await subject();
-        expect(gasPrice).to.equal(expectedGasPrice);
-      });
-    });
-
-    describe('when chain is invalid', () => {
-      beforeEach(() => {
-        subjectChainId = 1337;
-        provider.getNetwork = jest.fn(() => Promise.resolve(<unknown>{ chainId: subjectChainId } as Network ));
-      });
-
-      it('should error', async() => {
-        await expect(subject()).to.be.rejectedWith(`Unsupported chainId: ${subjectChainId}`);
       });
     });
   });

@@ -33,6 +33,7 @@ import {
   SlippageIssuanceAPI,
   PerpV2LeverageAPI,
   PerpV2LeverageViewerAPI,
+  UtilsAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -135,6 +136,12 @@ class Set {
   public blockchain: BlockchainAPI;
 
   /**
+   * An instance of the BlockchainAPI class. Contains interfaces for
+   * interacting with the blockchain
+   */
+  public utils: UtilsAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(config: SetJSConfig) {
@@ -164,6 +171,7 @@ class Set {
     this.perpV2Leverage = new PerpV2LeverageAPI(ethersProvider, config.perpV2LeverageModuleAddress);
     this.perpV2LeverageViewer = new PerpV2LeverageViewerAPI(ethersProvider, config.perpV2LeverageModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
+    this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey);
   }
 }
 
