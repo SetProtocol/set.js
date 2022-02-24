@@ -108,6 +108,7 @@ export class ZeroExTradeQuoter {
         buyAmount: BigNumber.from(response.data.buyAmount),
         calldata: response.data.data,
         gas: parseInt(response.data.gas),
+        _quote: response.data,
       };
     } catch (error) {
       throw new Error('ZeroEx quote request failed: ' + error);

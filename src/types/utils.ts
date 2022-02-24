@@ -145,7 +145,8 @@ export type ZeroExTradeQuote = {
   sellAmount: BigNumber,
   buyAmount: BigNumber,
   calldata: string,
-  gas: number
+  gas: number,
+  _quote: any
 };
 
 export type EthGasStationData = {
