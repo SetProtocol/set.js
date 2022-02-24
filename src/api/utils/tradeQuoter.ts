@@ -260,6 +260,7 @@ export class TradeQuoter {
       slippagePercentage: this.formatAsPercentage(slippagePercentage),
       fromTokenAmount: quote.sellAmount.toString(),
       toTokenAmount: quote.buyAmount.toString(),
+      _quote: quote._quote,
     };
   }
 

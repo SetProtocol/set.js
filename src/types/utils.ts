@@ -117,6 +117,7 @@ export type SwapQuote = {
   slippagePercentage: string,
   fromTokenAmount: string,
   toTokenAmount: string,
+  _quote: any
 };
 
 export type ZeroExTradeQuoterOptions = {
