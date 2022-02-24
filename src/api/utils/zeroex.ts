@@ -79,7 +79,7 @@ export class ZeroExTradeQuoter {
     const params: ZeroExQueryParams = {
       sellToken: sellTokenAddress,
       buyToken: buyTokenAddress,
-      // slippagePercentage: slippagePercentage,
+      slippagePercentage: slippagePercentage,
       sellAmount: (useBuyAmount) ? undefined : amount.toString(),
       buyAmount: (useBuyAmount) ? amount.toString() : undefined,
       takerAddress,

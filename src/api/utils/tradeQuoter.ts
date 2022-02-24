@@ -207,11 +207,20 @@ export class TradeQuoter {
   async generateQuoteForSwap(options: SwapQuoteOptions): Promise<SwapQuote> {
     const chainId = options.chainId;
     const useBuyAmount = options.useBuyAmount;
-    const feePercentage = options.feePercentage || this.feePercentage;
-    const isFirmQuote = (options.isFirmQuote === false) ? false : this.isFirmQuote;
-    const slippagePercentage = options.slippagePercentage || this.slippagePercentage;
     const feeRecipient = options.feeRecipient || this.feeRecipient;
     const excludedSources = options.excludedSources || this.excludedSources;
+
+    const isFirmQuote = (options.isFirmQuote === false)
+      ? false
+      : this.isFirmQuote;
+
+    const slippagePercentage = (options.slippagePercentage !== undefined)
+      ? options.slippagePercentage
+      : this.slippagePercentage;
+
+    const feePercentage = (options.feePercentage !== undefined)
+      ? options.feePercentage
+      : this.feePercentage;
 
     const {
       fromTokenAddress,
