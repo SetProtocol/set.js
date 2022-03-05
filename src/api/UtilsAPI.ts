@@ -127,6 +127,15 @@ export default class UtilsAPI {
   /**
    * Call 0x API to generate a trade quote for two SetToken components.
    *
+   * 0x rate-limits calls per API key as follows:
+   *
+   * > Ethereum: 10 requests per second/200 requests per minute.
+   * > Other networks: 30 requests per second.
+   *
+   * They also permit parallelization and allow making up to 50 requests in parallel. In testing (March 2022)
+   * we found this worked on Optimism and Ethereum but consistently 429'd (too many reqs) on Polygon. A
+   * delay step parameter option is available to stagger parallelized requests and is set to 25ms by default.
+   *
    * @param  orderPairs           SwapOrderPairs array
    * @param  useBuyAmount         When true, amount is `buyAmount` of `toToken`,
    *                              When false, amount is `sellAmount` of `fromToken`
@@ -139,6 +148,7 @@ export default class UtilsAPI {
    * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
    * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Mesh'])
    * @param  simulatedChainId     (Optional) ChainId of target network (useful when using a forked development client)
+   * @param  delayStep            (Optional) Delay between firing each quote request (to manage rate-limiting)
    *
    * @return {Promise<TradeQuote>}
    */
@@ -154,7 +164,9 @@ export default class UtilsAPI {
     feeRecipient?: Address,
     excludedSources?: string[],
     simulatedChainId?: number,
+    delayStep?: number,
   ): Promise<SwapQuote[]> {
+    const self = this;
     this.assert.schema.isValidAddress('fromAddress', fromAddress);
 
     for (const pair of orderPairs) {
@@ -168,10 +180,16 @@ export default class UtilsAPI {
       ? simulatedChainId
       : (await this.provider.getNetwork()).chainId;
 
+    // Default 25 ms delay
+    const _delayStep = (delayStep !== undefined)
+      ? delayStep
+      : 25;
+
     const orders = [];
 
     for (const pair of orderPairs) {
       let order;
+      let delay = 0;
 
       // We can't get a quote when `to` and `from` tokens are the same but it's helpful to be able
       // to stub in null order calldata for use-cases where contract methods expect components and data
@@ -185,21 +203,33 @@ export default class UtilsAPI {
           calldata: EthersConstants.HashZero,
         });
       } else {
-        order = this.tradeQuoter.generateQuoteForSwap({
-          fromToken: pair.fromToken,
-          toToken: pair.toToken,
-          rawAmount: pair.rawAmount,
-          useBuyAmount,
-          fromAddress,
-          chainId,
-          setToken,
-          gasPrice,
-          slippagePercentage,
-          isFirmQuote,
-          feePercentage,
-          feeRecipient,
-          excludedSources,
+        order = new Promise(async function (resolve, reject) {
+          await new Promise(r => setTimeout(() => r(true), delay));
+
+          try {
+            const response = await self.tradeQuoter.generateQuoteForSwap({
+              fromToken: pair.fromToken,
+              toToken: pair.toToken,
+              rawAmount: pair.rawAmount,
+              useBuyAmount,
+              fromAddress,
+              chainId,
+              setToken,
+              gasPrice,
+              slippagePercentage,
+              isFirmQuote,
+              feePercentage,
+              feeRecipient,
+              excludedSources,
+            });
+
+            resolve(response);
+          } catch (e) {
+            reject(e);
+          }
         });
+
+        delay += _delayStep;
       }
 
       orders.push(order);
