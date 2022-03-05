@@ -179,13 +179,13 @@ export default class UtilsAPI {
       // the from and to amounts to permit pre-trade accounting by the consumer of this method
       // for issuance and redemption, respectively.
       if (pair.ignore === true) {
-        order = {
+        order = Promise.resolve({
           fromTokenAmount: pair.rawAmount,
           toTokenAmount: pair.rawAmount,
           calldata: EthersConstants.HashZero,
-        };
+        });
       } else {
-        order = await this.tradeQuoter.generateQuoteForSwap({
+        order = this.tradeQuoter.generateQuoteForSwap({
           fromToken: pair.fromToken,
           toToken: pair.toToken,
           rawAmount: pair.rawAmount,
@@ -200,16 +200,12 @@ export default class UtilsAPI {
           feeRecipient,
           excludedSources,
         });
-
-        if (order === null) {
-          return [];
-        }
       }
 
       orders.push(order);
     }
 
-    return orders;
+    return Promise.all(orders);
   }
 
   /**
