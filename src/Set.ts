@@ -136,8 +136,8 @@ class Set {
   public blockchain: BlockchainAPI;
 
   /**
-   * An instance of the BlockchainAPI class. Contains interfaces for
-   * interacting with the blockchain
+   * An instance of the UtilsAPI class. Contains interfaces for fetching swap quotes from 0x Protocol,
+   * prices and token metadata from coingecko, and network gas prices from various sources
    */
   public utils: UtilsAPI;
 

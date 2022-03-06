@@ -104,7 +104,8 @@ export type TradeQuote = {
     gasCostsChainCurrency: string,
     feePercentage: string,
     slippage: string
-  }
+  },
+  _quote: any
 };
 
 export type SwapQuote = {
