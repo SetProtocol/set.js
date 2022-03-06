@@ -186,10 +186,10 @@ export default class UtilsAPI {
       : 25;
 
     const orders = [];
+    let delay = 0;
 
     for (const pair of orderPairs) {
       let order;
-      let delay = 0;
 
       // We can't get a quote when `to` and `from` tokens are the same but it's helpful to be able
       // to stub in null order calldata for use-cases where contract methods expect components and data
@@ -205,6 +205,7 @@ export default class UtilsAPI {
       } else {
         order = new Promise(async function (resolve, reject) {
           await new Promise(r => setTimeout(() => r(true), delay));
+
 
           try {
             const response = await self.tradeQuoter.generateQuoteForSwap({
