@@ -47,7 +47,7 @@ export const tradeQuoteFixtures = {
     totalSupply: BigNumber.from(10).pow(18),
   },
 
-  zeroExRequestEth: 'https://api.0x.org/swap/v1/quote',
+  zeroExRequestEth: 'https://gated.api.0x.org/swap/v1/quote',
   zeroExReponseEth: {
     data: {
       price: '0.082625382321048146',
@@ -59,7 +59,7 @@ export const tradeQuoteFixtures = {
     },
   },
 
-  zeroExRequestPoly: 'https://polygon.api.0x.org/swap/v1/quote',
+  zeroExRequestPoly: 'https://gated.polygon.api.0x.org/swap/v1/quote',
   zeroExReponsePoly: {
     data: {
       price: '0.00002973',
