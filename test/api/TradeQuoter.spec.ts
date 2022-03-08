@@ -145,9 +145,6 @@ describe('TradeQuoter', () => {
       it('should generate a trade quote correctly', async () => {
         const quote = await subject();
 
-        // Don't check debugging info attached to response.
-        delete quote._quote;
-
         expect(quote).to.be.deep.equal(fixture.setTradeQuoteEth);
       });
     });
@@ -249,9 +246,6 @@ describe('TradeQuoter', () => {
 
       it('should generate a trade quote correctly', async () => {
         const quote = await subject();
-
-        // Don't check debugging info attached to response.
-        delete quote._quote;
 
         expect(quote).to.be.deep.equal(fixture.setTradeQuotePoly);
       });
