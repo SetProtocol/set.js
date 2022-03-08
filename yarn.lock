@@ -1028,6 +1028,31 @@
     module-alias "^2.2.2"
     replace-in-file "^6.1.0"
 
+"@setprotocol/set-protocol-v2@^0.1.11-hardhat.0":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.1.12.tgz#4ff67d0d2935148908ddada79bc51fda17c97afa"
+  integrity sha512-0zHRCTgASXR4P8ya0lafF4WSjnVsc6N7QMLiOGymVfuoSJDpDD+jGOn57FnVmgeknmt60frxJYMxxn5XQN9lyw==
+  dependencies:
+    "@uniswap/v3-sdk" "^3.5.1"
+    ethers "^5.5.2"
+    fs-extra "^5.0.0"
+    jsbi "^3.2.5"
+    module-alias "^2.2.2"
+    replace-in-file "^6.1.0"
+
+"@setprotocol/set-v2-strategies@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-v2-strategies/-/set-v2-strategies-0.0.4.tgz#e71d4a6da3fbb05d64755afe1c1646f0024c78c2"
+  integrity sha512-0TbLst3lBeN9J2fsWJUyTCJq/5TBHZWVVvNZZy6WJtIaAU7eZeXl7RFYuIenERIxrOyKUEdiRbznBlwo9l/6tg==
+  dependencies:
+    "@setprotocol/set-protocol-v2" "^0.1.11-hardhat.0"
+    "@uniswap/v3-sdk" "^3.5.1"
+    ethers "5.5.2"
+    fs-extra "^5.0.0"
+    jsbi "^3.2.5"
+    module-alias "^2.2.2"
+    replace-in-file "^6.1.0"
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
