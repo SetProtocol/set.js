@@ -122,7 +122,14 @@ export type SwapQuote = {
 
 export type ZeroExTradeQuoterOptions = {
   chainId: number,
-  zeroExApiKey: string,
+  zeroExApiKey?: string,
+  zeroExApiUrls?: ZeroExApiUrls
+};
+
+export type ZeroExApiUrls = {
+  ethereum: string,
+  optimism: string,
+  polygon: string
 };
 
 export type ZeroExQueryParams = {
