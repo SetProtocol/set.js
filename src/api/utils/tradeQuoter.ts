@@ -25,7 +25,8 @@ import {
   TradeQuoteOptions,
   SwapQuoteOptions,
   TradeQuote,
-  SwapQuote
+  SwapQuote,
+  ZeroExApiUrls
 } from '../../types/index';
 
 import {
@@ -58,9 +59,11 @@ export class TradeQuoter {
   private slippagePercentage: number = 2;
   private excludedSources: string[] = ['Kyber', 'Eth2Dai', 'Mesh'];
   private zeroExApiKey: string;
+  private zeroExApiUrls: ZeroExApiUrls;
 
-  constructor(zeroExApiKey: string = '') {
+  constructor(zeroExApiKey?: string, zeroExApiUrls?: ZeroExApiUrls) {
     this.zeroExApiKey = zeroExApiKey;
+    this.zeroExApiUrls = zeroExApiUrls;
   }
 
   /**
@@ -235,6 +238,7 @@ export class TradeQuoter {
     const zeroEx = new ZeroExTradeQuoter({
       chainId: chainId,
       zeroExApiKey: this.zeroExApiKey,
+      zeroExApiUrls: this.zeroExApiUrls,
     });
 
     const quote = await zeroEx.fetchTradeQuote(
@@ -292,6 +296,7 @@ export class TradeQuoter {
     const zeroEx = new ZeroExTradeQuoter({
       chainId: chainId,
       zeroExApiKey: this.zeroExApiKey,
+      zeroExApiUrls: this.zeroExApiUrls,
     });
 
     const quote = await zeroEx.fetchTradeQuote(

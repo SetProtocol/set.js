@@ -162,7 +162,7 @@ class Set {
       assertions
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
-    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey);
+    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey, config.zeroExApiUrls);
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
@@ -171,7 +171,7 @@ class Set {
     this.perpV2Leverage = new PerpV2LeverageAPI(ethersProvider, config.perpV2LeverageModuleAddress);
     this.perpV2LeverageViewer = new PerpV2LeverageViewerAPI(ethersProvider, config.perpV2LeverageModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
-    this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey);
+    this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey, config.zeroExApiUrls);
   }
 }
 

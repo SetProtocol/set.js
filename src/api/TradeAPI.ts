@@ -31,7 +31,8 @@ import {
 } from './utils';
 
 import {
-  TradeQuote
+  TradeQuote,
+  ZeroExApiUrls
 } from '../types';
 
 /**
@@ -52,11 +53,12 @@ export default class TradeAPI {
     provider: Provider,
     tradeModuleAddress: Address,
     zeroExApiKey?: string,
+    zeroExApiUrls?: ZeroExApiUrls
   ) {
     this.provider = provider;
     this.tradeModuleWrapper = new TradeModuleWrapper(provider, tradeModuleAddress);
     this.assert = new Assertions();
-    this.tradeQuoter = new TradeQuoter(zeroExApiKey);
+    this.tradeQuoter = new TradeQuoter(zeroExApiKey, zeroExApiUrls);
   }
 
   /**

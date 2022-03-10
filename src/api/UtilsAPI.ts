@@ -35,7 +35,8 @@ import {
   CoinGeckoTokenData,
   CoinGeckoTokenMap,
   GasOracleSpeed,
-  CoinGeckoCoinPrices
+  CoinGeckoCoinPrices,
+  ZeroExApiUrls,
 } from '../types';
 
 /**
@@ -56,10 +57,11 @@ export default class UtilsAPI {
   public constructor(
     provider: Provider,
     zeroExApiKey?: string,
+    zeroExApiUrls?: ZeroExApiUrls
   ) {
     this.provider = provider;
     this.assert = new Assertions();
-    this.tradeQuoter = new TradeQuoter(zeroExApiKey);
+    this.tradeQuoter = new TradeQuoter(zeroExApiKey, zeroExApiUrls);
   }
 
   /**
