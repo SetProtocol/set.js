@@ -1,12 +1,9 @@
 /*
   Copyright 2022 Set Labs Inc.
-
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-
   http://www.apache.org/licenses/LICENSE-2.0
-
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,34 +13,31 @@
 
 'use strict';
 
-import { ContractTransaction, BigNumberish, BytesLike } from 'ethers';
-import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { BigNumberish, BytesLike, ContractTransaction } from 'ethers';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
+import { Provider } from '@ethersproject/providers';
+import { generateTxOpts } from '../../utils/transactions';
 
-import DelegatedManagerFactoryWrapper from '../wrappers/set-v2-strategies/DelegatedManagerFactoryWrapper';
-import Assertions from '../assertions';
+import ContractWrapper from './ContractWrapper';
 
 /**
- * @title  DelegatedManagerFactoryAPI
+ * @title  DelegatedManagerFactoryWrapper
  * @author Set Protocol
  *
- * The DelegatedManagerFactoryAPI exposes methods to create and initialized new SetTokens bundled with
- * Manager contracts and extensions which encode fee management and rebalance trading logic. The API also
- * provides some helper methods to generate bytecode data packets that encode module and extension
- * initialization method calls.
+ * The DelegatedManagerFactoryWrapper forwards functionality from the DelegatedManagerFactory contract.
  *
  */
-export default class DelegatedManagerFactoryAPI {
-  private DelegatedManagerFactoryWrapper: DelegatedManagerFactoryWrapper;
-  private assert: Assertions;
+export default class DelegatedManagerFactoryWrapper {
+  private provider: Provider;
+  private contracts: ContractWrapper;
 
-  public constructor(
-    provider: Provider,
-    delegatedManagerFactoryAddress: Address,
-    assertions?: Assertions) {
-    this.DelegatedManagerFactoryWrapper = new DelegatedManagerFactoryWrapper(provider, delegatedManagerFactoryAddress);
-    this.assert = assertions || new Assertions();
+  private delegatedManagerFactoryAddress: Address;
+
+  public constructor(provider: Provider, delegatedManagerFactoryAddress: Address) {
+    this.provider = provider;
+    this.contracts = new ContractWrapper(this.provider);
+    this.delegatedManagerFactoryAddress = delegatedManagerFactoryAddress;
   }
 
   /**
@@ -71,10 +65,8 @@ export default class DelegatedManagerFactoryAPI {
    * @param extensions       Extensions authorized for the DelegateManager
    * @param callerAddress    Address of caller (optional)
    * @param txOpts           Overrides for transaction (optional)
-   *
-   * @return                 Transaction hash of the initialize transaction
    */
-  public async createSetAndManagerAsync(
+  public async createSetAndManager(
     components: Address[],
     units: BigNumberish[],
     name: string,
@@ -88,27 +80,13 @@ export default class DelegatedManagerFactoryAPI {
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    this.assert.schema.isValidAddressList('components', components);
-    this.assert.schema.isValidNumberList('units', units);
-    this.assert.schema.isValidString('name', name);
-    this.assert.schema.isValidString('symbol', symbol);
-    this.assert.schema.isValidAddress('methodologist', methodologist);
-    this.assert.schema.isValidAddressList('modules', modules);
-    this.assert.schema.isValidAddressList('operators', operators);
-    this.assert.schema.isValidAddressList('assets', assets);
-    this.assert.schema.isValidAddressList('extensions', extensions);
-
-    this.assert.common.isNotEmptyArray(
-      components,
-      'Component addresses must contain at least one component.'
-    );
-    this.assert.common.isEqualLength(
-      components,
-      units,
-      'Component addresses and units must be equal length.'
+    const txOptions = await generateTxOpts(txOpts);
+    const delegatedManagerFactoryInstance = await this.contracts.loadDelegatedManagerFactoryAsync(
+      this.delegatedManagerFactoryAddress,
+      callerAddress
     );
 
-    return await this.DelegatedManagerFactoryWrapper.createSetAndManager(
+    return await delegatedManagerFactoryInstance.createSetAndManager(
       components,
       units,
       name,
@@ -119,8 +97,7 @@ export default class DelegatedManagerFactoryAPI {
       operators,
       assets,
       extensions,
-      callerAddress,
-      txOpts
+      txOptions,
     );
   }
 
@@ -138,39 +115,36 @@ export default class DelegatedManagerFactoryAPI {
    * initializeBytecode.push(tradeModuleBytecodeData);
    * ```
    *
-   * @param setTokenAddress        Address of deployed SetToken to initialize
-   * @param ownerFeeSplit          % of fees in precise units (10^16 = 1%) sent to owner, rest to methodologist
-   * @param ownerFeeRecipient      Address which receives operator's share of fees when they're distributed
-   * @param initializeTargets      Addresses of extensions or modules which should be initialized
-   * @param initializeBytecode     Array of encoded calls to a target's initialize function
-   * @param callerAddress          Address of caller (optional)
-   * @param txOpts                 Overrides for transaction (optional)
-   *
-   * @return                       Transaction hash of the initialize transaction
+   * @param setTokenAddress             Address of deployed SetToken to initialize
+   * @param ownerFeeSplit               % of fees in precise units (10^16 = 1%) sent to owner, rest to methodologist
+   * @param ownerFeeRecipient           Address which receives operator's share of fees when they're distributed
+   * @param initializeTargets           Addresses of extensions or modules which should be initialized
+   * @param initializedBytecode         Array of encoded calls to a target's initialize function
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
    */
-  public async initializeAsync(
+  public async initialize(
     setTokenAddress: Address,
     ownerFeeSplit: BigNumberish,
     ownerFeeRecipient: Address,
-    initializeTargets: Address[],
+    intializeTargets: Address[],
     initializeBytecode: BytesLike[],
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
-    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
-    this.assert.schema.isValidNumber('ownerFeeSplit', ownerFeeSplit);
-    this.assert.schema.isValidAddress('ownerFeeRecipient', ownerFeeRecipient);
-    this.assert.schema.isValidAddressList('initializeTargets', initializeTargets);
-    this.assert.schema.isValidBytesList('initializeBytecode', initializeBytecode);
+    const txOptions = await generateTxOpts(txOpts);
+    const delegatedManagerFactoryInstance = await this.contracts.loadDelegatedManagerFactoryAsync(
+      this.delegatedManagerFactoryAddress,
+      callerAddress
+    );
 
-    return await this.DelegatedManagerFactoryWrapper.initialize(
+    return await delegatedManagerFactoryInstance.initialize(
       setTokenAddress,
       ownerFeeSplit,
       ownerFeeRecipient,
-      initializeTargets,
+      intializeTargets,
       initializeBytecode,
-      callerAddress,
-      txOpts
+      txOptions,
     );
   }
 }

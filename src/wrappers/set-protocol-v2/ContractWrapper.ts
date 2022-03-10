@@ -36,6 +36,7 @@ import {
   PerpV2LeverageModuleViewer,
   PriceOracle,
 } from '@setprotocol/set-protocol-v2/typechain';
+
 import { BasicIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/BasicIssuanceModule__factory';
 import { DebtIssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModule__factory';
 import { DebtIssuanceModuleV2__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/DebtIssuanceModuleV2__factory';

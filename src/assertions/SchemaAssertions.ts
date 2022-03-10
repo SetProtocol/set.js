@@ -72,6 +72,18 @@ export class SchemaAssertions {
   }
 
   /**
+   * Throws if a given input is not a valid list of Byte Strings.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param values          Values being validated.
+   */
+  public isValidBytesList(variableName: string, values: any) {
+    for (const value of values) {
+      this.assertConformsToSchema(variableName, value, schemas.bytesSchema);
+    }
+  }
+
+  /**
    * Throws if a given input is not a number.
    *
    * @param variableName    Variable name being validated. Used for displaying error messages.
@@ -79,6 +91,18 @@ export class SchemaAssertions {
    */
   public isValidNumber(variableName: string, value: any) {
     this.assertConformsToSchema(variableName, value, schemas.numberSchema);
+  }
+
+  /**
+   * Throws if a given input is not a valid list of numbers.
+   *
+   * @param variableName    Variable name being validated. Used for displaying error messages.
+   * @param values          Values being validated.
+   */
+  public isValidNumberList(variableName: string, values: any) {
+    for (const value of values) {
+      this.assertConformsToSchema(variableName, value, schemas.numberSchema);
+    }
   }
 
   /**

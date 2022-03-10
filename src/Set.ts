@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { SetJSConfig } from './types';
+import { SetJSConfig, DelegatedManagerSystemExtensions } from './types';
 import Assertions from './assertions';
 import {
   BlockchainAPI,
@@ -34,6 +34,9 @@ import {
   PerpV2LeverageAPI,
   PerpV2LeverageViewerAPI,
   UtilsAPI,
+  IssuanceExtensionAPI,
+  TradeExtensionAPI,
+  StreamingFeeExtensionAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -147,6 +150,12 @@ class Set {
    */
   public blockchain: BlockchainAPI;
 
+
+  /**
+   * Group of extension for interacting with SetTokens managed by with DelegatedManager system contracts
+   */
+  public extensions: DelegatedManagerSystemExtensions;
+
   /**
    * An instance of the UtilsAPI class. Contains interfaces for fetching swap quotes from 0x Protocol,
    * prices and token metadata from coingecko, and network gas prices from various sources
@@ -187,6 +196,12 @@ class Set {
                                                                 config.perpV2BasisTradingModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
     this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey, config.zeroExApiUrls);
+
+    this.extensions = {
+      streamingFeeExtension: new StreamingFeeExtensionAPI(ethersProvider, config.streamingFeeExtensionAddress),
+      issuanceExtension: new IssuanceExtensionAPI(ethersProvider, config.issuanceExtensionAddress),
+      tradeExtension: new TradeExtensionAPI(ethersProvider, config.tradeExtensionAddress),
+    };
   }
 }
 

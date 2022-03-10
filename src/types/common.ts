@@ -4,6 +4,12 @@ import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { BigNumber } from 'ethers/lib/ethers';
 import { ZeroExApiUrls } from './utils';
 
+import type {
+  IssuanceExtensionAPI,
+  TradeExtensionAPI,
+  StreamingFeeExtensionAPI
+} from '../api';
+
 export { TransactionReceipt } from 'ethereum-types';
 
 /**
@@ -33,6 +39,9 @@ export interface SetJSConfig {
   perpV2LeverageModuleViewerAddress: Address;
   perpV2BasisTradingModuleAddress: Address;
   perpV2BasisTradingModuleViewerAddress: Address;
+  issuanceExtensionAddress: Address;
+  tradeExtensionAddress: Address;
+  streamingFeeExtensionAddress: Address;
 }
 
 export type SetDetails = {
@@ -149,4 +158,10 @@ export type VAssetDisplayInfo = {
   positionUnit: BigNumber; // 10^18 decimals
   indexPrice: BigNumber; // 10^18 decimals
   currentLeverageRatio: BigNumber; // 10^18 decimals
+};
+
+export type DelegatedManagerSystemExtensions = {
+  issuanceExtension: IssuanceExtensionAPI,
+  tradeExtension: TradeExtensionAPI,
+  streamingFeeExtension: StreamingFeeExtensionAPI
 };
