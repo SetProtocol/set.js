@@ -18,6 +18,7 @@
 
 import { ContractTransaction, BytesLike, utils as EthersUtils } from 'ethers';
 import { Provider } from '@ethersproject/providers';
+import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
 import { StreamingFeeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/StreamingFeeModule__factory';
 import { StreamingFeeSplitExtension__factory } from '@setprotocol/set-v2-strategies/dist/typechain/factories/StreamingFeeSplitExtension__factory';
@@ -51,13 +52,23 @@ export default class StreamingFeeExtensionAPI {
    * this method.)
    *
    * @param setTokenAddress      Instance of deployed SetToken to accrue & distribute streaming fees for
+   * @param callerAddress        Address of caller (optional)
+   * @param txOpts               Overrides for transaction (optional)
    *
    * @return                     Initialization bytecode
    */
-  public async accrueFeesAndDistribute(setTokenAddress: Address): Promise<ContractTransaction>  {
+  public async accrueFeesAndDistribute(
+    setTokenAddress: Address,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction>  {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
 
-    return await this.streamingFeeExtensionWrapper.accrueFeesAndDistribute(setTokenAddress);
+    return await this.streamingFeeExtensionWrapper.accrueFeesAndDistribute(
+      setTokenAddress,
+      callerAddress,
+      txOpts
+    );
   }
 
   /**
@@ -74,7 +85,7 @@ export default class StreamingFeeExtensionAPI {
     this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
 
     const extensionInterface = new EthersUtils.Interface(StreamingFeeSplitExtension__factory.abi);
-    return extensionInterface.encodeFunctionData('initialize', [ delegatedManagerAddress ]);
+    return extensionInterface.encodeFunctionData('initializeExtension', [ delegatedManagerAddress ]);
   }
 
   /**
