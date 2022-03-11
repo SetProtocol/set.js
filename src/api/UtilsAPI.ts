@@ -127,7 +127,12 @@ export default class UtilsAPI {
   }
 
   /**
-   * Call 0x API to generate a trade quote for two SetToken components.
+   * Call 0x API to generate a trade quote for two SetToken components. By default, swap quotes
+   * are fetched for 0x's public endpoints using their `https://api.0x.org`, `https://<network>/api.0x.org`
+   * url scheme. These open endpoints are rate limited at ~3 req/sec
+   *
+   * It's also possible to make calls from non-browser context with an API key using the `https://gated.api.0x.org`
+   * url scheme.
    *
    * 0x rate-limits calls per API key as follows:
    *
