@@ -57,7 +57,7 @@ export default class StreamingFeeExtensionAPI {
    *
    * @return                     Initialization bytecode
    */
-  public async accrueFeesAndDistribute(
+  public async accrueFeesAndDistributeAsync(
     setTokenAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}

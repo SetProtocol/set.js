@@ -63,7 +63,7 @@ export default class TradeExtensionAPI {
    * @param callerAddress        Address of caller (optional)
    * @param txOpts               Overrides for transaction (optional)
    */
-  public async tradeWithOperator(
+  public async tradeWithOperatorAsync(
     setTokenAddress: Address,
     exchangeName: Address,
     sendToken: Address,
@@ -109,7 +109,7 @@ export default class TradeExtensionAPI {
     this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
 
     const extensionInterface = new EthersUtils.Interface(TradeExtension__factory.abi);
-    return extensionInterface.encodeFunctionData('initialize', [ delegatedManagerAddress ]);
+    return extensionInterface.encodeFunctionData('initializeExtension', [ delegatedManagerAddress ]);
   }
 
   /**

@@ -74,7 +74,7 @@ export default class TradeExtensionWrapper {
       callerAddress
     );
 
-    return await tradeExtensionInstance.tradeWithOperator(
+    return await tradeExtensionInstance.trade(
       setTokenAddress,
       exchangeName,
       sendToken,
@@ -82,7 +82,6 @@ export default class TradeExtensionWrapper {
       receiveToken,
       minReceiveQuantity,
       data,
-      callerAddress,
       txOptions
     );
   }

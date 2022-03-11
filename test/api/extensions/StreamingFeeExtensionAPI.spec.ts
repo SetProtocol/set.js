@@ -54,7 +54,7 @@ describe('StreamingFeeExtensionAPI', () => {
     (StreamingFeeExtensionWrapper as any).mockClear();
   });
 
-  describe('#accrueFeesAndDistribute(ISetToken _setToken)', () => {
+  describe('#accrueFeesAndDistributeAsync', () => {
     let subjectSetToken: Address;
     let subjectCallerAddress: Address;
     let subjectTransactionOptions: any;
@@ -66,7 +66,7 @@ describe('StreamingFeeExtensionAPI', () => {
     });
 
     async function subject(): Promise<ContractTransaction> {
-      return streamingFeeExtensionAPI.accrueFeesAndDistribute(
+      return streamingFeeExtensionAPI.accrueFeesAndDistributeAsync(
         subjectSetToken,
         subjectCallerAddress,
         subjectTransactionOptions
