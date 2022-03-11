@@ -15,192 +15,311 @@
 */
 
 import { ethers } from 'ethers';
-import { BigNumber, ContractTransaction } from 'ethers/lib/ethers';
+import { BigNumber, ContractTransaction } from 'ethers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
+import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
-import DelegateManagerFactoryAPI from '@src/api/DelegateManagerFactoryAPI';
-import PerpV2LeverageModuleWrapper from '@src/wrappers/set-protocol-v2/PerpV2LeverageModuleWrapper';
+import DelegateManagerFactoryAPI from '@src/api/DelegatedManagerFactoryAPI';
+import DelegatedManagerFactoryWrapper from '@src/wrappers/set-v2-strategies/DelegatedManagerFactoryWrapper';
 import { expect } from '../utils/chai';
 
 const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
-jest.mock('@src/wrappers/set-protocol-v2/PerpV2LeverageModuleWrapper');
+jest.mock('@src/wrappers/set-v2-strategies/DelegatedManagerFactoryWrapper');
 
 describe('DelegateManagerFactoryAPI', () => {
-  let perpV2LeverageModuleAddress: Address;
-  let setTokenAddress: Address;
   let owner: Address;
+  let methodologist: Address;
+  let operator: Address;
+  let componentOne: Address;
+  let componentTwo: Address;
+  let module: Address;
+  let extension: Address;
+  let delegatedManagerFactory: Address;
+  let setToken: Address;
+  let ownerFeeRecipient: Address;
 
-  let perpV2LeverageAPI: DelegateManagerFactoryAPI;
-  let perpV2LeverageModuleWrapper: PerpV2LeverageModuleWrapper;
+  let delegatedManagerFactoryAPI: DelegateManagerFactoryAPI;
+  let delegatedManagerFactoryWrapper: DelegatedManagerFactoryWrapper;
 
   beforeEach(async () => {
     [
       owner,
-      perpV2LeverageModuleAddress,
-      setTokenAddress,
+      methodologist,
+      operator,
+      componentOne,
+      componentTwo,
+      module,
+      extension,
+      delegatedManagerFactory,
+      setToken,
+      ownerFeeRecipient,
     ] = await provider.listAccounts();
 
-    perpV2LeverageAPI = new DelegateManagerFactoryAPI(provider, perpV2LeverageModuleAddress);
-    perpV2LeverageModuleWrapper = (PerpV2LeverageModuleWrapper as any).mock.instances[0];
+    delegatedManagerFactoryAPI = new DelegateManagerFactoryAPI(provider, delegatedManagerFactory);
+    delegatedManagerFactoryWrapper = (DelegatedManagerFactoryWrapper as any).mock.instances[0];
   });
 
   afterEach(() => {
-    (PerpV2LeverageModuleWrapper as any).mockClear();
+    (DelegatedManagerFactoryWrapper as any).mockClear();
   });
 
-  describe('#initializeAsync', () => {
-    let subjectSetTokenAddress: Address;
+  describe('#createSetAndManagerAsync', () => {
+    let subjectComponents: Address[];
+    let subjectUnits: BigNumber[];
+    let subjectName: string;
+    let subjectSymbol: string;
+    let subjectOwner: Address;
+    let subjectMethodologist: Address;
+    let subjectModules: Address[];
+    let subjectOperators: Address[];
+    let subjectAssets: Address[];
+    let subjectExtensions: Address[];
     let subjectCallerAddress: Address;
-
     let subjectTransactionOptions: any;
 
     beforeEach(async () => {
-      subjectSetTokenAddress = setTokenAddress;
+      subjectComponents = [componentOne, componentTwo];
+      subjectUnits = [ether(1), ether(.5)];
+      subjectName = 'Test';
+      subjectSymbol = 'TEST';
+      subjectOwner = owner;
+      subjectMethodologist = methodologist;
+      subjectModules = [module];
+      subjectOperators = [operator];
+      subjectAssets = [componentOne, componentTwo];
+      subjectExtensions = [extension];
       subjectCallerAddress = owner;
       subjectTransactionOptions = {};
     });
 
     async function subject(): Promise<ContractTransaction> {
-      return perpV2LeverageAPI.initializeAsync(
-        subjectSetTokenAddress,
+      return delegatedManagerFactoryAPI.createSetAndManagerAsync(
+        subjectComponents,
+        subjectUnits,
+        subjectName,
+        subjectSymbol,
+        subjectOwner,
+        subjectMethodologist,
+        subjectModules,
+        subjectOperators,
+        subjectAssets,
+        subjectExtensions,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    }
+
+    it('should call `createSetAndManagerAsync` on the DelegatedManagerFactoryWrapper', async () => {
+      await subject();
+
+      expect(delegatedManagerFactoryWrapper.createSetAndManager).to.have.beenCalledWith(
+        subjectComponents,
+        subjectUnits,
+        subjectName,
+        subjectSymbol,
+        subjectOwner,
+        subjectMethodologist,
+        subjectModules,
+        subjectOperators,
+        subjectAssets,
+        subjectExtensions,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    });
+
+    describe('when a component is not a valid address', () => {
+      beforeEach(() => subjectComponents = ['0xinvalid', componentTwo]);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when a unit is not a valid number', () => {
+      beforeEach(() => subjectUnits = [NaN, ether(.5)]);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when a name is not a valid string', () => {
+      beforeEach(() => subjectName = <unknown>5 as string);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when a symbol is not a valid string', () => {
+      beforeEach(() => subjectSymbol = <unknown>5 as string);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when a methodologist is not a valid address', () => {
+      beforeEach(() => subjectMethodologist = '0xinvalid');
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when a module is not a valid address', () => {
+      beforeEach(() => subjectModules = ['0xinvalid']);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when an operator is not a valid address', () => {
+      beforeEach(() => subjectOperators = ['0xinvalid']);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when an asset is not a valid address', () => {
+      beforeEach(() => subjectAssets = ['0xinvalid']);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when an extension is not a valid address', () => {
+      beforeEach(() => subjectExtensions = ['0xinvalid']);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when components is an empty array', () => {
+      beforeEach(() => subjectComponents = []);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Component addresses must contain at least one component.');
+      });
+    });
+
+    describe('when components and units have different array lengths', () => {
+      beforeEach(() => subjectComponents = [componentOne] );
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Component addresses and units must be equal length.');
+      });
+    });
+  });
+
+  describe('#initializeAsync', () => {
+    let subjectSetToken: Address;
+    let subjectOwnerFeeSplit: BigNumber;
+    let subjectOwnerFeeRecipient: Address;
+    let subjectInitializeTargets: Address[];
+    let subjectInitializeBytecode: string[];
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      subjectSetToken = setToken;
+      subjectOwnerFeeSplit = ether(.5);
+      subjectOwnerFeeRecipient = ownerFeeRecipient;
+      subjectInitializeTargets = [module];
+      subjectInitializeBytecode = ['0x0123456789ABCDEF'];
+      subjectCallerAddress = owner;
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<ContractTransaction> {
+      return delegatedManagerFactoryAPI.initializeAsync(
+        subjectSetToken,
+        subjectOwnerFeeSplit,
+        subjectOwnerFeeRecipient,
+        subjectInitializeTargets,
+        subjectInitializeBytecode,
         subjectCallerAddress,
         subjectTransactionOptions,
       );
     }
 
-    it('should call initialize on the PerpV2LeverageModuleWrapper', async () => {
+    it('should call initialize on the DelegatedManagerFactoryWrapper', async () => {
       await subject();
 
-      expect(perpV2LeverageModuleWrapper.initialize).to.have.beenCalledWith(
-        subjectSetTokenAddress,
+      expect(delegatedManagerFactoryWrapper.initialize).to.have.beenCalledWith(
+        subjectSetToken,
+        subjectOwnerFeeSplit,
+        subjectOwnerFeeRecipient,
+        subjectInitializeTargets,
+        subjectInitializeBytecode,
         subjectCallerAddress,
         subjectTransactionOptions,
       );
     });
-  });
 
-  describe('#getCollateralTokenAsync', () => {
-    let nullCallerAddress: Address;
-
-    beforeEach(async () => {
-      nullCallerAddress = '0x0000000000000000000000000000000000000000';
-    });
-
-    async function subject(): Promise<string> {
-      return await perpV2LeverageAPI.getCollateralTokenAsync(
-        nullCallerAddress,
-      );
-    }
-
-    it('should call the PerpV2LeverageModuleWrapper with correct params', async () => {
-      await subject();
-
-      expect(perpV2LeverageModuleWrapper.collateralToken).to.have.beenCalledWith(nullCallerAddress);
-    });
-  });
-
-  describe('#getPositionNotionalInfoAsync', () => {
-    let subjectTokenAddress: Address;
-    let nullCallerAddress: Address;
-
-    beforeEach(async () => {
-      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
-      nullCallerAddress = '0x0000000000000000000000000000000000000000';
-    });
-
-    async function subject(): Promise<(Address|BigNumber)[][]> {
-      return await perpV2LeverageAPI.getPositionNotionalInfoAsync(
-        subjectTokenAddress,
-        nullCallerAddress,
-      );
-    }
-
-    it('should call the PerpV2LeverageModuleWrapper with correct params', async () => {
-      await subject();
-
-      expect(perpV2LeverageModuleWrapper.getPositionNotionalInfo).to.have.beenCalledWith(
-        subjectTokenAddress,
-        nullCallerAddress,
-      );
-    });
-
-    describe('when the SetToken address is invalid', () => {
-      beforeEach(async () => {
-        subjectTokenAddress = '0xInvalidAddress';
-      });
+    describe('when setToken is not a valid address', () => {
+      beforeEach(() => subjectSetToken = '0xinvalid');
 
       it('should throw with invalid params', async () => {
         await expect(subject()).to.be.rejectedWith('Validation error');
       });
     });
-  });
 
-  describe('#getPositionUnitInfoAsync', () => {
-    let subjectTokenAddress: Address;
-    let nullCallerAddress: Address;
-
-    beforeEach(async () => {
-      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
-      nullCallerAddress = '0x0000000000000000000000000000000000000000';
-    });
-
-    async function subject(): Promise<(Address|BigNumber)[][]> {
-      return await perpV2LeverageAPI.getPositionUnitInfoAsync(
-        subjectTokenAddress,
-        nullCallerAddress,
-      );
-    }
-
-    it('should call the PerpV2LeverageModuleWrapper with correct params', async () => {
-      await subject();
-
-      expect(perpV2LeverageModuleWrapper.getPositionUnitInfo).to.have.beenCalledWith(
-        subjectTokenAddress,
-        nullCallerAddress,
-      );
-    });
-
-    describe('when the SetToken address is invalid', () => {
-      beforeEach(async () => {
-        subjectTokenAddress = '0xInvalidAddress';
-      });
+    describe('when ownerFeeSplit is not a valid number', () => {
+      beforeEach(() => subjectOwnerFeeSplit = <unknown>NaN as BigNumber);
 
       it('should throw with invalid params', async () => {
         await expect(subject()).to.be.rejectedWith('Validation error');
       });
     });
-  });
 
-  describe('#getAccountInfoAsync', () => {
-    let subjectTokenAddress: Address;
-    let nullCallerAddress: Address;
-
-    beforeEach(async () => {
-      subjectTokenAddress = '0xEC0815AA9B462ed4fC84B5dFc43Fd2a10a54B569';
-      nullCallerAddress = '0x0000000000000000000000000000000000000000';
-    });
-
-    async function subject(): Promise<BigNumber[]> {
-      return await perpV2LeverageAPI.getAccountInfoAsync(
-        subjectTokenAddress,
-        nullCallerAddress,
-      );
-    }
-
-    it('should call the PerpV2LeverageModuleWrapper with correct params', async () => {
-      await subject();
-
-      expect(perpV2LeverageModuleWrapper.getAccountInfo).to.have.beenCalledWith(subjectTokenAddress, nullCallerAddress);
-    });
-
-    describe('when the SetToken address is invalid', () => {
-      beforeEach(async () => {
-        subjectTokenAddress = '0xInvalidAddress';
-      });
+    describe('when ownerFeeRecipient is not a valid address', () => {
+      beforeEach(() => subjectOwnerFeeRecipient = '0xinvalid');
 
       it('should throw with invalid params', async () => {
         await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when an initializeTarget is not a valid address', () => {
+      beforeEach(() => subjectInitializeTargets = ['0xinvalid']);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when an initializeBytecode is not a valid string', () => {
+      beforeEach(() => subjectInitializeBytecode = [<unknown>5 as string]);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+
+    describe('when initializeTargets array is empty', () => {
+      beforeEach(() => subjectInitializeTargets = []);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith(
+          'initializationTargets array must contain at least one element'
+        );
+      });
+    });
+
+    describe('when initializeTargets and initializeBytecode are not equal length', () => {
+      beforeEach(() => subjectInitializeBytecode = ['0x00', '0x00']);
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith(
+          'initializeTargets and initializeBytecode arrays must be equal length'
+        );
       });
     });
   });

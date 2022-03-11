@@ -1040,10 +1040,10 @@
     module-alias "^2.2.2"
     replace-in-file "^6.1.0"
 
-"@setprotocol/set-v2-strategies@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@setprotocol/set-v2-strategies/-/set-v2-strategies-0.0.4.tgz#e71d4a6da3fbb05d64755afe1c1646f0024c78c2"
-  integrity sha512-0TbLst3lBeN9J2fsWJUyTCJq/5TBHZWVVvNZZy6WJtIaAU7eZeXl7RFYuIenERIxrOyKUEdiRbznBlwo9l/6tg==
+"@setprotocol/set-v2-strategies@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-v2-strategies/-/set-v2-strategies-0.0.5.tgz#4f9fc0b9f434ca799d541924b6eb77af361415a0"
+  integrity sha512-UfmOG2Khkn9vitAOQYbSzlE3D5pv5ZKm3daEchCvKrY6gEmn6QhGmhhIlrjL7FrKLPCv6ljNLTJwBmtruQGEUQ==
   dependencies:
     "@setprotocol/set-protocol-v2" "^0.1.11-hardhat.0"
     "@uniswap/v3-sdk" "^3.5.1"

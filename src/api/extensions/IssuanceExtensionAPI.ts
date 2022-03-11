@@ -21,9 +21,7 @@ import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { IssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/IssuanceModule__factory';
-
-// @ts-ignore
-import { IssuanceExtension__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/IssuanceExtension__factory';
+import { IssuanceExtension__factory } from '@setprotocol/set-v2-strategies/dist/typechain/factories/IssuanceExtension__factory';
 
 import IssuanceExtensionWrapper from '../../wrappers/set-v2-strategies/IssuanceExtensionWrapper';
 import Assertions from '../../assertions';

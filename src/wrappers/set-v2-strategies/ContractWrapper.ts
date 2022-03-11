@@ -22,31 +22,23 @@ import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import {
   DelegatedManagerFactory,
-  // TODO: un-ts-ignore missing imports
-  // @ts-ignore
   StreamingFeeSplitExtension,
-  // @ts-ignore
   TradeExtension,
-  // @ts-ignore
   IssuanceExtension
 } from '@setprotocol/set-v2-strategies/typechain';
 
 import {
   DelegatedManagerFactory__factory
 } from '@setprotocol/set-v2-strategies/dist/typechain/factories/DelegatedManagerFactory__factory';
-// TODO: un-ts-ignore missing imports
 import {
   StreamingFeeSplitExtension__factory
-// @ts-ignore
-} from '@setprotocol/set-v2-strategies/dist/typechain/factories/StreamingFeeSplitExtension_factory';
+} from '@setprotocol/set-v2-strategies/dist/typechain/factories/StreamingFeeSplitExtension__factory';
 import {
   TradeExtension__factory,
-  // @ts-ignore
-} from '@setprotocol/set-v2-strategies/dist/typechain/factories/TradeExtension_factory';
+} from '@setprotocol/set-v2-strategies/dist/typechain/factories/TradeExtension__factory';
 import {
   IssuanceExtension__factory
-  // @ts-ignore
-} from '@setprotocol/set-v2-strategies/dist/typechain/factories/IssuanceExtension_factory';
+} from '@setprotocol/set-v2-strategies/dist/typechain/factories/IssuanceExtension__factory';
 
 
 /**

@@ -163,6 +163,17 @@ export default class DelegatedManagerFactoryAPI {
     this.assert.schema.isValidAddressList('initializeTargets', initializeTargets);
     this.assert.schema.isValidBytesList('initializeBytecode', initializeBytecode);
 
+    this.assert.common.isNotEmptyArray(
+      initializeTargets,
+      'initializationTargets array must contain at least one element.'
+    );
+
+    this.assert.common.isEqualLength(
+      initializeTargets,
+      initializeBytecode,
+      'initializeTargets and initializeBytecode arrays must be equal length.'
+    );
+
     return await this.DelegatedManagerFactoryWrapper.initialize(
       setTokenAddress,
       ownerFeeSplit,

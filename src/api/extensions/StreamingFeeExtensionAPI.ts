@@ -20,9 +20,7 @@ import { ContractTransaction, BytesLike, utils as EthersUtils } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
 import { StreamingFeeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/StreamingFeeModule__factory';
-
-// @ts-ignore
-import { StreamingFeeSplitExtension__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/StreamingFeeSplitExtension__factory';
+import { StreamingFeeSplitExtension__factory } from '@setprotocol/set-v2-strategies/dist/typechain/factories/StreamingFeeSplitExtension__factory';
 
 import StreamingFeeExtensionWrapper from '../../wrappers/set-v2-strategies/StreamingFeeExtensionWrapper';
 import Assertions from '../../assertions';

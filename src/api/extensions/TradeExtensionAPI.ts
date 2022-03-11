@@ -21,8 +21,6 @@ import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { TradeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/TradeModule__factory';
-
-// @ts-ignore
 import { TradeExtension__factory } from '@setprotocol/set-v2-strategies/dist/typechain/factories/TradeExtension__factory';
 
 import TradeExtensionWrapper from '../../wrappers/set-v2-strategies/TradeExtensionWrapper';
