@@ -30,7 +30,7 @@ export type CoinPricesParams = {
   vsCurrencies: string[]
 };
 
-export type QuoteOptions = {
+export type TradeQuoteOptions = {
   fromToken: Address,
   toToken: Address,
   fromTokenDecimals: number,
@@ -47,6 +47,29 @@ export type QuoteOptions = {
   feePercentage?: number,
   feeRecipient?: Address,
   excludedSources?: string[],
+};
+
+export type SwapQuoteOptions = {
+  fromToken: Address,
+  toToken: Address,
+  rawAmount: string,
+  useBuyAmount: boolean,
+  fromAddress: Address,
+  chainId: number,
+  setToken: SetTokenAPI,
+  gasPrice?: number,
+  slippagePercentage?: number,
+  isFirmQuote?: boolean,
+  feePercentage?: number,
+  feeRecipient?: Address,
+  excludedSources?: string[],
+};
+
+export type SwapOrderPairs = {
+  fromToken: Address,
+  toToken: Address,
+  rawAmount: string,
+  ignore?: boolean
 };
 
 export type ZeroExQuote = {
@@ -84,15 +107,36 @@ export type TradeQuote = {
   }
 };
 
+export type SwapQuote = {
+  from: Address,
+  fromTokenAddress: Address,
+  toTokenAddress: Address,
+  calldata: string,
+  gas: string,
+  gasPrice: string,
+  slippagePercentage: string,
+  fromTokenAmount: string,
+  toTokenAmount: string,
+  _quote: any
+};
+
 export type ZeroExTradeQuoterOptions = {
   chainId: number,
-  zeroExApiKey: string,
+  zeroExApiKey?: string,
+  zeroExApiUrls?: ZeroExApiUrls
+};
+
+export type ZeroExApiUrls = {
+  ethereum: string,
+  optimism: string,
+  polygon: string
 };
 
 export type ZeroExQueryParams = {
   sellToken: Address,
   buyToken: Address,
-  sellAmount: string,
+  sellAmount?: string,
+  buyAmount?: string,
   slippagePercentage: number,
   takerAddress: Address,
   excludedSources: string,
@@ -108,7 +152,9 @@ export type ZeroExTradeQuote = {
   price: number,
   sellAmount: BigNumber,
   buyAmount: BigNumber,
-  calldata: string
+  calldata: string,
+  gas: number,
+  _quote: any
 };
 
 export type EthGasStationData = {

@@ -33,6 +33,7 @@ import {
   SlippageIssuanceAPI,
   PerpV2LeverageAPI,
   PerpV2LeverageViewerAPI,
+  UtilsAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -135,6 +136,12 @@ class Set {
   public blockchain: BlockchainAPI;
 
   /**
+   * An instance of the UtilsAPI class. Contains interfaces for fetching swap quotes from 0x Protocol,
+   * prices and token metadata from coingecko, and network gas prices from various sources
+   */
+  public utils: UtilsAPI;
+
+  /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
    */
   constructor(config: SetJSConfig) {
@@ -155,7 +162,7 @@ class Set {
       assertions
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
-    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey);
+    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey, config.zeroExApiUrls);
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
@@ -164,6 +171,7 @@ class Set {
     this.perpV2Leverage = new PerpV2LeverageAPI(ethersProvider, config.perpV2LeverageModuleAddress);
     this.perpV2LeverageViewer = new PerpV2LeverageViewerAPI(ethersProvider, config.perpV2LeverageModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
+    this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey, config.zeroExApiUrls);
   }
 }
 

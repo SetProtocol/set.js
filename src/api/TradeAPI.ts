@@ -27,17 +27,12 @@ import SetTokenAPI from './SetTokenAPI';
 import Assertions from '../assertions';
 
 import {
-  TradeQuoter,
-  CoinGeckoDataService,
-  GasOracleService
+  TradeQuoter
 } from './utils';
 
 import {
   TradeQuote,
-  CoinGeckoTokenData,
-  CoinGeckoTokenMap,
-  GasOracleSpeed,
-  CoinGeckoCoinPrices
+  ZeroExApiUrls
 } from '../types';
 
 /**
@@ -53,18 +48,17 @@ export default class TradeAPI {
   private assert: Assertions;
   private provider: Provider;
   private tradeQuoter: TradeQuoter;
-  private coinGecko: CoinGeckoDataService;
-  private chainId: number;
 
   public constructor(
     provider: Provider,
     tradeModuleAddress: Address,
     zeroExApiKey?: string,
+    zeroExApiUrls?: ZeroExApiUrls
   ) {
     this.provider = provider;
     this.tradeModuleWrapper = new TradeModuleWrapper(provider, tradeModuleAddress);
     this.assert = new Assertions();
-    this.tradeQuoter = new TradeQuoter(zeroExApiKey);
+    this.tradeQuoter = new TradeQuoter(zeroExApiKey, zeroExApiUrls);
   }
 
   /**
@@ -150,7 +144,8 @@ export default class TradeAPI {
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0
    * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
-   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Uniswap', 'Mesh'])
+   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Mesh'])
+   * @param  simulatedChainId     (Optional) ChainId of target network (useful when using a forked development client)
    *
    * @return {Promise<TradeQuote>}
    */
@@ -168,6 +163,7 @@ export default class TradeAPI {
     feePercentage?: number,
     feeRecipient?: Address,
     excludedSources?: string[],
+    simulatedChainId?: number,
   ): Promise<TradeQuote> {
     this.assert.schema.isValidAddress('fromToken', fromToken);
     this.assert.schema.isValidAddress('toToken', toToken);
@@ -176,9 +172,12 @@ export default class TradeAPI {
     this.assert.schema.isValidJsNumber('toTokenDecimals', toTokenDecimals);
     this.assert.schema.isValidString('rawAmount', rawAmount);
 
-    const chainId = (await this.provider.getNetwork()).chainId;
+    // The forked Hardhat network has a chainId of 31337 so we can't rely on autofetching this value
+    const chainId = (simulatedChainId !== undefined)
+      ? simulatedChainId
+      : (await this.provider.getNetwork()).chainId;
 
-    return this.tradeQuoter.generate({
+    return this.tradeQuoter.generateQuoteForTrade({
       fromToken,
       toToken,
       fromTokenDecimals,
@@ -196,68 +195,5 @@ export default class TradeAPI {
       feeRecipient,
       excludedSources,
     });
-  }
-
-  /**
-   * Fetches a list of tokens and their metadata from CoinGecko. Each entry includes
-   * the token's address, proper name, decimals, exchange symbol and a logo URI if available.
-   * For Ethereum, this is a list of tokens tradeable on Uniswap, for Polygon it's a list of
-   * tokens tradeable on Sushiswap's Polygon exchange. Method is useful for acquiring token decimals
-   * necessary to generate a trade quote and images for representing available tokens in a UI.
-   *
-   * @return List of tradeable tokens for chain platform
-   */
-  public async fetchTokenListAsync(): Promise<CoinGeckoTokenData[]> {
-    await this.initializeForChain();
-    return this.coinGecko.fetchTokenList();
-  }
-
-  /**
-   * Fetches the same info as `fetchTokenList` in the form of a map indexed by address. Method is
-   * useful if you're cacheing the token list and want quick lookups for a variety of trades.
-   *
-   * @return Map of token addresses to token metadata
-   */
-  public async fetchTokenMapAsync(): Promise<CoinGeckoTokenMap> {
-    await this.initializeForChain();
-    return this.coinGecko.fetchTokenMap();
-  }
-
-  /**
-   * Fetches a list of prices vs currencies for the specified inputs from CoinGecko
-   *
-   * @param  contractAddresses         String array of contract addresses
-   * @param  vsCurrencies              String array of currency codes (see CoinGecko api for a complete list)
-   *
-   * @return                           List of prices vs currencies
-   */
-  public async fetchCoinPricesAsync(
-    contractAddresses: string[],
-    vsCurrencies: string[]
-  ): Promise<CoinGeckoCoinPrices> {
-    await this.initializeForChain();
-    return this.coinGecko.fetchCoinPrices({contractAddresses, vsCurrencies});
-  }
-
-  /**
-   * Fetches the recommended gas price for a specified execution speed.
-   *
-   * @param  speed                   (Optional) string value: "average" | "fast" | "fastest" (Default: fast)
-   *
-   * @return                         Number: gas price
-   */
-  public async fetchGasPriceAsync(speed?: GasOracleSpeed): Promise<number> {
-    await this.initializeForChain();
-    const oracle = new GasOracleService(this.chainId);
-    return oracle.fetchGasPrice(speed);
-  }
-
-
-  private async initializeForChain() {
-    if (this.coinGecko === undefined) {
-      const network = await this.provider.getNetwork();
-      this.chainId = network.chainId;
-      this.coinGecko = new CoinGeckoDataService(network.chainId);
-    }
   }
 }

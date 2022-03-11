@@ -2,6 +2,7 @@ import { Provider } from '@ethersproject/providers';
 import { provider as Web3CoreProvider } from 'web3-core';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { BigNumber } from 'ethers/lib/ethers';
+import { ZeroExApiUrls } from './utils';
 
 export { TransactionReceipt } from 'ethereum-types';
 
@@ -25,6 +26,7 @@ export interface SetJSConfig {
   governanceModuleAddress: Address;
   debtIssuanceModuleAddress: Address;
   zeroExApiKey?: string;
+  zeroExApiUrls?: ZeroExApiUrls;
   debtIssuanceModuleV2Address: Address;
   slippageIssuanceModuleAddress: Address;
   perpV2LeverageModuleAddress: Address;

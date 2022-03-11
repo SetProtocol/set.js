@@ -12,6 +12,7 @@ import DebtIssuanceV2API from './DebtIssuanceV2API';
 import SlippageIssuanceAPI from './SlippageIssuanceAPI';
 import PerpV2LeverageAPI from './PerpV2LeverageAPI';
 import PerpV2LeverageViewerAPI from './PerpV2LeverageViewerAPI';
+import UtilsAPI from './UtilsAPI';
 import {
   TradeQuoter,
   CoinGeckoDataService,
@@ -33,6 +34,7 @@ export {
   SlippageIssuanceAPI,
   PerpV2LeverageAPI,
   PerpV2LeverageViewerAPI,
+  UtilsAPI,
   TradeQuoter,
   CoinGeckoDataService,
   GasOracleService

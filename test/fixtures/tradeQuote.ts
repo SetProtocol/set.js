@@ -185,6 +185,18 @@ export const tradeQuoteFixtures = {
     },
   },
 
+  setSwapQuoteEth: {
+    from: '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b',
+    fromTokenAddress: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+    toTokenAddress: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+    calldata: '0x415565b00000000000000000000000009f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+    gas: '346000',
+    gasPrice: '10000000',
+    slippagePercentage: '2.00%',
+    fromTokenAmount: '499999999999793729',
+    toTokenAmount: '41312691160507030',
+  },
+
   setTradeQuotePoly: {
     from: '0xd7dc13984d4fe87f389e50067fb3eedb3f704ea0',
     fromTokenAddress: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
@@ -209,5 +221,18 @@ export const tradeQuoteFixtures = {
        gasCostsChainCurrency: '0.0015750 MATIC',
        feePercentage: '0.00%',
        slippage: '1.11%' },
+  },
+
+  setSwapQuotePoly: {
+    from: '0xd7dc13984d4fe87f389e50067fb3eedb3f704ea0',
+    fromTokenAddress: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+    toTokenAddress: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
+    calldata:
+     '0x415565b00000000000000000000000002791bca1f2de4661ed88a30c99a7a9449aa84174',
+    gas: '240000',
+    gasPrice: '10000000',
+    slippagePercentage: '2.00%',
+    fromTokenAmount: '1000000',
+    toTokenAmount: '2973',
   },
 };

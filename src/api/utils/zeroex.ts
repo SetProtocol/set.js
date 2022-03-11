@@ -23,7 +23,8 @@ import Assertions from '../../assertions';
 import {
   ZeroExTradeQuoterOptions,
   ZeroExTradeQuote,
-  ZeroExQueryParams
+  ZeroExQueryParams,
+  ZeroExApiUrls
 } from '../../types/index';
 
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
@@ -46,7 +47,7 @@ export class ZeroExTradeQuoter {
   constructor(options: ZeroExTradeQuoterOptions) {
     this.assert = new Assertions();
     this.assert.common.isSupportedChainId(options.chainId);
-    this.host = this.getHostForChain(options.chainId) as string;
+    this.host = this.getHostForChain(options.chainId, options.zeroExApiUrls) as string;
     this.zeroExApiKey = options.zeroExApiKey;
   }
 
@@ -65,7 +66,8 @@ export class ZeroExTradeQuoter {
   async fetchTradeQuote(
     sellTokenAddress: Address,
     buyTokenAddress: Address,
-    sellAmount: BigNumber,
+    amount: BigNumber,
+    useBuyAmount: boolean,
     takerAddress: Address,
     isFirm: boolean,
     slippagePercentage: number,
@@ -79,7 +81,8 @@ export class ZeroExTradeQuoter {
       sellToken: sellTokenAddress,
       buyToken: buyTokenAddress,
       slippagePercentage: slippagePercentage,
-      sellAmount: sellAmount.toString(),
+      sellAmount: (useBuyAmount) ? undefined : amount.toString(),
+      buyAmount: (useBuyAmount) ? amount.toString() : undefined,
       takerAddress,
       excludedSources: excludedSources.join(','),
       skipValidation: this.skipValidation,
@@ -89,14 +92,22 @@ export class ZeroExTradeQuoter {
       intentOnFilling: isFirm,
     };
 
+    // Only set the zeroExApiKey if calling `gated.api.0x.org` endpoints from a backend
+    // + `api.0x.org` is public - no api key is required
+    // + `frontend-integrations.api.0x.org` relies on IP whitelisting from 0x
+    const headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    if (this.zeroExApiKey !== undefined) {
+      headers['0x-api-key'] = this.zeroExApiKey;
+    }
+
     try {
       const response = await axios.get(url, {
-        params: params,
-        headers: {
-          '0x-api-key': this.zeroExApiKey,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        params,
+        headers,
       });
 
       return {
@@ -105,17 +116,23 @@ export class ZeroExTradeQuoter {
         sellAmount: BigNumber.from(response.data.sellAmount),
         buyAmount: BigNumber.from(response.data.buyAmount),
         calldata: response.data.data,
+        gas: parseInt(response.data.gas),
+        _quote: response.data,
       };
     } catch (error) {
       throw new Error('ZeroEx quote request failed: ' + error);
     }
   }
 
-  private getHostForChain(chainId: number) {
+  private getHostForChain(chainId: number, zeroExAPIUrls?: ZeroExApiUrls ) {
+    const ethereumUrl = zeroExAPIUrls?.ethereum ? zeroExAPIUrls.ethereum : 'https://api.0x.org';
+    const optimismUrl = zeroExAPIUrls?.optimism ? zeroExAPIUrls.optimism : 'https://optimism.api.0x.org';
+    const polygonUrl = zeroExAPIUrls?.polygon ? zeroExAPIUrls.polygon : 'https://polygon.api.0x.org';
+
     switch (chainId) {
-      case 1: return 'https://api.0x.org';
-      case 10: return 'https://optimism.api.0x.org';
-      case 137: return 'https://polygon.api.0x.org';
+      case 1: return ethereumUrl;
+      case 10: return optimismUrl;
+      case 137: return polygonUrl;
     }
   }
 }
