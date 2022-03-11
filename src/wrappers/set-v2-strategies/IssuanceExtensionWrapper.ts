@@ -48,7 +48,7 @@ export default class IssuanceExtensionWrapper {
    *
    * @return                     Initialization bytecode
    */
-  public async distribute(
+  public async distributeFees(
     setTokenAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
@@ -59,6 +59,6 @@ export default class IssuanceExtensionWrapper {
       callerAddress
     );
 
-    return await issuanceExtensionInstance.distribute(setTokenAddress, txOptions);
+    return await issuanceExtensionInstance.distributeFees(setTokenAddress, txOptions);
   }
 }

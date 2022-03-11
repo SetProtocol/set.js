@@ -54,14 +54,14 @@ export default class IssuanceExtensionAPI {
    * @param callerAddress        Address of caller (optional)
    * @param txOpts               Overrides for transaction (optional)
    */
-  public async distribute(
+  public async distributeFeesAsync(
     setTokenAddress: Address,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
 
-    return await this.issuanceExtensionWrapper.distribute(
+    return await this.issuanceExtensionWrapper.distributeFees(
       setTokenAddress,
       callerAddress,
       txOpts
@@ -72,12 +72,7 @@ export default class IssuanceExtensionAPI {
    * Generates IssuanceExtension initialize call bytecode to be passed as an element in the  `initializeBytecode`
    * array for the DelegatedManagerFactory's `initializeAsync` method.
    *
-   * @param setTokenAddress              Instance of deployed setToken to initialize the IssuanceExtension for
-   * @param maxManagerFee                Maximum fee that can be charged on issue and redeem
-   * @param managerIssueFee              Fee to charge on issuance
-   * @param managerRedeemFee             Fee to charge on redemption
-   * @param feeRecipient                 Address to send fees to
-   * @param managerIssuanceHook          Address of contract implementing pre-issuance hook function (ex: SupplyCapHook)
+   * @param delegatedManagerAddress      Instance of DelegatedManager to initialize the StreamingFeeExtension for
    *
    * @return                             Initialization bytecode
    */
@@ -87,14 +82,19 @@ export default class IssuanceExtensionAPI {
     this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
 
     const moduleInterface = new EthersUtils.Interface(IssuanceExtension__factory.abi);
-    return moduleInterface.encodeFunctionData('initialize', [ delegatedManagerAddress ]);
+    return moduleInterface.encodeFunctionData('initializeExtension', [ delegatedManagerAddress ]);
   }
 
   /**
    * Generates IssuanceModule initialize call bytecode to be passed as an element in the  `initializeBytecode`
    * array for the `initializeAsync` method.
    *
-   * @param delegatedManagerAddress      Instance of deployed DelegatedManager to initialize the IssuanceExtension for
+   * @param delegatedManagerAddress      Instance of deployed setToken to initialize the IssuanceExtension for
+   * @param maxManagerFee                Maximum fee that can be charged on issue and redeem
+   * @param managerIssueFee              Fee to charge on issuance
+   * @param managerRedeemFee             Fee to charge on redemption
+   * @param feeRecipient                 Address to send fees to
+   * @param managerIssuanceHook          Address of contract implementing pre-issuance hook function (ex: SupplyCapHook)
    *
    * @return                             Initialization bytecode
    */
