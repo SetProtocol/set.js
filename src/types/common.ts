@@ -39,6 +39,7 @@ export interface SetJSConfig {
   perpV2LeverageModuleViewerAddress: Address;
   perpV2BasisTradingModuleAddress: Address;
   perpV2BasisTradingModuleViewerAddress: Address;
+  delegatedManagerFactoryAddress: Address;
   issuanceExtensionAddress: Address;
   tradeExtensionAddress: Address;
   streamingFeeExtensionAddress: Address;

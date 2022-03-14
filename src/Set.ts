@@ -34,6 +34,7 @@ import {
   PerpV2LeverageAPI,
   PerpV2LeverageViewerAPI,
   UtilsAPI,
+  DelegatedManagerFactoryAPI,
   IssuanceExtensionAPI,
   TradeExtensionAPI,
   StreamingFeeExtensionAPI,
@@ -145,11 +146,10 @@ class Set {
   public perpV2BasisTradingViewer: PerpV2LeverageViewerAPI;
 
   /**
-   * An instance of the BlockchainAPI class. Contains interfaces for
-   * interacting with the blockchain
+   * An instance of DelegatedManagerFactory class. Contains methods for deploying and initializing
+   * DelegatedManagerSystem deployed SetTokens and Manager contracts
    */
-  public blockchain: BlockchainAPI;
-
+  public delegatedManagerFactory: DelegatedManagerFactoryAPI;
 
   /**
    * Group of extension for interacting with SetTokens managed by with DelegatedManager system contracts
@@ -161,6 +161,12 @@ class Set {
    * prices and token metadata from coingecko, and network gas prices from various sources
    */
   public utils: UtilsAPI;
+
+  /**
+   * An instance of the BlockchainAPI class. Contains interfaces for
+   * interacting with the blockchain
+   */
+  public blockchain: BlockchainAPI;
 
   /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
@@ -196,6 +202,11 @@ class Set {
                                                                 config.perpV2BasisTradingModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
     this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey, config.zeroExApiUrls);
+
+    this.delegatedManagerFactory = new DelegatedManagerFactoryAPI(
+      ethersProvider,
+      config.delegatedManagerFactoryAddress
+    );
 
     this.extensions = {
       streamingFeeExtension: new StreamingFeeExtensionAPI(ethersProvider, config.streamingFeeExtensionAddress),

@@ -13,6 +13,7 @@ import SlippageIssuanceAPI from './SlippageIssuanceAPI';
 import PerpV2LeverageAPI from './PerpV2LeverageAPI';
 import PerpV2LeverageViewerAPI from './PerpV2LeverageViewerAPI';
 import UtilsAPI from './UtilsAPI';
+import DelegatedManagerFactoryAPI from './DelegatedManagerFactoryAPI';
 import IssuanceExtensionAPI from './extensions/IssuanceExtensionAPI';
 import StreamingFeeExtensionAPI from './extensions/StreamingFeeExtensionAPI';
 import TradeExtensionAPI from './extensions/TradeExtensionAPI';
@@ -39,6 +40,7 @@ export {
   PerpV2LeverageAPI,
   PerpV2LeverageViewerAPI,
   UtilsAPI,
+  DelegatedManagerFactoryAPI,
   IssuanceExtensionAPI,
   StreamingFeeExtensionAPI,
   TradeExtensionAPI,
