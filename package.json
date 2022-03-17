@@ -59,7 +59,7 @@
         "@0xproject/typescript-typings": "^3.0.2",
         "@0xproject/utils": "^2.0.2",
         "@setprotocol/set-protocol-v2": "^0.1.15",
-        "@setprotocol/set-v2-strategies": "^0.0.5",
+        "@setprotocol/set-v2-strategies": "^0.0.6",
         "@types/chai-as-promised": "^7.1.3",
         "@types/jest": "^26.0.5",
         "@types/web3": "^1.2.2",
