@@ -31,6 +31,8 @@ export interface SetJSConfig {
   slippageIssuanceModuleAddress: Address;
   perpV2LeverageModuleAddress: Address;
   perpV2LeverageModuleViewerAddress: Address;
+  perpV2BasisTradingModuleAddress: Address;
+  perpV2BasisTradingModuleViewerAddress: Address;
 }
 
 export type SetDetails = {
