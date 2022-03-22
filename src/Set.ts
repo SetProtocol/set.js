@@ -130,6 +130,18 @@ class Set {
   public perpV2LeverageViewer: PerpV2LeverageViewerAPI;
 
   /**
+   * Another instance of the PerpV2LeverageAPI class, but for more specialized BasisTradingModule
+   * Sets.
+   */
+  public perpV2BasisTrading: PerpV2LeverageAPI;
+
+  /**
+   * Another instance of the PerpV2LeverageViewerAPI class, but for more specialized BasisTradingModule
+   * Sets.
+   */
+  public perpV2BasisTradingViewer: PerpV2LeverageViewerAPI;
+
+  /**
    * An instance of the BlockchainAPI class. Contains interfaces for
    * interacting with the blockchain
    */
@@ -170,6 +182,9 @@ class Set {
     this.slippageIssuance = new SlippageIssuanceAPI(ethersProvider, config.slippageIssuanceModuleAddress);
     this.perpV2Leverage = new PerpV2LeverageAPI(ethersProvider, config.perpV2LeverageModuleAddress);
     this.perpV2LeverageViewer = new PerpV2LeverageViewerAPI(ethersProvider, config.perpV2LeverageModuleViewerAddress);
+    this.perpV2BasisTrading = new PerpV2LeverageAPI(ethersProvider, config.perpV2BasisTradingModuleAddress);
+    this.perpV2BasisTradingViewer = new PerpV2LeverageViewerAPI(ethersProvider,
+                                                                config.perpV2BasisTradingModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
     this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey, config.zeroExApiUrls);
   }
