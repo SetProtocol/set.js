@@ -34,6 +34,7 @@ export interface SetJSConfig {
   zeroExApiKey?: string;
   zeroExApiUrls?: ZeroExApiUrls;
   debtIssuanceModuleV2Address: Address;
+  issuanceModuleAddress: Address;
   slippageIssuanceModuleAddress: Address;
   perpV2LeverageModuleAddress: Address;
   perpV2LeverageModuleViewerAddress: Address;

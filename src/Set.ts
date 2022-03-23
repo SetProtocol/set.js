@@ -113,6 +113,14 @@ class Set {
   public debtIssuanceV2: DebtIssuanceV2API;
 
   /**
+   * An instance of the DebtIssuanceV2API class. Contains interfaces for interacting
+   * with the IssuanceModule contract (an alternatively named DebtIssuanceV2 module instance)
+   * to issue and redeem tokens that accrue interest. Primarily used for contracts deployed via
+   * the DelegatedManagerSystem
+   */
+  public issuanceV2: DebtIssuanceV2API;
+
+  /**
    * An instance of the SlippageIssuanceAPI class. Contains interfaces for interacting
    * with the SlippageIssuanceAPI contract to to trade into/from tokens during the issuance and
    * redemption step. Initially used for Perpetual Leverage Tokens.
@@ -194,6 +202,7 @@ class Set {
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
     this.debtIssuanceV2 = new DebtIssuanceV2API(ethersProvider, config.debtIssuanceModuleV2Address);
+    this.issuanceV2 = new DebtIssuanceV2API(ethersProvider, config.issuanceModuleAddress);
     this.slippageIssuance = new SlippageIssuanceAPI(ethersProvider, config.slippageIssuanceModuleAddress);
     this.perpV2Leverage = new PerpV2LeverageAPI(ethersProvider, config.perpV2LeverageModuleAddress);
     this.perpV2LeverageViewer = new PerpV2LeverageViewerAPI(ethersProvider, config.perpV2LeverageModuleViewerAddress);
