@@ -1,6 +1,6 @@
 {
     "name": "set.js",
-    "version": "0.4.13-managerV3.3",
+    "version": "0.4.13-managerV3.2",
     "description": "A javascript library for interacting with the Set Protocol v2",
     "keywords": [
         "set.js",
