@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { BigNumberish, BytesLike, utils as EthersUtils } from 'ethers';
+import { ContractTransaction, BigNumberish, BytesLike, utils as EthersUtils } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
@@ -72,7 +72,7 @@ export default class TradeExtensionAPI {
     data: BytesLike,
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
-  ) {
+  ): Promise<ContractTransaction> {
     this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
     this.assert.schema.isValidString('exchangeName', exchangeName);
     this.assert.schema.isValidAddress('sendToken', sendToken);

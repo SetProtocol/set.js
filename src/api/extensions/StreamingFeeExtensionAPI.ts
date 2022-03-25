@@ -54,7 +54,7 @@ export default class StreamingFeeExtensionAPI {
    * @param callerAddress        Address of caller (optional)
    * @param txOpts               Overrides for transaction (optional)
    *
-   * @return                     Initialization bytecode
+   * @return                     ContractTransaction
    */
   public async accrueFeesAndDistributeAsync(
     setTokenAddress: Address,
