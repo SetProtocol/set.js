@@ -20,7 +20,6 @@ import { BigNumberish, BytesLike, utils as EthersUtils } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
-import { TradeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/TradeModule__factory';
 import { TradeExtension__factory } from '@setprotocol/set-v2-strategies/dist/typechain/factories/TradeExtension__factory';
 
 import TradeExtensionWrapper from '../../wrappers/set-v2-strategies/TradeExtensionWrapper';
@@ -113,17 +112,17 @@ export default class TradeExtensionAPI {
   }
 
   /**
-   * Generates TradeModule initialize call bytecode to be passed as an element in the  `initializeBytecode`
+   * Generates `moduleAndExtensionInitialization` bytecode to be passed as an element in the  `initializeBytecode`
    * array for the `initializeAsync` method.
    *
    * @param setTokenAddress              Instance of deployed setToken to initialize the TradeModule for
    *
    * @return                             Initialization bytecode
    */
-  public getTradeModuleInitializationBytecode(setTokenAddress: Address): BytesLike {
-    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+  public getTradeModuleAndExtensionInitializationBytecode(delegatedManagerAddress: Address): BytesLike {
+    this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
 
-    const moduleInterface = new EthersUtils.Interface(TradeModule__factory.abi);
-    return moduleInterface.encodeFunctionData('initialize', [setTokenAddress]);
+    const extensionInterface = new EthersUtils.Interface(TradeExtension__factory.abi);
+    return extensionInterface.encodeFunctionData('initializeExtension', [ delegatedManagerAddress ]);
   }
 }

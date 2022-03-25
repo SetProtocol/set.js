@@ -185,25 +185,25 @@ describe('TradeExtensionAPI', () => {
     });
   });
 
-  describe('#getTradeModuleInitializationBytecode', () => {
-    let subjectSetToken: Address;
+  describe('#getTradeModuleAndExtensionInitializationBytecode', () => {
+    let subjectDelegatedManager: Address;
 
     beforeEach(async () => {
-      subjectSetToken = setToken;
+      subjectDelegatedManager = delegatedManager;
     });
 
     async function subject(): Promise<BytesLike> {
-      return tradeExtensionAPI.getTradeModuleInitializationBytecode(subjectSetToken);
+      return tradeExtensionAPI.getTradeModuleAndExtensionInitializationBytecode(subjectDelegatedManager);
     }
 
     it('should generate the expected bytecode', async () => {
-      const expectedBytecode = '0xc4d66de80000000000000000000000006ecbe1db9ef729cbe972c83fb886247691fb6beb';
+      const expectedBytecode = '0xde2236bd000000000000000000000000e36ea790bc9d7ab70c55260c66d52b1eca985f84';
 
       expect(await subject()).eq(expectedBytecode);
     });
 
     describe('when setToken is not a valid address', () => {
-      beforeEach(() => subjectSetToken = '0xinvalid');
+      beforeEach(() => subjectDelegatedManager = '0xinvalid');
 
       it('should throw with invalid params', async () => {
         await expect(subject()).to.be.rejectedWith('Validation error');

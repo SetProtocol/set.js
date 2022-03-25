@@ -119,12 +119,12 @@ describe('StreamingFeeExtensionAPI', () => {
     });
   });
 
-  describe('#getStreamingFeeModuleInitializationBytecode', () => {
-    let subjectSetToken: Address;
+  describe('#getStreamingFeeModuleAndExtensionInitializationBytecode', () => {
+    let subjectDelegatedManager: Address;
     let subjectFeeSettings: StreamingFeeState;
 
     beforeEach(async () => {
-      subjectSetToken = setToken;
+      subjectDelegatedManager = delegatedManager;
       subjectFeeSettings = {
         feeRecipient,
         maxStreamingFeePercentage: ether(.1),
@@ -134,15 +134,15 @@ describe('StreamingFeeExtensionAPI', () => {
     });
 
     async function subject(): Promise<BytesLike> {
-      return streamingFeeExtensionAPI.getStreamingFeeModuleInitializationBytecode(
-        subjectSetToken,
+      return streamingFeeExtensionAPI.getStreamingFeeModuleAndExtensionInitializationBytecode(
+        subjectDelegatedManager,
         subjectFeeSettings
       );
     }
 
     it('should generate the expected bytecode', async () => {
       const expectedBytecode =
-        '0xeb78e5ee0000000000000000000000006ecbe1db9ef729cbe972c83fb886247691fb6beb000000000000000' +
+        '0x51146818000000000000000000000000e36ea790bc9d7ab70c55260c66d52b1eca985f84000000000000000' +
         '00000000078dc5d2d739606d31509c31d654056a45185ecb60000000000000000000000000000000000000000' +
         '00000000016345785d8a0000000000000000000000000000000000000000000000000000002386f26fc100000' +
         '000000000000000000000000000000000000000000000000000000000000000';
@@ -151,7 +151,7 @@ describe('StreamingFeeExtensionAPI', () => {
     });
 
     describe('when setToken is not a valid address', () => {
-      beforeEach(() => subjectSetToken = '0xinvalid');
+      beforeEach(() => subjectDelegatedManager = '0xinvalid');
 
       it('should throw with invalid params', async () => {
         await expect(subject()).to.be.rejectedWith('Validation error');

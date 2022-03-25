@@ -20,7 +20,6 @@ import { ContractTransaction, BytesLike, utils as EthersUtils } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { Address, StreamingFeeState } from '@setprotocol/set-protocol-v2/utils/types';
-import { StreamingFeeModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/StreamingFeeModule__factory';
 import { StreamingFeeSplitExtension__factory } from '@setprotocol/set-v2-strategies/dist/typechain/factories/StreamingFeeSplitExtension__factory';
 
 import StreamingFeeExtensionWrapper from '../../wrappers/set-v2-strategies/StreamingFeeExtensionWrapper';
@@ -89,8 +88,8 @@ export default class StreamingFeeExtensionAPI {
   }
 
   /**
-   * Generates StreamingFeeModule initialize call bytecode to be passed as an element in the  `initializeBytecode`
-   * array for the `initializeAsync` method.
+   * Generates `moduleAndExtensionInitialization` bytecode to be passed as an element in the
+   * `initializeBytecode` array for the `initializeAsync` method.
    *
    * FeeSettings is an object with the properties:
    * ```
@@ -106,17 +105,20 @@ export default class StreamingFeeExtensionAPI {
    *
    * @return                            Initialization bytecode
    */
-  public getStreamingFeeModuleInitializationBytecode(
-    setTokenAddress: Address,
+  public getStreamingFeeModuleAndExtensionInitializationBytecode(
+    delegatedManagerAddress: Address,
     feeSettings: StreamingFeeState
   ): BytesLike {
-    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
     this.assert.schema.isValidAddress('feeSettings.feeRecipient', feeSettings.feeRecipient);
     this.assert.schema.isValidNumber('feeSettings.maxStreamingFeePercentage', feeSettings.maxStreamingFeePercentage);
     this.assert.schema.isValidNumber('feeSettings.streamingFeePercentage', feeSettings.streamingFeePercentage);
     this.assert.schema.isValidNumber('feeSettings.lastStreamingFeeTimestamp', feeSettings.lastStreamingFeeTimestamp);
 
-    const moduleInterface = new EthersUtils.Interface(StreamingFeeModule__factory.abi);
-    return moduleInterface.encodeFunctionData('initialize', [ setTokenAddress, feeSettings ]);
+    const extensionInterface = new EthersUtils.Interface(StreamingFeeSplitExtension__factory.abi);
+    return extensionInterface.encodeFunctionData('initializeModuleAndExtension', [
+      delegatedManagerAddress,
+      feeSettings,
+    ]);
   }
 }

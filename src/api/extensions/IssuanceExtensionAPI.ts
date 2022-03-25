@@ -20,7 +20,6 @@ import { ContractTransaction, BigNumberish, BytesLike, utils as EthersUtils } fr
 import { Provider } from '@ethersproject/providers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
-import { IssuanceModule__factory } from '@setprotocol/set-protocol-v2/dist/typechain/factories/IssuanceModule__factory';
 import { IssuanceExtension__factory } from '@setprotocol/set-v2-strategies/dist/typechain/factories/IssuanceExtension__factory';
 
 import IssuanceExtensionWrapper from '../../wrappers/set-v2-strategies/IssuanceExtensionWrapper';
@@ -86,10 +85,10 @@ export default class IssuanceExtensionAPI {
   }
 
   /**
-   * Generates IssuanceModule initialize call bytecode to be passed as an element in the  `initializeBytecode`
-   * array for the `initializeAsync` method.
+   * Generates `moduleAndExtensionInitialization` bytecode to be passed as an element in the
+   * `initializeBytecode` array for the `initializeAsync` method.
    *
-   * @param delegatedManagerAddress      Instance of deployed setToken to initialize the IssuanceExtension for
+   * @param delegatedManagerAddress      Instance of deployed delegatedManager to initialize the IssuanceExtension for
    * @param maxManagerFee                Maximum fee that can be charged on issue and redeem
    * @param managerIssueFee              Fee to charge on issuance
    * @param managerRedeemFee             Fee to charge on redemption
@@ -98,24 +97,24 @@ export default class IssuanceExtensionAPI {
    *
    * @return                             Initialization bytecode
    */
-  public getIssuanceModuleInitializationBytecode(
-    setTokenAddress: Address,
+  public getIssuanceModuleAndExtensionInitializationBytecode(
+    delegatedManagerAddress: Address,
     maxManagerFee: BigNumberish,
     managerIssueFee: BigNumberish,
     managerRedeemFee: BigNumberish,
     feeRecipientAddress: Address,
     managerIssuanceHookAddress: Address
   ): BytesLike {
-    this.assert.schema.isValidAddress('setTokenAddress', setTokenAddress);
+    this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
     this.assert.schema.isValidNumber('maxManagerFee', maxManagerFee);
     this.assert.schema.isValidNumber('managerIssueFee', managerIssueFee);
     this.assert.schema.isValidNumber('managerRedeemFee', managerRedeemFee);
     this.assert.schema.isValidAddress('feeRecipientAddress', feeRecipientAddress);
     this.assert.schema.isValidAddress('managerIssuanceHookAddress', managerIssuanceHookAddress);
 
-    const moduleInterface = new EthersUtils.Interface(IssuanceModule__factory.abi);
-    return moduleInterface.encodeFunctionData('initialize', [
-      setTokenAddress,
+    const moduleInterface = new EthersUtils.Interface(IssuanceExtension__factory.abi);
+    return moduleInterface.encodeFunctionData('initializeModuleAndExtension', [
+      delegatedManagerAddress,
       maxManagerFee,
       managerIssueFee,
       managerRedeemFee,

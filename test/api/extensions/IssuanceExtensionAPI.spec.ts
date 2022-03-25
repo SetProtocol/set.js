@@ -121,8 +121,8 @@ describe('IssuanceExtensionAPI', () => {
     });
   });
 
-  describe('#getIssuanceModuleInitializationBytecode', () => {
-    let subjectSetToken: Address;
+  describe('#getIssuanceModuleAndExtensionInitializationBytecode', () => {
+    let subjectDelegatedManager: Address;
     let subjectMaxManagerFee: BigNumber;
     let subjectManagerIssueFee: BigNumber;
     let subjectManagerRedeemFee: BigNumber;
@@ -130,7 +130,7 @@ describe('IssuanceExtensionAPI', () => {
     let subjectManagerIssuanceHook: Address;
 
     beforeEach(async () => {
-      subjectSetToken = setToken;
+      subjectDelegatedManager = delegatedManager;
       subjectMaxManagerFee = ether(.5);
       subjectManagerIssueFee = ether(.05);
       subjectManagerRedeemFee =  ether(.04);
@@ -139,8 +139,8 @@ describe('IssuanceExtensionAPI', () => {
     });
 
     async function subject(): Promise<BytesLike> {
-      return issuanceExtensionAPI.getIssuanceModuleInitializationBytecode(
-        subjectSetToken,
+      return issuanceExtensionAPI.getIssuanceModuleAndExtensionInitializationBytecode(
+        subjectDelegatedManager,
         subjectMaxManagerFee,
         subjectManagerIssueFee,
         subjectManagerRedeemFee,
@@ -151,7 +151,7 @@ describe('IssuanceExtensionAPI', () => {
 
     it('should generate the expected bytecode', async () => {
       const expectedBytecode =
-        '0xbf9fe1380000000000000000000000006ecbe1db9ef729cbe972c83fb886247691fb6beb000000000000000' +
+        '0xb738ad91000000000000000000000000e834ec434daba538cd1b9fe1582052b880bd7e63000000000000000' +
         '00000000000000000000000000000000006f05b59d3b200000000000000000000000000000000000000000000' +
         '0000000000b1a2bc2ec50000000000000000000000000000000000000000000000000000008e1bc9bf0400000' +
         '0000000000000000000000078dc5d2d739606d31509c31d654056a45185ecb6000000000000000000000000a8' +
@@ -161,7 +161,7 @@ describe('IssuanceExtensionAPI', () => {
     });
 
     describe('when setToken is not a valid address', () => {
-      beforeEach(() => subjectSetToken = '0xinvalid');
+      beforeEach(() => subjectDelegatedManager = '0xinvalid');
 
       it('should throw with invalid params', async () => {
         await expect(subject()).to.be.rejectedWith('Validation error');
