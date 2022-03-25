@@ -197,7 +197,7 @@ describe('TradeExtensionAPI', () => {
     }
 
     it('should generate the expected bytecode', async () => {
-      const expectedBytecode = '0xde2236bd000000000000000000000000e36ea790bc9d7ab70c55260c66d52b1eca985f84';
+      const expectedBytecode = '0x9b468312000000000000000000000000e36ea790bc9d7ab70c55260c66d52b1eca985f84';
 
       expect(await subject()).eq(expectedBytecode);
     });

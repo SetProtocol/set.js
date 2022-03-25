@@ -123,6 +123,6 @@ export default class TradeExtensionAPI {
     this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
 
     const extensionInterface = new EthersUtils.Interface(TradeExtension__factory.abi);
-    return extensionInterface.encodeFunctionData('initializeExtension', [ delegatedManagerAddress ]);
+    return extensionInterface.encodeFunctionData('initializeModuleAndExtension', [ delegatedManagerAddress ]);
   }
 }
