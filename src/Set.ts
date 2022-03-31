@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { SetJSConfig } from './types';
+import { SetJSConfig, DelegatedManagerSystemExtensions } from './types';
 import Assertions from './assertions';
 import {
   BlockchainAPI,
@@ -34,6 +34,10 @@ import {
   PerpV2LeverageAPI,
   PerpV2LeverageViewerAPI,
   UtilsAPI,
+  DelegatedManagerFactoryAPI,
+  IssuanceExtensionAPI,
+  TradeExtensionAPI,
+  StreamingFeeExtensionAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -142,16 +146,27 @@ class Set {
   public perpV2BasisTradingViewer: PerpV2LeverageViewerAPI;
 
   /**
-   * An instance of the BlockchainAPI class. Contains interfaces for
-   * interacting with the blockchain
+   * An instance of DelegatedManagerFactory class. Contains methods for deploying and initializing
+   * DelegatedManagerSystem deployed SetTokens and Manager contracts
    */
-  public blockchain: BlockchainAPI;
+  public delegatedManagerFactory: DelegatedManagerFactoryAPI;
+
+  /**
+   * Group of extension for interacting with SetTokens managed by with DelegatedManager system contracts
+   */
+  public extensions: DelegatedManagerSystemExtensions;
 
   /**
    * An instance of the UtilsAPI class. Contains interfaces for fetching swap quotes from 0x Protocol,
    * prices and token metadata from coingecko, and network gas prices from various sources
    */
   public utils: UtilsAPI;
+
+  /**
+   * An instance of the BlockchainAPI class. Contains interfaces for
+   * interacting with the blockchain
+   */
+  public blockchain: BlockchainAPI;
 
   /**
    * Instantiates a new Set instance that provides the public interface to the Set.js library
@@ -187,6 +202,17 @@ class Set {
                                                                 config.perpV2BasisTradingModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
     this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey, config.zeroExApiUrls);
+
+    this.delegatedManagerFactory = new DelegatedManagerFactoryAPI(
+      ethersProvider,
+      config.delegatedManagerFactoryAddress
+    );
+
+    this.extensions = {
+      streamingFeeExtension: new StreamingFeeExtensionAPI(ethersProvider, config.streamingFeeExtensionAddress),
+      issuanceExtension: new IssuanceExtensionAPI(ethersProvider, config.issuanceExtensionAddress),
+      tradeExtension: new TradeExtensionAPI(ethersProvider, config.tradeExtensionAddress),
+    };
   }
 }
 
