@@ -69,12 +69,12 @@ export default class UtilsAPI {
    *
    * @param  fromToken            Address of token being sold
    * @param  toToken              Address of token being bought
-   * @param  rawAmount            String quantity of token to sell (ex: "0.5")
+   * @param  rawAmount            String quantity of token to sell in token decimals (ex: "5000000" = 5 USDC)
    * @param  useBuyAmount         When true, amount is `buyAmount` of `toToken`,
    *                              When false, amount is `sellAmount` of `fromToken`
    * @param  fromAddress          SetToken address which holds the buy / sell components
    * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
+   * @param  gasPrice             gasPrice to calculate gas costs with
    * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0
@@ -127,28 +127,27 @@ export default class UtilsAPI {
   }
 
   /**
-   * Call 0x API to generate a trade quote for two SetToken components. By default, swap quotes
+   * Batch multiple calls to 0x API to generate trade quotes SetToken component pairs. By default, swap quotes
    * are fetched for 0x's public endpoints using their `https://api.0x.org`, `https://<network>/api.0x.org`
    * url scheme. These open endpoints are rate limited at ~3 req/sec
    *
    * It's also possible to make calls from non-browser context with an API key using the `https://gated.api.0x.org`
    * url scheme.
    *
-   * 0x rate-limits calls per API key as follows:
+   * Officially 0x rate-limits calls *per API key* as follows (mileage may vary):
    *
    * > Ethereum: 10 requests per second/200 requests per minute.
    * > Other networks: 30 requests per second.
    *
-   * They also permit parallelization and allow making up to 50 requests in parallel. In testing (March 2022)
-   * we found this worked on Optimism and Ethereum but consistently 429'd (too many reqs) on Polygon. A
-   * delay step parameter option is available to stagger parallelized requests and is set to 25ms by default.
+   * The `delayStep` parameter option allows you to stagger parallelized requests to stay within rate limits
+   * and is set to 25ms by default.
    *
    * @param  orderPairs           SwapOrderPairs array
    * @param  useBuyAmount         When true, amount is `buyAmount` of `toToken`,
    *                              When false, amount is `sellAmount` of `fromToken`
    * @param  fromAddress          SetToken address which holds the buy / sell components
    * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
+   * @param  gasPrice             gasPrice to calculate gas costs with
    * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0
