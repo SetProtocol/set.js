@@ -14,13 +14,15 @@
 
 # set.js
 
-`set.js` is a library for interacting with Set Protocol V2 smart contracts.
+`set.js` is a library for wrapping and interacting with Set Protocol V2 smart contracts.
 This library enables you to create, issue, redeem, and trade for Sets.
+
+For Set Protocol V2 smart contract function descriptions, visit our [docs](https://docs.tokensets.com/developers/contracts/protocol)
 
 ## Getting Started
 
 1. Add this package to your project: `yarn install set.js`
-2. Configure your Set.js instance to read from & write to [Ethereum, Polygon, or Optimism contracts](https://docs.tokensets.com/developers/contracts/deployed/protocol).
+2. Configure your Set.js instance to read from & write to [Ethereum, Polygon, or Optimism contract addresses](https://docs.tokensets.com/developers/contracts/deployed/protocol).
    Your configuration for Ethereum Mainnet (Production) might look like this:
 
 ```
