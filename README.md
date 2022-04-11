@@ -47,7 +47,7 @@ const SetJsConfig = {
   ...SetJsEthereumMainnetAddresses,
 };
 
-const SetJsInstance = new SetJs(setJsConfig);
+const SetJsInstance = new SetJs(SetJsConfig);
 ```
 
 4. Begin using the Set Protocol. Try this command to see if your instance has been set up correctly (for ethereum production mainnet):
