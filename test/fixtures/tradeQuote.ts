@@ -163,7 +163,7 @@ export const tradeQuoteFixtures = {
     from: '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b',
     fromTokenAddress: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
     toTokenAddress: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-    exchangeAdapterName: 'ZeroExApiAdapterV4',
+    exchangeAdapterName: 'ZeroExApiAdapterV5',
     calldata: '0x415565b00000000000000000000000009f8f72aa9304c8b593d555f12ef6589cc3a579a2',
     gas: '315000',
     gasPrice: '61',
@@ -201,7 +201,7 @@ export const tradeQuoteFixtures = {
     from: '0xd7dc13984d4fe87f389e50067fb3eedb3f704ea0',
     fromTokenAddress: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
     toTokenAddress: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
-    exchangeAdapterName: 'ZeroExApiAdapterV4',
+    exchangeAdapterName: 'ZeroExApiAdapterV5',
     calldata:
      '0x415565b00000000000000000000000002791bca1f2de4661ed88a30c99a7a9449aa84174',
     gas: '315000',
