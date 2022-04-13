@@ -57,7 +57,7 @@ export class TradeQuoter {
   private feePercentage: number = 0;
   private isFirmQuote: boolean = true;
   private slippagePercentage: number = 2;
-  private excludedSources: string[] = ['Kyber', 'Eth2Dai', 'Mesh', 'RFQT'];
+  private excludedSources: string[] = ['Kyber', 'Eth2Dai', 'Mesh'];
   private zeroExApiKey: string;
   private zeroExApiUrls: ZeroExApiUrls;
 
