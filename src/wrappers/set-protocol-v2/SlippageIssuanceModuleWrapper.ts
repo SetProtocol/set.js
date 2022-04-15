@@ -195,6 +195,9 @@ export default class SlippageIssuanceModuleWrapper {
     return await slippageIssuanceModuleInstance.callStatic.getRequiredComponentIssuanceUnitsOffChain(
       setTokenAddress,
       quantity,
+      {
+        gasLimit: BigNumber.from(50000),
+      },
     );
   }
 
@@ -225,6 +228,9 @@ export default class SlippageIssuanceModuleWrapper {
     return await slippageIssuanceModuleInstance.callStatic.getRequiredComponentRedemptionUnitsOffChain(
       setTokenAddress,
       quantity,
+      {
+        gasLimit: BigNumber.from(50000),
+      },
     );
   }
 
