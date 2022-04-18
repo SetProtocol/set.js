@@ -44,7 +44,7 @@ export default class TradeExtensionWrapper {
    * Executes a trade on a supported DEX. Must be called an address authorized for the `operator` role
    * on the TradeExtension
    *
-   * NOTE: Although the SetToken units are passed in for the send and receive quantities, the total quantity
+   * NOTE: Although SetToken units are passed in for the send and receive quantities, the total quantity
    * sent and received is the quantity of SetToken units multiplied by the SetToken totalSupply.
    *
    * @param setTokenAddress      Address of the deployed SetToken to trade on behalf of

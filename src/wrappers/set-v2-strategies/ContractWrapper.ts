@@ -24,7 +24,8 @@ import {
   DelegatedManagerFactory,
   StreamingFeeSplitExtension,
   TradeExtension,
-  IssuanceExtension
+  IssuanceExtension,
+  BatchTradeExtension
 } from '@setprotocol/set-v2-strategies/typechain';
 
 import {
@@ -39,6 +40,9 @@ import {
 import {
   IssuanceExtension__factory
 } from '@setprotocol/set-v2-strategies/dist/typechain/factories/IssuanceExtension__factory';
+import {
+  BatchTradeExtension__factory,
+} from '@setprotocol/set-v2-strategies/dist/typechain/factories/TradeExtension__factory';
 
 
 /**
@@ -162,6 +166,33 @@ export default class ContractWrapper {
 
       this.cache[cacheKey] = issuanceExtensionContract;
       return issuanceExtensionContract;
+    }
+  }
+
+  /**
+   * Load BatchTradeExtension contract
+   *
+   * @param  batchTradeExtensionAddress          Address of the TradeExtension instance
+   * @param  callerAddress                       Address of caller, uses first one on node if none provided.
+   * @return                                     BatchTradeExtension contract instance
+   */
+   public async loadBatchTradeExtensionAsync(
+    batchTradeExtensionAddress: Address,
+    callerAddress?: Address,
+  ): Promise<BatchTradeExtension> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `batchTradeExtension_${batchTradeExtensionAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as BatchTradeExtension;
+    } else {
+      const batchTradeExtensionContract = BatchTradeExtension__factory.connect(
+        batchTradeExtensionAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = batchTradeExtensionContract;
+      return batchTradeExtensionContract;
     }
   }
 }

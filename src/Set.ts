@@ -38,6 +38,7 @@ import {
   IssuanceExtensionAPI,
   TradeExtensionAPI,
   StreamingFeeExtensionAPI,
+  BatchTradeExtensionAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -212,6 +213,7 @@ class Set {
       streamingFeeExtension: new StreamingFeeExtensionAPI(ethersProvider, config.streamingFeeExtensionAddress),
       issuanceExtension: new IssuanceExtensionAPI(ethersProvider, config.issuanceExtensionAddress),
       tradeExtension: new TradeExtensionAPI(ethersProvider, config.tradeExtensionAddress),
+      batchTradeExtension: new BatchTradeExtensionAPI(ethersProvider, config.batchTradeExtensionAddress),
     };
   }
 }

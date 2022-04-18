@@ -1,13 +1,14 @@
 import { Provider } from '@ethersproject/providers';
 import { provider as Web3CoreProvider } from 'web3-core';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
-import { BigNumber } from 'ethers/lib/ethers';
+import { BigNumber, BytesLike } from 'ethers/lib/ethers';
 import { ZeroExApiUrls } from './utils';
 
 import type {
   IssuanceExtensionAPI,
   TradeExtensionAPI,
-  StreamingFeeExtensionAPI
+  StreamingFeeExtensionAPI,
+  BatchTradeExtensionAPI
 } from '../api';
 
 export { TransactionReceipt } from 'ethereum-types';
@@ -43,6 +44,7 @@ export interface SetJSConfig {
   issuanceExtensionAddress: Address;
   tradeExtensionAddress: Address;
   streamingFeeExtensionAddress: Address;
+  batchTradeExtensionAddress: Address;
 }
 
 export type SetDetails = {
@@ -164,5 +166,21 @@ export type VAssetDisplayInfo = {
 export type DelegatedManagerSystemExtensions = {
   issuanceExtension: IssuanceExtensionAPI,
   tradeExtension: TradeExtensionAPI,
-  streamingFeeExtension: StreamingFeeExtensionAPI
+  streamingFeeExtension: StreamingFeeExtensionAPI,
+  batchTradeExtension: BatchTradeExtensionAPI
+};
+
+export type TradeInfo = {
+  exchangeName: string;
+  sendToken: Address;
+  sendQuantity: BigNumber;
+  receiveToken: Address;
+  minReceiveQuantity: BigNumber;
+  data: BytesLike;
+};
+
+export type BatchTradeResult = {
+  success: boolean;
+  tradeInfo: TradeInfo;
+  revertReason?: string | undefined;
 };

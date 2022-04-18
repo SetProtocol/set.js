@@ -1016,10 +1016,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.4.1-solc-0.7-2.tgz#371c67ebffe50f551c3146a9eec5fe6ffe862e92"
   integrity sha512-tAG9LWg8+M2CMu7hIsqHPaTyG4uDzjr6mhvH96LvOpLZZj6tgzTluBt+LsCf1/QaYrlis6pITvpIaIhE+iZB+Q==
 
-"@setprotocol/set-protocol-v2@^0.1.11-hardhat.0":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.1.12.tgz#4ff67d0d2935148908ddada79bc51fda17c97afa"
-  integrity sha512-0zHRCTgASXR4P8ya0lafF4WSjnVsc6N7QMLiOGymVfuoSJDpDD+jGOn57FnVmgeknmt60frxJYMxxn5XQN9lyw==
+"@setprotocol/set-protocol-v2@0.10.0-hhat.1":
+  version "0.10.0-hhat.1"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-protocol-v2/-/set-protocol-v2-0.10.0-hhat.1.tgz#933dc1ad9599ddf39796ce5785e0cd4ec0e7ba5d"
+  integrity sha512-wjTIHUzsAmL8u01XsOALJp62ceznVPK420zfpNK6Kv/mK56UKZWq3ptzHbnhjujU1vDfiNylH+enEHjUYiBogQ==
   dependencies:
     "@uniswap/v3-sdk" "^3.5.1"
     ethers "^5.5.2"
@@ -1040,12 +1040,12 @@
     module-alias "^2.2.2"
     replace-in-file "^6.1.0"
 
-"@setprotocol/set-v2-strategies@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@setprotocol/set-v2-strategies/-/set-v2-strategies-0.0.7.tgz#dca84f40c31b7118b6ff527f372d7fe2906f53ad"
-  integrity sha512-YfA1obWvj2v/lsNnwrCHf2wRud+mdUZutHJggZyziqMokFi6dsej9StczSt8ftWUsWQqQnnGshVcBAjSL0T1sQ==
+"@setprotocol/set-v2-strategies@^0.0.10-batch.0":
+  version "0.0.10-batch.0"
+  resolved "https://registry.yarnpkg.com/@setprotocol/set-v2-strategies/-/set-v2-strategies-0.0.10-batch.0.tgz#419a58a6c3154ff626ff9a37311b3c981dc0002f"
+  integrity sha512-3P/oWV6vjuttCoAybEfVF7x/6KjYkrUW27cS1SOOPwOIJzzVdHdFRd9zV587qbpAfULk6w7HB1t1aVTkQ3mfMw==
   dependencies:
-    "@setprotocol/set-protocol-v2" "^0.1.11-hardhat.0"
+    "@setprotocol/set-protocol-v2" "0.10.0-hhat.1"
     "@uniswap/v3-sdk" "^3.5.1"
     ethers "5.5.2"
     fs-extra "^5.0.0"
