@@ -196,7 +196,7 @@ export default class SlippageIssuanceModuleWrapper {
       setTokenAddress,
       quantity,
       {
-        gasLimit: BigNumber.from(50000),
+        gasLimit: BigNumber.from(7000000),
       },
     );
   }
@@ -229,7 +229,7 @@ export default class SlippageIssuanceModuleWrapper {
       setTokenAddress,
       quantity,
       {
-        gasLimit: BigNumber.from(50000),
+        gasLimit: BigNumber.from(7000000),
       },
     );
   }
