@@ -184,3 +184,12 @@ export type BatchTradeResult = {
   tradeInfo: TradeInfo;
   revertReason?: string | undefined;
 };
+
+export type TradeOrderPair = {
+  fromToken: Address;
+  toToken: Address;
+  fromTokenDecimals: number;
+  toTokenDecimals: number;
+  rawAmount: string;
+  slippagePercentage: number;
+};
