@@ -123,7 +123,6 @@ export default class BatchTradeExtensionAPI {
           results[tradeIndex].revertReason = customErrorParser((decodedLog.args as any)._reason);
         }
       } catch (e) {
-        console.log('e --> ' + e);
         // ignore all non-batch trade events
       }
     }

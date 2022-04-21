@@ -195,14 +195,4 @@ export default class ContractWrapper {
       return batchTradeExtensionContract;
     }
   }
-
-  /**
-   * Load BatchTradeExtension contract without signer (for running populateTransaction)
-   *
-   * @param  batchTradeExtensionAddress         Address of the BatchTradeExtension
-   * @return                                    BatchTradeExtension contract instance
-   */
-  public loadBatchTradeExtensionWithoutSigner(batchTradeExtensionAddress: Address): BatchTradeExtension {
-      return BatchTradeExtension__factory.connect(batchTradeExtensionAddress);
-  }
 }
