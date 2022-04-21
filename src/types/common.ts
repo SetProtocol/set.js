@@ -191,5 +191,5 @@ export type TradeOrderPair = {
   fromTokenDecimals: number;
   toTokenDecimals: number;
   rawAmount: string;
-  slippagePercentage: number;
+  slippagePercentage?: number;
 };

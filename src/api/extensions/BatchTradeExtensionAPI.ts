@@ -18,13 +18,14 @@
 
 import { ContractTransaction, BytesLike, utils as EthersUtils } from 'ethers';
 import { Provider } from '@ethersproject/providers';
+import { RevertError } from '@0x/utils';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { BatchTradeExtension__factory } from '@setprotocol/set-v2-strategies/dist/typechain/factories/BatchTradeExtension__factory';
 
 import BatchTradeExtensionWrapper from '../../wrappers/set-v2-strategies/BatchTradeExtensionWrapper';
 import Assertions from '../../assertions';
-import { TradeInfo } from '../../types';
+import { TradeInfo, BatchTradeResult } from '../../types';
 
 /**
  * @title  BatchTradeExtensionAPI
@@ -35,6 +36,7 @@ import { TradeInfo } from '../../types';
  * data packets that encode module and extension initialization method calls.
  */
 export default class BatchTradeExtensionAPI {
+  private provider: Provider;
   private batchTradeExtensionWrapper: BatchTradeExtensionWrapper;
   private assert: Assertions;
 
@@ -42,6 +44,7 @@ export default class BatchTradeExtensionAPI {
     provider: Provider,
     batchTradeExtensionAddress: Address,
     assertions?: Assertions) {
+    this.provider = provider;
     this.batchTradeExtensionWrapper = new BatchTradeExtensionWrapper(provider, batchTradeExtensionAddress);
     this.assert = assertions || new Assertions();
   }
@@ -76,14 +79,67 @@ export default class BatchTradeExtensionAPI {
   }
 
   /**
-   * Generates TradeExtension initialize call bytecode to be passed as an element in the  `initializeBytecode`
+   * Given the transaction hash of `batchTradeWithOperator` tx, fetches success statuses of all trades
+   * executed including the revert reason if a trade failed. If a revert reason is formatted as a
+   * custom error, invokes customErrorParser to transform it into a human readable string.
+   * (Uses a ZeroEx custom error parser by default)
+   *
+   *
+   * @param  transactionHash         Transaction hash of a batchTradeWithOperator tx
+   * @param  trades                  Array of trades executed by batchTrade
+   */
+  public async getBatchTradeResultsAsync(
+    transactionHash: string,
+    trades: TradeInfo[],
+    customErrorParser: (hexEncodedErr: string) => string = this.decodeZeroExCustomError
+  ): Promise<BatchTradeResult[]> {
+    this.assert.schema.isValidBytes('transactionHash', transactionHash);
+    this._validateTrades(trades);
+
+    const results: BatchTradeResult[] = [];
+    const extensionInterface = new EthersUtils.Interface(BatchTradeExtension__factory.abi);
+    const receipt = await this.provider.getTransactionReceipt(transactionHash);
+
+    for (const trade of trades) {
+      results.push({
+        success: true,
+        tradeInfo: trade,
+      });
+    }
+
+    for (const log of receipt.logs) {
+      try {
+        const decodedLog = extensionInterface.parseLog({ data: log.data, topics: log.topics });
+
+        if (decodedLog.name === 'StringTradeFailed') {
+          const tradeIndex = (decodedLog.args as any)._index.toNumber();
+          results[tradeIndex].success = false;
+          results[tradeIndex].revertReason = (decodedLog.args as any)._reason;
+        }
+
+        if (decodedLog.name === 'BytesTradeFailed') {
+          const tradeIndex = (decodedLog.args as any)._index.toNumber();
+          results[tradeIndex].success = false;
+          results[tradeIndex].revertReason = customErrorParser((decodedLog.args as any)._reason);
+        }
+      } catch (e) {
+        console.log('e --> ' + e);
+        // ignore all non-batch trade events
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Generates BatchTradeExtension initialize call bytecode to be passed as an element in the  `initializeBytecode`
    * array for the DelegatedManagerFactory's `initializeAsync` method.
    *
-   * @param delegatedManagerAddress      Instance of deployed DelegatedManager to initialize the TradeExtension for
+   * @param delegatedManagerAddress      Instance of deployed DelegatedManager to initialize the BatchTradeExtension for
    *
    * @return                             Initialization bytecode
    */
-  public getTradeExtensionInitializationBytecode(
+  public getBatchTradeExtensionInitializationBytecode(
     delegatedManagerAddress: Address
   ): BytesLike {
     this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
@@ -116,5 +172,9 @@ export default class BatchTradeExtensionAPI {
       this.assert.schema.isValidNumber('minReceiveQuantity', trade.minReceiveQuantity);
       this.assert.schema.isValidBytes('data', trade.data);
     }
+  }
+
+  private decodeZeroExCustomError(hexEncodedErr: string): string {
+    return RevertError.decode(hexEncodedErr).message;
   }
 }

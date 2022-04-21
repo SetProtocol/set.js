@@ -14,12 +14,11 @@
 'use strict';
 
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
-import { ContractTransaction, constants, BigNumber } from 'ethers';
+import { ContractTransaction } from 'ethers';
 import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechain';
 import { Provider } from '@ethersproject/providers';
 import { generateTxOpts } from '../../utils/transactions';
-import { TradeInfo, BatchTradeResult } from '../../types';
-import { RevertError } from '@0x/utils';
+import { TradeInfo } from '../../types';
 
 import ContractWrapper from './ContractWrapper';
 
@@ -71,90 +70,5 @@ export default class BatchTradeExtensionWrapper {
       trades,
       txOptions
     );
-  }
-
-  /**
-   * Estimate gas cost for executing a batch trade on a supported DEX
-   *
-   * @param setTokenAddress      Address of the deployed SetToken to trade on behalf of
-   * @param trades               Array of TradeInfo objects to execute as a batch of trades
-   * @param callerAddress        Address of caller
-   */
-  public async estimateGasForBatchTradeWithOperator(
-    setTokenAddress: Address,
-    trades: TradeInfo[],
-    callerAddress: Address
-  ): Promise<BigNumber> {
-    const batchTradeExtensionInstance = await this.contracts.loadBatchTradeExtensionWithoutSigner(
-      this.batchTradeExtensionAddress
-    );
-
-    const tx = await batchTradeExtensionInstance.populateTransaction.batchTrade(
-      setTokenAddress,
-      trades,
-      {from: callerAddress }
-    );
-
-    return this.provider.estimateGas(tx);
-  }
-
-  /**
-   * Given the transaction hash of `batchTradeWithOperator` tx, fetches success statuses of all trades
-   * executed including the revert reason if a trade failed. If a revert reason is formatted as a
-   * custom error, invokes customErrorParser to transform it into a human readable string.
-   * (Uses a ZeroEx custom error parser by default)
-   *
-   *
-   * @param  transactionHash         Transaction hash of a batchTradeWithOperator tx
-   * @param  trades                  Array of trades executed by batchTrade
-   */
-  public async getBatchTradeResults(
-    transactionHash: string,
-    trades: TradeInfo[],
-    customErrorParser: (hexEncodedErr: string) => string = this.decodeZeroExCustomError
-  ): Promise<BatchTradeResult[]> {
-    const batchTradeExtensionInstance = await this.contracts.loadBatchTradeExtensionAsync(
-      this.batchTradeExtensionAddress,
-      constants.AddressZero
-    );
-
-    const receipt = await this.provider.getTransactionReceipt(transactionHash);
-    const results: BatchTradeResult[] = [];
-
-    for (const trade of trades) {
-      results.push({
-        success: true,
-        tradeInfo: trade,
-      });
-    }
-
-    for (const log of receipt.logs) {
-      try {
-        const decodedLog = batchTradeExtensionInstance.interface.parseLog({
-          data: log.data,
-          topics: log.topics,
-        });
-
-        if (decodedLog.name === 'StringTradeFailed') {
-          const tradeIndex = (decodedLog.args as any)._index.toNumber();
-          results[tradeIndex].success = false;
-          results[tradeIndex].revertReason = (decodedLog.args as any)._reason;
-        }
-
-        if (decodedLog.name === 'BytesTradeFailed') {
-          const tradeIndex = (decodedLog.args as any)._index.toNumber();
-          results[tradeIndex].success = false;
-          results[tradeIndex].revertReason = customErrorParser((decodedLog.args as any)._reason);
-        }
-      } catch (e) {
-        // ignore all non-batch trade events
-      }
-    }
-
-    return results;
-  }
-
-  private decodeZeroExCustomError(hexEncodedErr: string): string {
-    return RevertError.decode(hexEncodedErr).message;
   }
 }
