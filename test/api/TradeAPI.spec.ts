@@ -24,9 +24,6 @@ import { ether } from '@setprotocol/set-protocol-v2/dist/utils/common';
 
 import TradeAPI from '@src/api/TradeAPI';
 import TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
-import {
-  TradeQuoter,
-} from '@src/api/utils';
 import { expect } from '@test/utils/chai';
 
 import { tradeQuoteFixtures as fixture } from '../fixtures/tradeQuote';
