@@ -41,9 +41,8 @@ export default class DelegatedManagerAPI {
 
   public constructor(
     provider: Provider,
-    delegatedManagerAddress: Address,
     assertions?: Assertions) {
-    this.DelegatedManagerWrapper = new DelegatedManagerWrapper(provider, delegatedManagerAddress);
+    this.DelegatedManagerWrapper = new DelegatedManagerWrapper(provider);
     this.assert = assertions || new Assertions();
   }
 
@@ -51,18 +50,22 @@ export default class DelegatedManagerAPI {
    * ONLY OWNER: Add new extension(s) that the DelegatedManager can call. Puts extensions into PENDING
    * state, each must be initialized in order to be used.
    *
-   * @param _extensions      New extension(s) to add
-   * @param callerAddress    Address of caller (optional)
-   * @param txOpts           Overrides for transaction (optional)
+   * @param _delegatedManagerAddress       DelegatedManager to addExtension for
+   * @param _extensions                    New extension(s) to add
+   * @param callerAddress                  Address of caller (optional)
+   * @param txOpts                         Overrides for transaction (optional)
    */
   public async addExtensionsAsync(
+    delegatedManagerAddress: Address,
     extensions: Address[],
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
+    this.assert.schema.isValidAddress('delegatedManagerAddress', delegatedManagerAddress);
     this.assert.schema.isValidAddressList('extensions', extensions);
 
     return await this.DelegatedManagerWrapper.addExtensions(
+      delegatedManagerAddress,
       extensions,
       callerAddress,
       txOpts

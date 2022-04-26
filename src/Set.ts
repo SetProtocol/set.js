@@ -211,10 +211,7 @@ class Set {
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
     this.utils = new UtilsAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey, config.zeroExApiUrls);
 
-    this.delegatedManager = new DelegatedManagerAPI(
-      ethersProvider,
-      config.delegatedManagerAddress
-    );
+    this.delegatedManager = new DelegatedManagerAPI(ethersProvider);
 
     this.delegatedManagerFactory = new DelegatedManagerFactoryAPI(
       ethersProvider,

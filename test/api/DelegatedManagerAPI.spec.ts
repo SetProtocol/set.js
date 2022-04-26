@@ -43,7 +43,7 @@ describe('DelegatedManagerAPI', () => {
       extensionB,
     ] = await provider.listAccounts();
 
-    delegatedManagerAPI = new DelegateManagerFactoryAPI(provider, delegatedManager);
+    delegatedManagerAPI = new DelegateManagerFactoryAPI(provider);
     delegatedManagerWrapper = (DelegatedManagerWrapper as any).mock.instances[0];
   });
 
@@ -52,11 +52,13 @@ describe('DelegatedManagerAPI', () => {
   });
 
   describe('#addExtension', () => {
+    let subjectDelegatedManager: Address;
     let subjectExtensions: Address[];
     let subjectCallerAddress: Address;
     let subjectTransactionOptions: any;
 
     beforeEach(async () => {
+      subjectDelegatedManager = delegatedManager;
       subjectExtensions = [extensionA, extensionB];
       subjectCallerAddress = owner;
       subjectTransactionOptions = {};
@@ -64,6 +66,7 @@ describe('DelegatedManagerAPI', () => {
 
     async function subject(): Promise<ContractTransaction> {
       return delegatedManagerAPI.addExtensionsAsync(
+        subjectDelegatedManager,
         subjectExtensions,
         subjectCallerAddress,
         subjectTransactionOptions
@@ -74,6 +77,7 @@ describe('DelegatedManagerAPI', () => {
       await subject();
 
       expect(delegatedManagerWrapper.addExtensions).to.have.beenCalledWith(
+        subjectDelegatedManager,
         subjectExtensions,
         subjectCallerAddress,
         subjectTransactionOptions

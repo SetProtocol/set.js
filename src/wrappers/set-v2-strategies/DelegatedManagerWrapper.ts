@@ -32,30 +32,29 @@ export default class DelegatedManagerWrapper {
   private provider: Provider;
   private contracts: ContractWrapper;
 
-  private delegatedManagerAddress: Address;
-
-  public constructor(provider: Provider, delegatedManagerAddress: Address) {
+  public constructor(provider: Provider) {
     this.provider = provider;
     this.contracts = new ContractWrapper(this.provider);
-    this.delegatedManagerAddress = delegatedManagerAddress;
   }
 
   /**
    * ONLY OWNER: Add new extension(s) that the DelegatedManager can call. Puts extensions into PENDING
    * state, each must be initialized in order to be used.
    *
-   * @param _extensions      New extension(s) to add
-   * @param callerAddress    Address of caller (optional)
-   * @param txOpts           Overrides for transaction (optional)
+   * @param delegatedManagerAddress     DelegatedManager to add extension for
+   * @param extensions                  New extension(s) to add
+   * @param callerAddress               Address of caller (optional)
+   * @param txOpts                      Overrides for transaction (optional)
    */
   public async addExtensions(
+    delegatedManagerAddress: Address,
     extensions: Address[],
     callerAddress: Address = undefined,
     txOpts: TransactionOverrides = {}
   ): Promise<ContractTransaction> {
     const txOptions = await generateTxOpts(txOpts);
     const delegatedManagerInstance = await this.contracts.loadDelegatedManagerAsync(
-      this.delegatedManagerAddress,
+      delegatedManagerAddress,
       callerAddress
     );
 
