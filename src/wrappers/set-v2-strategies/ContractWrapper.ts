@@ -21,6 +21,7 @@ import { Contract } from 'ethers';
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 
 import {
+  DelegatedManager,
   DelegatedManagerFactory,
   StreamingFeeSplitExtension,
   TradeExtension,
@@ -28,6 +29,9 @@ import {
   BatchTradeExtension
 } from '@setprotocol/set-v2-strategies/typechain';
 
+import {
+  DelegatedManager__factory
+} from '@setprotocol/set-v2-strategies/dist/typechain/factories/DelegatedManager__factory';
 import {
   DelegatedManagerFactory__factory
 } from '@setprotocol/set-v2-strategies/dist/typechain/factories/DelegatedManagerFactory__factory';
@@ -59,6 +63,33 @@ export default class ContractWrapper {
   public constructor(provider: Provider) {
     this.provider = provider;
     this.cache = {};
+  }
+
+  /**
+   * Load DelegatedManager contract
+   *
+   * @param  DelegatedManagerAddress         Address of the DelegatedManager instance
+   * @param  callerAddress                   Address of caller, uses first one on node if none provided.
+   * @return                                 DelegatedManager contract instance
+   */
+   public async loadDelegatedManagerAsync(
+    delegatedManagerAddress: Address,
+    callerAddress?: Address,
+  ): Promise<DelegatedManager> {
+    const signer = (this.provider as JsonRpcProvider).getSigner(callerAddress);
+    const cacheKey = `DelegatedManagerFactory_${delegatedManagerAddress}_${await signer.getAddress()}`;
+
+    if (cacheKey in this.cache) {
+      return this.cache[cacheKey] as DelegatedManager;
+    } else {
+      const delegatedManagerContract = DelegatedManager__factory.connect(
+        delegatedManagerAddress,
+        signer
+      );
+
+      this.cache[cacheKey] = delegatedManagerContract;
+      return delegatedManagerContract;
+    }
   }
 
   /**

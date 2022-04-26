@@ -59,6 +59,44 @@ describe('BatchTradeExtensionAPI', () => {
     (BatchTradeExtensionWrapper as any).mockClear();
   });
 
+  describe('#initializeExtension', () => {
+    let subjectDelegatedManager: Address;
+    let subjectCallerAddress: Address;
+    let subjectTransactionOptions: any;
+
+    beforeEach(async () => {
+      subjectDelegatedManager = delegatedManager;
+      subjectCallerAddress = owner;
+      subjectTransactionOptions = {};
+    });
+
+    async function subject(): Promise<ContractTransaction> {
+      return batchTradeExtensionAPI.initializeExtensionAsync(
+        subjectDelegatedManager,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    }
+
+    it('should call `initializeExtension` on the BatchTradeExtensionWrapper', async () => {
+      await subject();
+
+      expect(batchTradeExtensionWrapper.initializeExtension).to.have.beenCalledWith(
+        subjectDelegatedManager,
+        subjectCallerAddress,
+        subjectTransactionOptions
+      );
+    });
+
+    describe('when an extension is not a valid address', () => {
+      beforeEach(() => subjectDelegatedManager = '0xinvalid');
+
+      it('should throw with invalid params', async () => {
+        await expect(subject()).to.be.rejectedWith('Validation error');
+      });
+    });
+  });
+
   describe('#batchTradeWithOperatorAsync', () => {
     let subjectSetToken: Address;
     let subjectTrades: TradeInfo[];
@@ -109,7 +147,7 @@ describe('BatchTradeExtensionAPI', () => {
     it('should call `tradeWithOperator` on the BatchTradeExtensionWrapper', async () => {
       await subject();
 
-      expect(batchTradeExtensionWrapper.batchTradeWithOperatorAsync).to.have.beenCalledWith(
+      expect(batchTradeExtensionWrapper.batchTradeWithOperator).to.have.beenCalledWith(
         subjectSetToken,
         subjectTrades,
         subjectCallerAddress,

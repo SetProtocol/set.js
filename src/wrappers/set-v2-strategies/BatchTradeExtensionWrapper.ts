@@ -42,6 +42,29 @@ export default class BatchTradeExtensionWrapper {
   }
 
   /**
+   * ONLY OWNER: Initializes BatchTradeExtension to the DelegatedManager.
+   *
+   * @param delegatedManager     Instance of the DelegatedManager to initialize extension for
+   */
+  public async initializeExtension(
+    delegatedManagerAddress: Address,
+    callerAddress: Address = undefined,
+    txOpts: TransactionOverrides = {}
+  ): Promise<ContractTransaction> {
+    const txOptions = await generateTxOpts(txOpts);
+    const batchTradeExtensionInstance = await this.contracts.loadBatchTradeExtensionAsync(
+      this.batchTradeExtensionAddress,
+      callerAddress
+    );
+
+    return await batchTradeExtensionInstance.initializeExtension(
+      delegatedManagerAddress,
+      txOptions
+    );
+
+  }
+
+  /**
    * Executes a batch of trades on a supported DEX. Must be called an address authorized for the `operator` role
    * on the BatchTradeExtension
    *
@@ -53,7 +76,7 @@ export default class BatchTradeExtensionWrapper {
    * @param callerAddress        Address of caller (optional)
    * @param txOptions            Overrides for transaction (optional)
    */
-  public async batchTradeWithOperatorAsync(
+  public async batchTradeWithOperator(
     setTokenAddress: Address,
     trades: TradeInfo[],
     callerAddress: Address = undefined,
