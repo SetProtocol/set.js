@@ -39,6 +39,7 @@ import {
   TradeExtensionAPI,
   StreamingFeeExtensionAPI,
   BatchTradeExtensionAPI,
+  DelegatedManagerAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -147,6 +148,12 @@ class Set {
   public perpV2BasisTradingViewer: PerpV2LeverageViewerAPI;
 
   /**
+   * An instance of DelegatedManager class. Contains methods for owner-administering Delegated
+   * Manager contracts
+   */
+  public delegatedManager: DelegatedManagerAPI;
+
+  /**
    * An instance of DelegatedManagerFactory class. Contains methods for deploying and initializing
    * DelegatedManagerSystem deployed SetTokens and Manager contracts
    */
@@ -203,6 +210,11 @@ class Set {
                                                                 config.perpV2BasisTradingModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
     this.utils = new UtilsAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey, config.zeroExApiUrls);
+
+    this.delegatedManager = new DelegatedManagerAPI(
+      ethersProvider,
+      config.delegatedManagerAddress
+    );
 
     this.delegatedManagerFactory = new DelegatedManagerFactoryAPI(
       ethersProvider,

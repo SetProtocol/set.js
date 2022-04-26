@@ -18,6 +18,7 @@ import IssuanceExtensionAPI from './extensions/IssuanceExtensionAPI';
 import StreamingFeeExtensionAPI from './extensions/StreamingFeeExtensionAPI';
 import TradeExtensionAPI from './extensions/TradeExtensionAPI';
 import BatchTradeExtensionAPI from './extensions/BatchTradeExtensionAPI';
+import DelegatedManagerAPI from './DelegatedManagerAPI';
 
 import {
   TradeQuoter,
@@ -46,6 +47,7 @@ export {
   StreamingFeeExtensionAPI,
   TradeExtensionAPI,
   BatchTradeExtensionAPI,
+  DelegatedManagerAPI,
   TradeQuoter,
   CoinGeckoDataService,
   GasOracleService
