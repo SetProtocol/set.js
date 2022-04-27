@@ -71,7 +71,9 @@ export default class UtilsAPI {
   }
 
   /**
-   * Call 0x API to generate a trade quote for two SetToken components.
+   * Call 0x API to generate a swap quote for two tokens. This method is intended to be used alongside
+   * ExchangeIssuanceZeroEx contract which allows you to convert a liquid "payment" currency into the
+   * components that will make up the issued SetToken, (or the reverse when redeeming).
    *
    * @param  fromToken            Address of token being sold
    * @param  toToken              Address of token being bought
@@ -133,7 +135,9 @@ export default class UtilsAPI {
   }
 
   /**
-   * Batch multiple calls to 0x API to generate trade quotes SetToken component pairs. By default, swap quotes
+   * Batch multiple calls to 0x API to generate swap quotes for token pairs. This method is intended to be used
+   * alongside the ExchangeIssuanceZeroEx contract which allows you to convert a liquid "payment" currency into the
+   * components that will make up the issued SetToken, (or the reverse when redeeming). By default, swap quotes
    * are fetched for 0x's public endpoints using their `https://api.0x.org`, `https://<network>/api.0x.org`
    * url scheme. These open endpoints are rate limited at ~3 req/sec
    *
@@ -252,7 +256,8 @@ export default class UtilsAPI {
   }
 
   /**
-   * Call 0x API to generate a trade quote for two SetToken components.
+   * Call 0x API to generate a trade quote for two SetToken components. This method is intended to be used alongside
+   * the DelegatedManager TradeExtension which allows you to rebalance holdings within the SetToken.
    *
    * @param  fromToken            Address of token being sold
    * @param  toToken              Address of token being bought
@@ -320,9 +325,10 @@ export default class UtilsAPI {
   }
 
   /**
-   * Batch multiple calls to 0x API to generate trade quotes for SetToken component pairs. By default, trade quotes
-   * are fetched for 0x's public endpoints using their `https://api.0x.org`, `https://<network>/api.0x.org`
-   * url scheme. In practice these open endpoints appear to be rate limited at ~3 req/sec
+   * Batch multiple calls to 0x API to generate trade quotes for SetToken component pairs. This method is intended
+   * to be used alongside the DelegatedManager BatchTradeExtension which allows you to rebalance holdings within the
+   * SetToken. By default, trade quotes are fetched for 0x's public endpoints using their `https://api.0x.org`,
+   * `https://<network>/api.0x.org` url scheme. In practice these open endpoints appear to be rate limited at ~3 req/sec
    *
    * It's also possible to make calls from non-browser context with an API key using the `https://gated.api.0x.org`
    * url scheme.
