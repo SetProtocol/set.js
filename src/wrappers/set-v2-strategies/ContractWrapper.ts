@@ -46,7 +46,7 @@ import {
 } from '@setprotocol/set-v2-strategies/dist/typechain/factories/IssuanceExtension__factory';
 import {
   BatchTradeExtension__factory,
-} from '@setprotocol/set-v2-strategies/dist/typechain/factories/TradeExtension__factory';
+} from '@setprotocol/set-v2-strategies/dist/typechain/factories/BatchTradeExtension__factory';
 
 
 /**
