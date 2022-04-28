@@ -16,8 +16,7 @@
 
 'use strict';
 
-import BigDecimal from 'js-big-decimal';
-import { BigNumber, FixedNumber, utils as ethersUtils } from 'ethers';
+import { BigNumber, FixedNumber, utils as ethersUtils, constants as ethersConstants } from 'ethers';
 import type TradeModuleWrapper from '@src/wrappers/set-protocol-v2/TradeModuleWrapper';
 
 import {
@@ -313,26 +312,14 @@ export class TradeQuoter {
     );
 
     const fromTokenAmount = quote.sellAmount;
-
-    // Convert to BigDecimal to get ceiling in fromUnits calculation
-    // This is necessary to derive the trade amount ZeroEx expects when scaling is
-    // done in the TradeModule contract. (ethers.FixedNumber does not work for this case)
-    const fromTokenAmountBD = new BigDecimal(fromTokenAmount.toString());
-    const scaleBD = new BigDecimal(SCALE.toString());
-    const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
-
-    const fromUnitsBD = fromTokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
-    const fromUnits = BigNumber.from(fromUnitsBD.getValue());
+    const fromUnits = this.preciseMulCeil(fromTokenAmount, setTotalSupply);
 
     const toTokenAmount = quote.buyAmount;
-
-    // BigNumber does not do fixed point math & FixedNumber underflows w/ numbers less than 1
-    // Multiply the slippage by a factor and divide the end result by same...
     const percentMultiplier = 1000;
     const slippageAndFee = slippagePercentage + feePercentage;
     const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippageAndFee));
     const toTokenAmountMinusSlippage = toTokenAmount.mul(slippageToleranceBN).div(percentMultiplier);
-    const toUnits = toTokenAmountMinusSlippage.mul(SCALE).div(setTotalSupply);
+    const toUnits = this.preciseMulCeil(toTokenAmountMinusSlippage, setTotalSupply);
 
     return {
       fromTokenAmount,
@@ -405,6 +392,14 @@ export class TradeQuoter {
       const amountMulScaleOverTotalSupply = amount.mul(SCALE).div(totalSupply);
       return amountMulScaleOverTotalSupply.mul(totalSupply).div(SCALE);
     }
+  }
+
+  private preciseMulCeil(a: BigNumber, b: BigNumber): BigNumber {
+    if (a.eq(0) || b.eq(0)) {
+      return ethersConstants.Zero;
+    }
+
+    return a.mul(b).sub(1).div(SCALE).add(1);
   }
 
   private tokenDisplayAmount(amount: BigNumber, decimals: number): string {
