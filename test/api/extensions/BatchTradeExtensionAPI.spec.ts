@@ -108,7 +108,7 @@ describe('BatchTradeExtensionAPI', () => {
       const sendToken = '0xAAAA15AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       const sendQuantity = ether(10);
       const receiveToken = '0xBBBB262A92581EC09C2d522b48bCcd9E3C8ACf9C';
-      const minReceiveQuantity = ether(.9);
+      const receiveQuantity = ether(.9);
       const data = '0x123456789abcdedf';
 
       subjectTrades = [
@@ -117,7 +117,7 @@ describe('BatchTradeExtensionAPI', () => {
           sendToken,
           receiveToken,
           sendQuantity,
-          minReceiveQuantity,
+          receiveQuantity,
           data,
         },
         {
@@ -125,7 +125,7 @@ describe('BatchTradeExtensionAPI', () => {
           sendToken: '0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
           receiveToken: '0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
           sendQuantity,
-          minReceiveQuantity,
+          receiveQuantity,
           data,
         },
       ];
@@ -195,8 +195,8 @@ describe('BatchTradeExtensionAPI', () => {
       });
     });
 
-    describe('when minReceiveQuantity is not a valid number', () => {
-      beforeEach(() => subjectTrades[0].minReceiveQuantity = <unknown>NaN as BigNumber);
+    describe('when receiveQuantity is not a valid number', () => {
+      beforeEach(() => subjectTrades[0].receiveQuantity = <unknown>NaN as BigNumber);
 
       it('should throw with invalid params', async () => {
         await expect(subject()).to.be.rejectedWith('Validation error');
@@ -213,7 +213,7 @@ describe('BatchTradeExtensionAPI', () => {
       const sendToken = '0xAAAA15AA9B462ed4fC84B5dFc43Fd2a10a54B569';
       const sendQuantity = ether(10);
       const receiveToken = '0xBBBB262A92581EC09C2d522b48bCcd9E3C8ACf9C';
-      const minReceiveQuantity = ether(.9);
+      const receiveQuantity = ether(.9);
       const data = '0x123456789abcdedf';
 
       subjectTrades = [
@@ -222,7 +222,7 @@ describe('BatchTradeExtensionAPI', () => {
           sendToken,
           receiveToken,
           sendQuantity,
-          minReceiveQuantity,
+          receiveQuantity,
           data,
         },
       ];
