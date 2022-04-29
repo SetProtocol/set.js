@@ -242,7 +242,7 @@ describe('BatchTradeExtensionAPI', () => {
 
       expect(results[0].success).eq(false);
       expect(results[0].tradeInfo).deep.eq(subjectTrades[0]);
-      expect(results[0].revertReason).eq(`NotImplementedError({ selector: '0x6af479b2' })`);
+      expect(results[0].revertReason).eq(`UniswapFeature/UnderBought`);
     });
   });
 
