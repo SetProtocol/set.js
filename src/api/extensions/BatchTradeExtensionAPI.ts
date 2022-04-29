@@ -188,7 +188,7 @@ export default class BatchTradeExtensionAPI {
       this.assert.schema.isValidAddress('sendToken', trade.sendToken);
       this.assert.schema.isValidNumber('sendQuantity', trade.sendQuantity);
       this.assert.schema.isValidAddress('receiveToken', trade.receiveToken);
-      this.assert.schema.isValidNumber('minReceiveQuantity', trade.minReceiveQuantity);
+      this.assert.schema.isValidNumber('minReceiveQuantity', trade.receiveQuantity);
       this.assert.schema.isValidBytes('data', trade.data);
     }
   }
