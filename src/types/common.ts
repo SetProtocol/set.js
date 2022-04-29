@@ -175,7 +175,7 @@ export type TradeInfo = {
   sendToken: Address;
   sendQuantity: BigNumber;
   receiveToken: Address;
-  minReceiveQuantity: BigNumber;
+  receiveQuantity: BigNumber;
   data: BytesLike;
 };
 
