@@ -169,8 +169,8 @@ export const tradeQuoteFixtures = {
     gas: '315000',
     gasPrice: '61',
     slippagePercentage: '2.00%',
-    fromTokenAmount: '221853651020280958044955',
-    toTokenAmount: '17780820452824974082126',
+    fromTokenAmount: '1126868991563',
+    toTokenAmount: '90314741816',
     display: {
        inputAmountRaw: '.5',
        inputAmount: '500000000000000000',
