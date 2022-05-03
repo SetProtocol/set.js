@@ -95,11 +95,17 @@ export class TradeQuoter {
       fromAddress, [fromTokenAddress, toTokenAddress]
     );
 
+    // This value is already floored. Number that ends in 8, should end in .7
     const fromTokenRequestAmount = this.calculateFromTokenAmount(
       setOnChainDetails,
       fromTokenAddress,
       amount
     );
+
+    const positionForFromToken = setOnChainDetails
+      .positions
+      .find((p: any) => p.component.toLowerCase() === fromTokenAddress.toLowerCase());
+
 
     const {
       fromTokenAmount,
@@ -112,6 +118,7 @@ export class TradeQuoter {
       toTokenAddress,
       fromTokenRequestAmount,
       setOnChainDetails.manager,
+      positionForFromToken,
       (setOnChainDetails as any).totalSupply, // Typings incorrect,
       chainId,
       isFirmQuote,
@@ -286,6 +293,7 @@ export class TradeQuoter {
     fromTokenRequestAmount: BigNumber,
     manager: Address,
     setTotalSupply: BigNumber,
+    positionForFromToken: Position,
     chainId: number,
     isFirmQuote: boolean,
     slippagePercentage: number,
@@ -312,7 +320,13 @@ export class TradeQuoter {
       (feePercentage / 100)
     );
 
+
     const fromTokenAmount = quote.sellAmount;
+
+    let fromUnits;
+    if (fromTokenRequestAmount.eq(fromTokenAmount)) {
+      fromUnits = positionForFromToken;
+    }
 
     // Convert to BigDecimal to get ceiling in fromUnits calculation
     // This is necessary to derive the trade amount ZeroEx expects when scaling is
@@ -379,6 +393,7 @@ export class TradeQuoter {
     }
   }
 
+  // Need to move this logic from isMax into the fetchZeroExQuoteTradeModule or before
   private calculateFromTokenAmount(
     setOnChainDetails: any,
     fromTokenAddress: Address,
@@ -392,6 +407,7 @@ export class TradeQuoter {
       throw new Error('Invalid fromToken input');
     }
 
+    // This logic needs to be moved/present in `fetchZeroExQuoteForTradeModule`
     const totalSupply = setOnChainDetails.totalSupply;
     const impliedMaxNotional = positionForFromToken.unit.mul(totalSupply).div(SCALE);
     const isGreaterThanMax = amount.gt(impliedMaxNotional);
