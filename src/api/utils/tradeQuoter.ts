@@ -347,7 +347,7 @@ export class TradeQuoter {
   }
 
 
-  public async validateBatchTradeDoesNotProduceDustPositions(
+  public async validateBatchTradeDoesNotProduceDustPosition(
     orderPairs: TradeOrderPair[],
     setToken: SetTokenAPI,
     setTokenAddress: Address
@@ -355,8 +355,15 @@ export class TradeQuoter {
     const allSellQuantitiesByAddress = {};
 
     orderPairs.forEach((orderEntry: TradeOrderPair) => {
-      const { fromToken: fromTokenAddress } = orderEntry;
-      const fromTokenAmountBN = new BigDecimal(orderEntry.rawAmount).mul(10).pow(18);
+      const { fromToken: fromTokenAddress, fromTokenDecimals } = orderEntry;
+
+      const fromTokenScaleBN = BigNumber.from(10).pow(fromTokenDecimals);
+      const fromTokenScaleBD = new BigDecimal(fromTokenScaleBN.toString());
+      const fromTokenAmountBD = new BigDecimal(orderEntry.rawAmount).multiply(fromTokenScaleBD);
+      const fromTokenAmountBN = BigNumber.from(fromTokenAmountBD.getValue());
+
+      console.log('from token amount is', fromTokenAmountBN.toString());
+
       const totalSellQuantityForComponent = allSellQuantitiesByAddress[fromTokenAddress];
 
       if (!totalSellQuantityForComponent) {
@@ -366,13 +373,26 @@ export class TradeQuoter {
       }
     });
 
+    // Check that allSellQuantitiesByAddress is being calculated correctly
+    console.log('allSellQuantitiesByAddress', allSellQuantitiesByAddress);
+
+
     const setOnChainDetails = await setToken.fetchSetDetailsAsync(
       setTokenAddress, [NULL_ADDRESS]
     );
 
-    setOnChainDetails;
-
-    this.validateTradeDoesNotProduceDustPositions;
+    Object.keys(allSellQuantitiesByAddress).forEach(
+      (fromTokenAddress: Address) => {
+        const sellQuantity = BigNumber.from(allSellQuantitiesByAddress[fromTokenAddress].getValue());
+        this.validateTradeDoesNotProduceDustPositions(
+          setOnChainDetails,
+          fromTokenAddress,
+          fromTokenAddress,
+          sellQuantity,
+          sellQuantity
+        );
+      }
+    );
   }
 
   /**

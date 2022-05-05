@@ -391,7 +391,7 @@ export default class UtilsAPI {
     let delay = 0;
 
     // Check that summation of order pairs do not result in dust position upon trade execution
-    self.tradeQuoter.validateBatchTradeDoesNotProduceDustPositions(
+    self.tradeQuoter.validateBatchTradeDoesNotProduceDustPosition(
       orderPairs,
       setToken,
       fromAddress
