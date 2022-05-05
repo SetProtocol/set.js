@@ -390,6 +390,13 @@ export default class UtilsAPI {
     const orders = [];
     let delay = 0;
 
+    // Check that summation of order pairs do not result in dust position upon trade execution
+    self.tradeQuoter.validateBatchTradeDoesNotProduceDustPositions(
+      orderPairs,
+      setToken,
+      fromAddress
+    );
+
     for (const pair of orderPairs) {
       const order = new Promise(async function (resolve, reject) {
         await new Promise(r => setTimeout(() => r(true), delay));
