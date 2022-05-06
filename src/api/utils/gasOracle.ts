@@ -57,6 +57,7 @@ export class GasOracleService {
       case 1: return this.getEthereumGasPrice(speed);
       case 10: return this.getOptimismGasPrice();
       case 137: return this.getPolygonGasPrice(speed);
+      case 43114: return this.getAvalancheGasPrice(speed);
 
       // This case should never run because chainId is validated
       // Needed to stop TS complaints about return sig
@@ -92,6 +93,17 @@ export class GasOracleService {
       case GasOracleService.AVERAGE: return data.standard;
       case GasOracleService.FAST:    return data.fast;
       case GasOracleService.FASTEST: return data.fastest;
+    }
+  }
+
+  private async getAvalancheGasPrice(speed: GasOracleSpeed): Promise<number> {
+    const url = 'https://gavax.blockscan.com/gasapi.ashx?apikey=key&method=pendingpooltxgweidata';
+    const data = (await axios.get(url)).data.result;
+
+    switch (speed) {
+      case GasOracleService.AVERAGE: return data.standardgaspricegwei;
+      case GasOracleService.FAST:    return data.fastgaspricegwei;
+      case GasOracleService.FASTEST: return data.rapidgaspricegwei;
     }
   }
 }

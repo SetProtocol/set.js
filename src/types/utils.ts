@@ -129,7 +129,8 @@ export type ZeroExTradeQuoterOptions = {
 export type ZeroExApiUrls = {
   ethereum: string,
   optimism: string,
-  polygon: string
+  polygon: string,
+  avalanche: string
 };
 
 export type ZeroExQueryParams = {
