@@ -283,6 +283,47 @@ export class TradeQuoter {
     return ethersUtils.parseUnits(rawAmount, decimals);
   }
 
+  /**
+   * ZeroEx returns the total quantity of component to be traded as order data.
+   * This order data is submitted to Set's Trade Module, but it's format must be tweaked.
+   * Set's Trade Module accepts the quantity of components to be traded per Set Token
+   * in Total Supply.
+   * This helper converts ZeroEx's trade order data to something Trade Module can consume.
+   * It also converts trade order data to complete sanity checks on possible dust positions.
+   * (ethers.FixedNumber does not work for this case)
+   * @param tokenQuantity       Component quantity to be converted.
+   * @param setTotalSupply      Total supply of the Set.
+   * @param isReceiveQuantity   Boolean. True if the token is being received.
+   * @param slippagePercentage  The amount of slippage allowed on  the trade.
+   * @param feePercentage       The fee percentage to be paid to Set. Applied if isReceiveQuantity is true.
+   */
+  private convertTotalSetQuantitiesToPerTokenQuantities(
+    tokenQuantity: string,
+    setTotalSupply: string,
+    isReceiveQuantity?: boolean,
+    slippagePercentage?: number,
+    feePercentage?: number,
+  ): BigNumber {
+    const tokenAmountBD = new BigDecimal(tokenQuantity.toString());
+    const scaleBD = new BigDecimal(SCALE.toString());
+    const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
+
+    const tokenUnitsBD = tokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
+    const tokenUnitsBN = BigNumber.from(tokenUnitsBD.getValue());
+
+    if (!isReceiveQuantity) return tokenUnitsBN;
+
+    // If we are converting "buy" quantities, we need to account for slippage.
+    // We seem to lose some precisien merely multiplying by slippageTolerance
+    // So we re-do the math in full here.
+    const percentMultiplier = 1000;
+    const slippageAndFee = slippagePercentage + feePercentage;
+    const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippageAndFee));
+    const tokenAmountMinusSlippage = BigNumber.from(tokenQuantity).mul(slippageToleranceBN).div(percentMultiplier);
+
+    return tokenAmountMinusSlippage.mul(SCALE).div(setTotalSupply);
+  }
+
   private async fetchZeroExQuoteForTradeModule(
     fromTokenAddress: Address,
     toTokenAddress: Address,
@@ -317,25 +358,20 @@ export class TradeQuoter {
 
     const fromTokenAmount = quote.sellAmount;
 
-    // Convert to BigDecimal to get ceiling in fromUnits calculation
-    // This is necessary to derive the trade amount ZeroEx expects when scaling is
-    // done in the TradeModule contract. (ethers.FixedNumber does not work for this case)
-    const fromTokenAmountBD = new BigDecimal(fromTokenAmount.toString());
-    const scaleBD = new BigDecimal(SCALE.toString());
-    const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
-
-    const fromUnitsBD = fromTokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
-    const fromUnits = BigNumber.from(fromUnitsBD.getValue());
+    const fromUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
+      fromTokenAmount.toString(),
+      setTotalSupply.toString(),
+    );
 
     const toTokenAmount = quote.buyAmount;
 
-    // BigNumber does not do fixed point math & FixedNumber underflows w/ numbers less than 1
-    // Multiply the slippage by a factor and divide the end result by same...
-    const percentMultiplier = 1000;
-    const slippageAndFee = slippagePercentage + feePercentage;
-    const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippageAndFee));
-    const toTokenAmountMinusSlippage = toTokenAmount.mul(slippageToleranceBN).div(percentMultiplier);
-    const toUnits = toTokenAmountMinusSlippage.mul(SCALE).div(setTotalSupply);
+    const toUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
+      quote.buyAmount.toString(),
+      setTotalSupply.toString(),
+      true,
+      slippagePercentage,
+      feePercentage,
+    );
 
     return {
       fromTokenAmount,
@@ -375,9 +411,13 @@ export class TradeQuoter {
       setTokenAddress, [NULL_ADDRESS]
     );
 
+    console.log('===================================================');
+    console.log('==================BEGIN NEW TRADE==================');
+    console.log('===================================================');
     console.log('all sell quantities are', allSellQuantitiesByAddress);
-    console.log('==========');
 
+    // In here, we need to _already_ do the work of converting to per-token positions
+    // This data is in fetchZeroExQuoteForTradeModule
     Object.keys(allSellQuantitiesByAddress).forEach(
       (fromTokenAddress: Address) => {
         console.log('from token address', fromTokenAddress);
