@@ -128,8 +128,8 @@ export class TradeQuoter {
     this.validateTradeDoesNotProduceDustPositions(
       setOnChainDetails,
       fromTokenAddress,
-      toTokenAddress,
       fromUnits,
+      toTokenAddress,
       toUnits
     );
 
@@ -362,34 +362,31 @@ export class TradeQuoter {
       const fromTokenAmountBD = new BigDecimal(orderEntry.rawAmount).multiply(fromTokenScaleBD);
       const fromTokenAmountBN = BigNumber.from(fromTokenAmountBD.getValue());
 
-      console.log('from token amount is', fromTokenAmountBN.toString());
-
       const totalSellQuantityForComponent = allSellQuantitiesByAddress[fromTokenAddress];
 
       if (!totalSellQuantityForComponent) {
-        allSellQuantitiesByAddress[orderEntry.fromToken] = fromTokenAmountBN;
+        allSellQuantitiesByAddress[fromTokenAddress] = fromTokenAmountBN;
       } else {
-        allSellQuantitiesByAddress[orderEntry.fromToken] = totalSellQuantityForComponent;
+        allSellQuantitiesByAddress[fromTokenAddress] = totalSellQuantityForComponent.add(fromTokenAmountBN);
       }
     });
-
-    // Check that allSellQuantitiesByAddress is being calculated correctly
-    console.log('allSellQuantitiesByAddress', allSellQuantitiesByAddress);
-
 
     const setOnChainDetails = await setToken.fetchSetDetailsAsync(
       setTokenAddress, [NULL_ADDRESS]
     );
 
+    console.log('all sell quantities are', allSellQuantitiesByAddress);
+    console.log('==========');
+
     Object.keys(allSellQuantitiesByAddress).forEach(
       (fromTokenAddress: Address) => {
-        const sellQuantity = BigNumber.from(allSellQuantitiesByAddress[fromTokenAddress].getValue());
+        console.log('from token address', fromTokenAddress);
+        const sellQuantity = allSellQuantitiesByAddress[fromTokenAddress];
+        console.log('sell quantity is', sellQuantity);
         this.validateTradeDoesNotProduceDustPositions(
           setOnChainDetails,
           fromTokenAddress,
-          fromTokenAddress,
           sellQuantity,
-          sellQuantity
         );
       }
     );
@@ -408,9 +405,9 @@ export class TradeQuoter {
   private validateTradeDoesNotProduceDustPositions(
     setOnChainDetails: any,
     fromTokenAddress: Address,
-    toTokenAddress: Address,
     fromTokenQuantity: BigNumber,
-    toTokenQuantity: BigNumber
+    toTokenAddress?: Address,
+    toTokenQuantity?: BigNumber
   ) {
     // fromToken
     const positionForFromToken = setOnChainDetails
@@ -421,9 +418,17 @@ export class TradeQuoter {
     const remainingPositionUnits = currentPositionUnits.sub(fromTokenQuantity);
     const remainingPositionUnitsTooSmall = remainingPositionUnits.gt(0) && remainingPositionUnits.lt(50);
 
+    console.log('current position units', currentPositionUnits);
+    console.log('from token quantity', fromTokenQuantity);
+    console.log('remaining units are', remainingPositionUnits);
+
     if (remainingPositionUnitsTooSmall) {
       throw new Error('Remaining units too small, incorrectly attempting sell mmax');
     }
+
+    // Sometimes we use this method to only check for dust positions
+    // in the sell component.
+    if (!toTokenAddress && !toTokenQuantity) return;
 
     // toToken
     const positionForToToken = setOnChainDetails
