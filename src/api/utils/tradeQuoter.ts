@@ -411,22 +411,19 @@ export class TradeQuoter {
       setTokenAddress, [NULL_ADDRESS]
     );
 
-    console.log('===================================================');
-    console.log('==================BEGIN NEW TRADE==================');
-    console.log('===================================================');
-    console.log('all sell quantities are', allSellQuantitiesByAddress);
-
-    // In here, we need to _already_ do the work of converting to per-token positions
-    // This data is in fetchZeroExQuoteForTradeModule
+    // Check that each component selling position will not generate a dust position.
     Object.keys(allSellQuantitiesByAddress).forEach(
       (fromTokenAddress: Address) => {
-        console.log('from token address', fromTokenAddress);
-        const sellQuantity = allSellQuantitiesByAddress[fromTokenAddress];
-        console.log('sell quantity is', sellQuantity);
+        const totalSellQuantity = allSellQuantitiesByAddress[fromTokenAddress];
+        const perTokenSellQuantity = this.convertTotalSetQuantitiesToPerTokenQuantities(
+          totalSellQuantity.toString(),
+          (setOnChainDetails as any).totalSupply,
+        );
+
         this.validateTradeDoesNotProduceDustPositions(
           setOnChainDetails,
           fromTokenAddress,
-          sellQuantity,
+          perTokenSellQuantity,
         );
       }
     );
@@ -457,10 +454,6 @@ export class TradeQuoter {
     const currentPositionUnits = BigNumber.from(positionForFromToken.unit);
     const remainingPositionUnits = currentPositionUnits.sub(fromTokenQuantity);
     const remainingPositionUnitsTooSmall = remainingPositionUnits.gt(0) && remainingPositionUnits.lt(50);
-
-    console.log('current position units', currentPositionUnits);
-    console.log('from token quantity', fromTokenQuantity);
-    console.log('remaining units are', remainingPositionUnits);
 
     if (remainingPositionUnitsTooSmall) {
       throw new Error('Remaining units too small, incorrectly attempting sell mmax');
