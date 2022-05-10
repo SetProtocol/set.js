@@ -105,13 +105,17 @@ export class TradeQuoter {
       amount
     );
 
+    // This does not currently account for attempting "Max" sell (e.g. selling all USDC in Set)
+    // across multiple trades. To do that, we would need to update the remaining position
+    // quantities for each component being sold in the Set, so we can correctly detect
+    // when a "Max" sell trade is being attempted.
     const {
       fromTokenAmount,
       fromUnits,
       toTokenAmount,
       toUnits,
       calldata,
-    } = await this.fetchZeroExQuoteForTradeModule( // fetchQuote (and switch...)
+    } = await this.fetchZeroExQuoteForTradeModule(
       fromTokenAddress,
       toTokenAddress,
       fromTokenRequestAmount,
