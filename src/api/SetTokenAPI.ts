@@ -124,7 +124,7 @@ export default class SetTokenAPI {
    * the initialization statuses of each of the modules for the SetToken
    *
    * @param  setTokenAddress    Address of SetToken to fetch details for
-   * @param  moduleAddresses    Addresses of ERC20 contracts to check balance for
+   * @param  moduleAddresses    Addresses of modules to check initialization statuses for
    * @param  callerAddress      Address to use as the caller (optional)
    */
   public async fetchSetDetailsAsync(
