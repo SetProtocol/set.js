@@ -407,12 +407,22 @@ export class TradeQuoter {
   }
 
 
+  /**
+   * Check that a given batch trade does not produce dust positions in tokens being
+   * sold across multiple trades. This may happen when a user tries to max sell
+   * out of a token position across multiple trades in a single batch.
+   *
+   * @param orderPairs
+   * @param setToken
+   * @param setTokenAddress
+   */
   public async validateBatchTradeDoesNotProduceDustPosition(
     orderPairs: TradeOrderPair[],
     setToken: SetTokenAPI,
     setTokenAddress: Address
   ): Promise<void> {
     const allSellQuantitiesByAddress = {};
+    const sellTokensPresentInMultipleTrades = {};
 
     orderPairs.forEach((orderEntry: TradeOrderPair) => {
       const { fromToken: fromTokenAddress, fromTokenDecimals } = orderEntry;
@@ -428,6 +438,7 @@ export class TradeQuoter {
         allSellQuantitiesByAddress[fromTokenAddress] = fromTokenAmountBN;
       } else {
         allSellQuantitiesByAddress[fromTokenAddress] = totalSellQuantityForComponent.add(fromTokenAmountBN);
+        sellTokensPresentInMultipleTrades[fromTokenAddress] = true;
       }
     });
 
@@ -435,8 +446,11 @@ export class TradeQuoter {
       setTokenAddress, [NULL_ADDRESS]
     );
 
-    // Check that each component selling position will not generate a dust position.
-    Object.keys(allSellQuantitiesByAddress).forEach(
+    // Check that each component being sold will not have dust position leftover.
+    // We only want to check poential sell tokens that are spread across multiple trades.
+    // We have other logic in place in fetchZeroExTradeQuoteForTradeModule to allow users to
+    // properly max sell out of a position in a single trade.
+    Object.keys(sellTokensPresentInMultipleTrades).forEach(
       (fromTokenAddress: Address) => {
         const totalSellQuantity = allSellQuantitiesByAddress[fromTokenAddress];
         const perTokenSellQuantity = this.convertTotalSetQuantitiesToPerTokenQuantities(
