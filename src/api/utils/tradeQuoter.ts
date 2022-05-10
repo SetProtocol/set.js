@@ -40,6 +40,7 @@ import { GasOracleService } from './gasOracle';
 import { ZeroExTradeQuoter } from './zeroex';
 import { NULL_ADDRESS } from '../../utils/constants';
 import SetTokenAPI from '../SetTokenAPI';
+import { SetDetails, SetDetailsWithStreamingInfo } from '../../types/common';
 
 export const ZERO_EX_ADAPTER_NAME = 'ZeroExApiAdapterV5';
 
@@ -114,8 +115,7 @@ export class TradeQuoter {
       fromTokenAddress,
       toTokenAddress,
       fromTokenRequestAmount,
-      setOnChainDetails.manager,
-      (setOnChainDetails as any).totalSupply, // Typings incorrect,
+      setOnChainDetails,
       chainId,
       isFirmQuote,
       slippagePercentage,
@@ -328,8 +328,7 @@ export class TradeQuoter {
     fromTokenAddress: Address,
     toTokenAddress: Address,
     fromTokenRequestAmount: BigNumber,
-    manager: Address,
-    setTotalSupply: BigNumber,
+    setOnChainDetails: SetDetails | SetDetailsWithStreamingInfo,
     chainId: number,
     isFirmQuote: boolean,
     slippagePercentage: number,
@@ -337,6 +336,9 @@ export class TradeQuoter {
     excludedSources: string[],
     feePercentage: number,
   ) {
+    const manager = setOnChainDetails.manager;
+    const setTotalSupply = (setOnChainDetails as any).totalSupply;
+
     const zeroEx = new ZeroExTradeQuoter({
       chainId: chainId,
       zeroExApiKey: this.zeroExApiKey,
@@ -356,12 +358,34 @@ export class TradeQuoter {
       (feePercentage / 100)
     );
 
+    const positionForFromToken = setOnChainDetails
+      .positions
+      .find((p: any) => p.component.toLowerCase() === fromTokenAddress.toLowerCase());
+
+    const currentPositionUnits = BigNumber.from(positionForFromToken.unit);
+    const fromTokenImpliedMaxPositionInSet =
+      currentPositionUnits
+        .mul(setTotalSupply)
+        .div(SCALE.toString());
+
     const fromTokenAmount = quote.sellAmount;
 
-    const fromUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
-      fromTokenAmount.toString(),
-      setTotalSupply.toString(),
-    );
+    let fromUnits: BigNumber;
+
+    // Remember: the Trade Module accepts trade quantities on a per-token basis.
+    // If the trade quote returned form ZeroEx equals the target sell token's implied max
+    // position in the Set, we simply return the components current position in the Set as the
+    // "sell quantity" to be submitted to the Trade Module.
+    // If we tried to convert the ZeroEx trade quote data to the per-token quantity, we may
+    // to incorrectly calculate the per-token position, resulting in a dust position being created.
+    if (fromTokenAmount.eq(fromTokenImpliedMaxPositionInSet)) {
+      fromUnits = currentPositionUnits;
+    } else {
+      fromUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
+        fromTokenAmount.toString(),
+        setTotalSupply.toString(),
+      );
+    }
 
     const toTokenAmount = quote.buyAmount;
 
@@ -456,7 +480,7 @@ export class TradeQuoter {
     const remainingPositionUnitsTooSmall = remainingPositionUnits.gt(0) && remainingPositionUnits.lt(50);
 
     if (remainingPositionUnitsTooSmall) {
-      throw new Error('Remaining units too small, incorrectly attempting sell mmax');
+      throw new Error('Remaining units too small, incorrectly attempting sell max');
     }
 
     // Sometimes we use this method to only check for dust positions
