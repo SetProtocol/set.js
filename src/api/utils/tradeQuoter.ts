@@ -38,9 +38,9 @@ import {
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { GasOracleService } from './gasOracle';
 import { ZeroExTradeQuoter } from './zeroex';
-import { NULL_ADDRESS } from '../../utils/constants';
 import SetTokenAPI from '../SetTokenAPI';
 import { SetDetails, SetDetailsWithStreamingInfo } from '../../types/common';
+import { NULL_ADDRESS } from '../../utils/constants';
 
 export const ZERO_EX_ADAPTER_NAME = 'ZeroExApiAdapterV5';
 
@@ -124,7 +124,7 @@ export class TradeQuoter {
       feePercentage,
     );
 
-    // Sanity check response from quote APIs
+    // Check that the trade data we return to front-end will not generate dust positions.
     this.validateTradeDoesNotProduceDustPositions(
       setOnChainDetails,
       fromTokenAddress,
@@ -288,8 +288,12 @@ export class TradeQuoter {
    * This order data is submitted to Set's Trade Module, but it's format must be tweaked.
    * Set's Trade Module accepts the quantity of components to be traded per Set Token
    * in Total Supply.
+   *
    * This helper converts ZeroEx's trade order data to something Trade Module can consume.
-   * It also converts trade order data to complete sanity checks on possible dust positions.
+   * The converted data:
+   * 1. Bakes a fee percentage to be paid to the Set Protocol.
+   * 2. Is also used to complete sanity checks on possible dust positions.
+   * 3. is eventually returned to the front-end, to be submitted on-chain directly.
    * (ethers.FixedNumber does not work for this case)
    * @param tokenQuantity       Component quantity to be converted.
    * @param setTotalSupply      Total supply of the Set.
@@ -304,18 +308,18 @@ export class TradeQuoter {
     slippagePercentage?: number,
     feePercentage?: number,
   ): BigNumber {
-    const tokenAmountBD = new BigDecimal(tokenQuantity.toString());
-    const scaleBD = new BigDecimal(SCALE.toString());
-    const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
+    if (!isReceiveQuantity) {
+      const tokenAmountBD = new BigDecimal(tokenQuantity.toString());
+      const scaleBD = new BigDecimal(SCALE.toString());
+      const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
 
-    const tokenUnitsBD = tokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
-    const tokenUnitsBN = BigNumber.from(tokenUnitsBD.getValue());
+      const tokenUnitsBD = tokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
+      return BigNumber.from(tokenUnitsBD.getValue());
+    }
 
-    if (!isReceiveQuantity) return tokenUnitsBN;
-
-    // If we are converting "buy" quantities, we need to account for slippage.
-    // We seem to lose some precisien merely multiplying by slippageTolerance
-    // So we re-do the math in full here.
+    // If we are converting "buy" quantities, we need to account for a trade fee percentage
+    // & slippage. We seem to lose some precisien merely multiplying the above
+    // by slippageTolerance so we re-do the math in full here.
     const percentMultiplier = 1000;
     const slippageAndFee = slippagePercentage + feePercentage;
     const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippageAndFee));
@@ -368,16 +372,15 @@ export class TradeQuoter {
         .mul(setTotalSupply)
         .div(SCALE.toString());
 
-    const fromTokenAmount = quote.sellAmount;
-
-    let fromUnits: BigNumber;
-
-    // Remember: the Trade Module accepts trade quantities on a per-token basis.
     // If the trade quote returned form ZeroEx equals the target sell token's implied max
     // position in the Set, we simply return the components current position in the Set as the
     // "sell quantity" to be submitted to the Trade Module.
     // If we tried to convert the ZeroEx trade quote data to the per-token quantity, we may
     // to incorrectly calculate the per-token position, resulting in a dust position being created.
+    // Remember: the Trade Module accepts trade quantities on a per-token basis.
+    const fromTokenAmount = quote.sellAmount;
+    let fromUnits: BigNumber;
+
     if (fromTokenAmount.eq(fromTokenImpliedMaxPositionInSet)) {
       fromUnits = currentPositionUnits;
     } else {
@@ -388,7 +391,6 @@ export class TradeQuoter {
     }
 
     const toTokenAmount = quote.buyAmount;
-
     const toUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
       quote.buyAmount.toString(),
       setTotalSupply.toString(),
@@ -412,9 +414,10 @@ export class TradeQuoter {
    * sold across multiple trades. This may happen when a user tries to max sell
    * out of a token position across multiple trades in a single batch.
    *
-   * @param orderPairs
-   * @param setToken
-   * @param setTokenAddress
+   * @param orderPairs       A list of all trades to be made in a given batch trade txn
+   * @param setToken         An instance fo the Set Token API, used to fetch total supply
+   *                         required to complete validation
+   * @param setTokenAddress  Set Token that will be executing the batch trade txn
    */
   public async validateBatchTradeDoesNotProduceDustPosition(
     orderPairs: TradeOrderPair[],

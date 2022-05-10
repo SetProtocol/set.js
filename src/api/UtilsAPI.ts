@@ -390,8 +390,7 @@ export default class UtilsAPI {
     const orders = [];
     let delay = 0;
 
-    // Check that summation of order pairs do not result in dust position upon trade execution
-    // If there's a single max trade, then disregard this check
+    // Check that summation of order pairs do not create dust positions upon trade execution
     self.tradeQuoter.validateBatchTradeDoesNotProduceDustPosition(
       orderPairs,
       setToken,
