@@ -123,7 +123,7 @@ export class CommonAssertions {
   }
 
   public isSupportedChainId(chainId: number) {
-    const validChainIds = [1, 10, 137];
+    const validChainIds = [1, 10, 137, 43114];
 
     if ( !validChainIds.includes(chainId)) {
       throw new Error(`Unsupported chainId: ${chainId}. Must be one of ${validChainIds}`);

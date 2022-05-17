@@ -475,7 +475,8 @@ export class TradeQuoter {
     switch (chainId) {
       case 1:   return 'ETH';
       case 137: return 'MATIC';
-      default:  return '';
+      case 43114: return 'AVAX';
+      default:  return 'ETH';
     }
   }
 
