@@ -92,18 +92,22 @@ export class TradeQuoter {
       toTokenAddress,
       fromAddress,
     } = this.sanitizeAddress(options.fromToken, options.toToken, options.fromAddress);
+    console.log('raw amount', options.rawAmount);
 
     const amount = this.sanitizeAmount(options.rawAmount, options.fromTokenDecimals);
 
     const setOnChainDetails = await options.setToken.fetchSetDetailsAsync(
       fromAddress, [NULL_ADDRESS]
     );
+    console.log('sanitized amount', amount.toString());
 
     const fromTokenRequestAmount = this.calculateFromTokenAmount(
       setOnChainDetails,
       fromTokenAddress,
       amount
     );
+
+    console.log('from token request amount 1', fromTokenRequestAmount.toString());
 
     // This does not currently account for attempting "Max" sell (e.g. selling all USDC in Set)
     // across multiple trades. To do that, we would need to update the remaining position
@@ -353,6 +357,8 @@ export class TradeQuoter {
       zeroExApiUrls: this.zeroExApiUrls,
     });
 
+    console.log('from token request amount', fromTokenRequestAmount.toString());
+
     const quote = await zeroEx.fetchTradeQuote(
       fromTokenAddress,
       toTokenAddress,
@@ -371,10 +377,13 @@ export class TradeQuoter {
       .find((p: any) => p.component.toLowerCase() === fromTokenAddress.toLowerCase());
 
     const currentPositionUnits = BigNumber.from(positionForFromToken.unit);
+    console.log('current position units', currentPositionUnits.toString());
     const fromTokenImpliedMaxPositionInSet =
       currentPositionUnits
         .mul(setTotalSupply)
         .div(SCALE.toString());
+
+    console.log('implied max quantity', fromTokenImpliedMaxPositionInSet.toString());
 
     // If the trade quote returned form ZeroEx equals the target sell token's implied max
     // position in the Set, we simply return the components current position in the Set as the
@@ -385,6 +394,8 @@ export class TradeQuoter {
     const fromTokenAmount = quote.sellAmount;
     let fromUnits: BigNumber;
 
+    console.log('0x sell quantity quote', fromTokenAmount.toString());
+    console.log('set total supply', setTotalSupply.toString());
     if (fromTokenAmount.eq(fromTokenImpliedMaxPositionInSet)) {
       fromUnits = currentPositionUnits;
     } else {
@@ -392,6 +403,7 @@ export class TradeQuoter {
         fromTokenAmount.toString(),
         setTotalSupply.toString(),
       );
+      console.log('converted 0x sell quantity into Set position units', fromUnits.toString());
     }
 
     const toTokenAmount = quote.buyAmount;
@@ -496,9 +508,15 @@ export class TradeQuoter {
       .positions
       .find((p: any) => p.component.toLowerCase() === fromTokenAddress.toLowerCase());
 
+    const setTotalSupply = (setOnChainDetails as any).totalSupply;
     const currentPositionUnits = BigNumber.from(positionForFromToken.unit);
-    const remainingPositionUnits = currentPositionUnits.sub(fromTokenQuantity);
-    const remainingPositionUnitsTooSmall = remainingPositionUnits.gt(0) && remainingPositionUnits.lt(50);
+
+    const preImpliedNotional = currentPositionUnits.mul(setTotalSupply).div(SCALE);
+    const fromTokenNotional = fromTokenQuantity.mul(setTotalSupply).div(SCALE);
+    const difference = preImpliedNotional.sub(fromTokenNotional);
+    const remainingUnits = difference.mul(SCALE).div(setTotalSupply);
+
+    const remainingPositionUnitsTooSmall = remainingUnits.gt(0) && remainingUnits.lt(50);
 
     if (remainingPositionUnitsTooSmall) {
       throw new Error('Remaining units too small, incorrectly attempting sell max');
@@ -547,6 +565,8 @@ export class TradeQuoter {
     } else if (isMax) {
       return impliedMaxNotional.toString();
     } else {
+      // this rounds down.
+      // Could we just return amount here?
       const amountMulScaleOverTotalSupply = amount.mul(SCALE).div(totalSupply);
       return amountMulScaleOverTotalSupply.mul(totalSupply).div(SCALE);
     }
