@@ -47,6 +47,7 @@ export type TradeQuoteOptions = {
   feePercentage?: number,
   feeRecipient?: Address,
   excludedSources?: string[],
+  isFirstTrade?: boolean,
 };
 
 export type SwapQuoteOptions = {
