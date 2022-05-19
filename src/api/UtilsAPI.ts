@@ -397,7 +397,8 @@ export default class UtilsAPI {
       fromAddress
     );
 
-    for (const pair of orderPairs) {
+    for (let i = 0; i < orderPairs.length; i++) {
+      const pair = orderPairs[i];
       const order = new Promise(async function (resolve, reject) {
         await new Promise(r => setTimeout(() => r(true), delay));
 

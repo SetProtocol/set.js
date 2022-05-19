@@ -85,6 +85,8 @@ export class TradeQuoter {
     const feeRecipient = options.feeRecipient || this.feeRecipient;
     const excludedSources = options.excludedSources || this.excludedSources;
 
+    console.log('Generating Quote for Trade... Is First Trade?', options.isFirstTrade);
+
     const exchangeAdapterName = ZERO_EX_ADAPTER_NAME;
 
     const {
@@ -109,6 +111,7 @@ export class TradeQuoter {
     // across multiple trades. To do that, we would need to update the remaining position
     // quantities for each component being sold in the Set, so we can correctly detect
     // when a "Max" sell trade is being attempted.
+
     const {
       fromTokenAmount,
       fromUnits,
@@ -126,6 +129,7 @@ export class TradeQuoter {
       feeRecipient,
       excludedSources,
       feePercentage,
+      options.isFirstTrade,
     );
 
     // Check that the trade data we return to front-end will not generate dust positions.
@@ -306,20 +310,58 @@ export class TradeQuoter {
    * @param feePercentage       The fee percentage to be paid to Set. Applied if isReceiveQuantity is true.
    */
   private convertTotalSetQuantitiesToPerTokenQuantities(
-    tokenQuantity: string,
-    setTotalSupply: string,
+    tokenQuantity: BigNumber,
+    setTotalSupply: BigNumber,
+    isFirstTrade?: boolean,
     isReceiveQuantity?: boolean,
     slippagePercentage?: number,
     feePercentage?: number,
   ): BigNumber {
+    console.log('is first trade?', isFirstTrade);
     if (!isReceiveQuantity) {
-      const tokenAmountBD = new BigDecimal(tokenQuantity.toString());
-      const scaleBD = new BigDecimal(SCALE.toString());
-      const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
+      const initialNotionalQuantity = tokenQuantity;
+      const initialPositionQuantity = initialNotionalQuantity.mul(SCALE).div(setTotalSupply);
+      const positionMulTotalSupply = initialPositionQuantity.mul(setTotalSupply);
+      const finalNotionalQuantity = positionMulTotalSupply.div(SCALE);
 
-      const tokenUnitsBD = tokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
-      return BigNumber.from(tokenUnitsBD.getValue());
+      console.log('=================PARAMS=======================');
+      console.log('initial notional quantity', initialNotionalQuantity.toString());
+      console.log('implied notional quantity', finalNotionalQuantity.toString());
+
+      if (isFirstTrade && finalNotionalQuantity.lt(initialNotionalQuantity)) {
+        console.log('FIXING THE FIRST TRADE');
+        const fixedPositionQuantity = initialPositionQuantity.add(1);
+        const fixedPositionMulTotalSupply = fixedPositionQuantity.mul(setTotalSupply);
+        const fixedFinalNotional = fixedPositionMulTotalSupply.div(SCALE);
+
+        // console.log('fixed position quantity', fixedPositionQuantity.toString());
+        // console.log('fixed position mul total supply', fixedPositionMulTotalSupply.toString());
+
+        console.log('fixed final notional quantity', fixedFinalNotional.toString());
+
+        if (fixedFinalNotional.eq(initialNotionalQuantity)) {
+          return fixedPositionQuantity;
+        }
+
+        return initialPositionQuantity;
+      }
+
+      return initialPositionQuantity;
+      // return BigNumber.from(tokenUnitsBD.getValue());
     }
+
+
+
+
+      // console.log('===================BIG DECIMAL OUTPUTS=====================');
+
+      // const tokenAmountBD = new BigDecimal(tokenQuantity.toString());
+      // const scaleBD = new BigDecimal(SCALE.toString());
+      // const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
+      // const tokenUnitsBD = tokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
+
+      // console.log('Big Decimal old value', tokenUnitsBD.getValue());
+
 
     // If we are converting "buy" quantities, we need to account for a trade fee percentage
     // & slippage. We seem to lose some precisien merely multiplying the above
@@ -343,7 +385,9 @@ export class TradeQuoter {
     feeRecipient: Address,
     excludedSources: string[],
     feePercentage: number,
+    isFirstTrade?: boolean,
   ) {
+    console.log('Fetching Zero Ex Quote for First Trade?', isFirstTrade);
     const manager = setOnChainDetails.manager;
     const setTotalSupply = (setOnChainDetails as any).totalSupply;
 
@@ -365,6 +409,7 @@ export class TradeQuoter {
       excludedSources,
       (feePercentage / 100)
     );
+
 
     const positionForFromToken = setOnChainDetails
       .positions
@@ -389,15 +434,17 @@ export class TradeQuoter {
       fromUnits = currentPositionUnits;
     } else {
       fromUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
-        fromTokenAmount.toString(),
-        setTotalSupply.toString(),
+        fromTokenAmount,
+        setTotalSupply,
+        isFirstTrade,
       );
     }
 
     const toTokenAmount = quote.buyAmount;
     const toUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
-      quote.buyAmount.toString(),
-      setTotalSupply.toString(),
+      quote.buyAmount,
+      setTotalSupply,
+      isFirstTrade,
       true,
       slippagePercentage,
       feePercentage,
@@ -460,16 +507,19 @@ export class TradeQuoter {
     Object.keys(sellTokensPresentInMultipleTrades).forEach(
       (fromTokenAddress: Address) => {
         const totalSellQuantity = allSellQuantitiesByAddress[fromTokenAddress];
+
         const perTokenSellQuantity = this.convertTotalSetQuantitiesToPerTokenQuantities(
-          totalSellQuantity.toString(),
+          totalSellQuantity,
           (setOnChainDetails as any).totalSupply,
         );
 
-        this.validateTradeDoesNotProduceDustPositions(
-          setOnChainDetails,
-          fromTokenAddress,
-          perTokenSellQuantity,
-        );
+        perTokenSellQuantity;
+
+        // this.validateTradeDoesNotProduceDustPositions(
+        //   setOnChainDetails,
+        //   fromTokenAddress,
+        //   perTokenSellQuantity,
+        // );
       }
     );
   }
@@ -496,9 +546,17 @@ export class TradeQuoter {
       .positions
       .find((p: any) => p.component.toLowerCase() === fromTokenAddress.toLowerCase());
 
+    const setTotalSupply = (setOnChainDetails as any).totalSupply;
     const currentPositionUnits = BigNumber.from(positionForFromToken.unit);
-    const remainingPositionUnits = currentPositionUnits.sub(fromTokenQuantity);
-    const remainingPositionUnitsTooSmall = remainingPositionUnits.gt(0) && remainingPositionUnits.lt(50);
+
+    const preImpliedNotional = currentPositionUnits.mul(setTotalSupply).div(SCALE);
+    const fromTokenNotional = fromTokenQuantity.mul(setTotalSupply).div(SCALE);
+    const difference = preImpliedNotional.sub(fromTokenNotional);
+    const remainingUnits = difference.mul(SCALE).div(setTotalSupply);
+
+    console.log('expected remaining units', remainingUnits.toString());
+
+    const remainingPositionUnitsTooSmall = remainingUnits.gt(0) && remainingUnits.lt(50);
 
     if (remainingPositionUnitsTooSmall) {
       throw new Error('Remaining units too small, incorrectly attempting sell max');
@@ -538,6 +596,8 @@ export class TradeQuoter {
     }
 
     const totalSupply = setOnChainDetails.totalSupply;
+
+    // This is the same as on smart contract
     const impliedMaxNotional = positionForFromToken.unit.mul(totalSupply).div(SCALE);
     const isGreaterThanMax = amount.gt(impliedMaxNotional);
     const isMax = amount.eq(impliedMaxNotional);
@@ -547,8 +607,37 @@ export class TradeQuoter {
     } else if (isMax) {
       return impliedMaxNotional.toString();
     } else {
-      const amountMulScaleOverTotalSupply = amount.mul(SCALE).div(totalSupply);
-      return amountMulScaleOverTotalSupply.mul(totalSupply).div(SCALE);
+      // Do we still want this rounded?
+      // const roundedAmount = amount.mul(SCALE).div(totalSupply).mul(totalSupply).div(SCALE);
+      // console.log('rounded amount', roundedAmount.toString());
+      // return amount;
+
+      // const targetAmount = BigNumber.from(amount.toString());
+      // let baseAmount = BigNumber.from(amount.toString());
+
+      // let perSetAmount = baseAmount.mul(SCALE).div(totalSupply);
+      // let roundedAmount = totalSupply.mul(perSetAmount).div(SCALE);
+
+
+      // console.log('target amount is', targetAmount.toString());
+      // console.log('initial per set amount', perSetAmount.toString());
+      // console.log('initial rounded amount', roundedAmount.toString());
+
+      // while (roundedAmount.lt(targetAmount)) {
+      //   baseAmount = baseAmount.add(1);
+      //   perSetAmount = baseAmount.mul(SCALE).div(totalSupply);
+      //   roundedAmount = totalSupply.mul(perSetAmount).div(SCALE);
+
+      //   console.log('========================================');
+      //   console.log('base ammount insufficient, adding total supply.');
+      //   console.log('now at', baseAmount.toString());
+      //   console.log('per set amount', perSetAmount.toString());
+      //   console.log('rounded amount is now', roundedAmount.toString());
+      // }
+
+
+      // console.log('rounded amount', roundedAmount.toString());
+      return amount;
     }
   }
 
