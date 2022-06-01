@@ -1,6 +1,6 @@
 {
     "name": "set.js",
-    "version": "0.6.0-batch.7",
+    "version": "0.6.0",
     "description": "A javascript library for interacting with the Set Protocol v2",
     "keywords": [
         "set.js",

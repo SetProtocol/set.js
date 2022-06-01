@@ -127,6 +127,7 @@ export class CoinGeckoDataService {
       case 1: return 'ethereum';
       case 10: return 'optimistic-ethereum';
       case 137: return 'polygon-pos';
+      case 43114: return 'avalanche';
       default: return '';
     }
   }
@@ -136,6 +137,7 @@ export class CoinGeckoDataService {
       case 1: return 'https://tokens.coingecko.com/uniswap/all.json';
       case 10: return 'https://tokens.coingecko.com/optimistic-ethereum/all.json';
       case 137: return 'https://tokens.coingecko.com/polygon-pos/all.json';
+      case 43114: return 'https://tokens.coingecko.com/avalanche/all.json';
     }
   }
 

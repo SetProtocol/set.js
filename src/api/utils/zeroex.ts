@@ -128,11 +128,13 @@ export class ZeroExTradeQuoter {
     const ethereumUrl = zeroExAPIUrls?.ethereum ? zeroExAPIUrls.ethereum : 'https://api.0x.org';
     const optimismUrl = zeroExAPIUrls?.optimism ? zeroExAPIUrls.optimism : 'https://optimism.api.0x.org';
     const polygonUrl = zeroExAPIUrls?.polygon ? zeroExAPIUrls.polygon : 'https://polygon.api.0x.org';
+    const avalancheUrl = zeroExAPIUrls?.avalanche ? zeroExAPIUrls.avalanche : 'https://avalanche.api.0x.org';
 
     switch (chainId) {
       case 1: return ethereumUrl;
       case 10: return optimismUrl;
       case 137: return polygonUrl;
+      case 43114: return avalancheUrl;
     }
   }
 }
