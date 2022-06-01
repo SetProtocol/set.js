@@ -26,6 +26,7 @@ import {
   SwapQuoteOptions,
   TradeQuote,
   SwapQuote,
+  TradeOrderPair,
   ZeroExApiUrls
 } from '../../types/index';
 
@@ -37,6 +38,9 @@ import {
 import { Address } from '@setprotocol/set-protocol-v2/utils/types';
 import { GasOracleService } from './gasOracle';
 import { ZeroExTradeQuoter } from './zeroex';
+import SetTokenAPI from '../SetTokenAPI';
+import { SetDetails, SetDetailsWithStreamingInfo } from '../../types/common';
+import { NULL_ADDRESS } from '../../utils/constants';
 
 export const ZERO_EX_ADAPTER_NAME = 'ZeroExApiAdapterV5';
 
@@ -92,7 +96,7 @@ export class TradeQuoter {
     const amount = this.sanitizeAmount(options.rawAmount, options.fromTokenDecimals);
 
     const setOnChainDetails = await options.setToken.fetchSetDetailsAsync(
-      fromAddress, [fromTokenAddress, toTokenAddress]
+      fromAddress, [NULL_ADDRESS]
     );
 
     const fromTokenRequestAmount = this.calculateFromTokenAmount(
@@ -101,18 +105,21 @@ export class TradeQuoter {
       amount
     );
 
+    // This does not currently account for attempting "Max" sell (e.g. selling all USDC in Set)
+    // across multiple trades. To do that, we would need to update the remaining position
+    // quantities for each component being sold in the Set, so we can correctly detect
+    // when a "Max" sell trade is being attempted.
     const {
       fromTokenAmount,
       fromUnits,
       toTokenAmount,
       toUnits,
       calldata,
-    } = await this.fetchZeroExQuoteForTradeModule( // fetchQuote (and switch...)
+    } = await this.fetchZeroExQuoteForTradeModule(
       fromTokenAddress,
       toTokenAddress,
       fromTokenRequestAmount,
-      setOnChainDetails.manager,
-      (setOnChainDetails as any).totalSupply, // Typings incorrect,
+      setOnChainDetails,
       chainId,
       isFirmQuote,
       slippagePercentage,
@@ -121,12 +128,12 @@ export class TradeQuoter {
       feePercentage,
     );
 
-    // Sanity check response from quote APIs
-    this.validateQuoteValues(
+    // Check that the trade data we return to front-end will not generate dust positions.
+    this.validateTradeDoesNotProduceDustPositions(
       setOnChainDetails,
       fromTokenAddress,
-      toTokenAddress,
       fromUnits,
+      toTokenAddress,
       toUnits
     );
 
@@ -280,12 +287,56 @@ export class TradeQuoter {
     return ethersUtils.parseUnits(rawAmount, decimals);
   }
 
+  /**
+   * ZeroEx returns the total quantity of component to be traded as order data.
+   * This order data is submitted to Set's Trade Module, but it's format must be tweaked.
+   * Set's Trade Module accepts the quantity of components to be traded per Set Token
+   * in Total Supply.
+   *
+   * This helper converts ZeroEx's trade order data to something Trade Module can consume.
+   * The converted data:
+   * 1. Bakes a fee percentage to be paid to the Set Protocol.
+   * 2. Is also used to complete sanity checks on possible dust positions.
+   * 3. is eventually returned to the front-end, to be submitted on-chain directly.
+   * (ethers.FixedNumber does not work for this case)
+   * @param tokenQuantity       Component quantity to be converted.
+   * @param setTotalSupply      Total supply of the Set.
+   * @param isReceiveQuantity   Boolean. True if the token is being received.
+   * @param slippagePercentage  The amount of slippage allowed on  the trade.
+   * @param feePercentage       The fee percentage to be paid to Set. Applied if isReceiveQuantity is true.
+   */
+  private convertTotalSetQuantitiesToPerTokenQuantities(
+    tokenQuantity: string,
+    setTotalSupply: string,
+    isReceiveQuantity?: boolean,
+    slippagePercentage?: number,
+    feePercentage?: number,
+  ): BigNumber {
+    if (!isReceiveQuantity) {
+      const tokenAmountBD = new BigDecimal(tokenQuantity.toString());
+      const scaleBD = new BigDecimal(SCALE.toString());
+      const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
+
+      const tokenUnitsBD = tokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
+      return BigNumber.from(tokenUnitsBD.getValue());
+    }
+
+    // If we are converting "buy" quantities, we need to account for a trade fee percentage
+    // & slippage. We seem to lose some precisien merely multiplying the above
+    // by slippageTolerance so we re-do the math in full here.
+    const percentMultiplier = 1000;
+    const slippageAndFee = slippagePercentage + feePercentage;
+    const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippageAndFee));
+    const tokenAmountMinusSlippage = BigNumber.from(tokenQuantity).mul(slippageToleranceBN).div(percentMultiplier);
+
+    return tokenAmountMinusSlippage.mul(SCALE).div(setTotalSupply);
+  }
+
   private async fetchZeroExQuoteForTradeModule(
     fromTokenAddress: Address,
     toTokenAddress: Address,
     fromTokenRequestAmount: BigNumber,
-    manager: Address,
-    setTotalSupply: BigNumber,
+    setOnChainDetails: SetDetails | SetDetailsWithStreamingInfo,
     chainId: number,
     isFirmQuote: boolean,
     slippagePercentage: number,
@@ -293,6 +344,9 @@ export class TradeQuoter {
     excludedSources: string[],
     feePercentage: number,
   ) {
+    const manager = setOnChainDetails.manager;
+    const setTotalSupply = (setOnChainDetails as any).totalSupply;
+
     const zeroEx = new ZeroExTradeQuoter({
       chainId: chainId,
       zeroExApiKey: this.zeroExApiKey,
@@ -312,27 +366,42 @@ export class TradeQuoter {
       (feePercentage / 100)
     );
 
+    const positionForFromToken = setOnChainDetails
+      .positions
+      .find((p: any) => p.component.toLowerCase() === fromTokenAddress.toLowerCase());
+
+    const currentPositionUnits = BigNumber.from(positionForFromToken.unit);
+    const fromTokenImpliedMaxPositionInSet =
+      currentPositionUnits
+        .mul(setTotalSupply)
+        .div(SCALE.toString());
+
+    // If the trade quote returned form ZeroEx equals the target sell token's implied max
+    // position in the Set, we simply return the components current position in the Set as the
+    // "sell quantity" to be submitted to the Trade Module.
+    // If we tried to convert the ZeroEx trade quote data to the per-token quantity, we may
+    // to incorrectly calculate the per-token position, resulting in a dust position being created.
+    // Remember: the Trade Module accepts trade quantities on a per-token basis.
     const fromTokenAmount = quote.sellAmount;
+    let fromUnits: BigNumber;
 
-    // Convert to BigDecimal to get ceiling in fromUnits calculation
-    // This is necessary to derive the trade amount ZeroEx expects when scaling is
-    // done in the TradeModule contract. (ethers.FixedNumber does not work for this case)
-    const fromTokenAmountBD = new BigDecimal(fromTokenAmount.toString());
-    const scaleBD = new BigDecimal(SCALE.toString());
-    const setTotalSupplyBD = new BigDecimal(setTotalSupply.toString());
-
-    const fromUnitsBD = fromTokenAmountBD.multiply(scaleBD).divide(setTotalSupplyBD, 10).ceil();
-    const fromUnits = BigNumber.from(fromUnitsBD.getValue());
+    if (fromTokenAmount.eq(fromTokenImpliedMaxPositionInSet)) {
+      fromUnits = currentPositionUnits;
+    } else {
+      fromUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
+        fromTokenAmount.toString(),
+        setTotalSupply.toString(),
+      );
+    }
 
     const toTokenAmount = quote.buyAmount;
-
-    // BigNumber does not do fixed point math & FixedNumber underflows w/ numbers less than 1
-    // Multiply the slippage by a factor and divide the end result by same...
-    const percentMultiplier = 1000;
-    const slippageAndFee = slippagePercentage + feePercentage;
-    const slippageToleranceBN = Math.floor(percentMultiplier * this.outputSlippageTolerance(slippageAndFee));
-    const toTokenAmountMinusSlippage = toTokenAmount.mul(slippageToleranceBN).div(percentMultiplier);
-    const toUnits = toTokenAmountMinusSlippage.mul(SCALE).div(setTotalSupply);
+    const toUnits = this.convertTotalSetQuantitiesToPerTokenQuantities(
+      quote.buyAmount.toString(),
+      setTotalSupply.toString(),
+      true,
+      slippagePercentage,
+      feePercentage,
+    );
 
     return {
       fromTokenAmount,
@@ -343,12 +412,84 @@ export class TradeQuoter {
     };
   }
 
-  private validateQuoteValues(
+
+  /**
+   * Check that a given batch trade does not produce dust positions in tokens being
+   * sold across multiple trades. This may happen when a user tries to max sell
+   * out of a token position across multiple trades in a single batch.
+   *
+   * @param orderPairs       A list of all trades to be made in a given batch trade txn
+   * @param setToken         An instance fo the Set Token API, used to fetch total supply
+   *                         required to complete validation
+   * @param setTokenAddress  Set Token that will be executing the batch trade txn
+   */
+  public async validateBatchTradeDoesNotProduceDustPosition(
+    orderPairs: TradeOrderPair[],
+    setToken: SetTokenAPI,
+    setTokenAddress: Address
+  ): Promise<void> {
+    const allSellQuantitiesByAddress = {};
+    const sellTokensPresentInMultipleTrades = {};
+
+    orderPairs.forEach((orderEntry: TradeOrderPair) => {
+      const { fromToken: fromTokenAddress, fromTokenDecimals } = orderEntry;
+
+      const fromTokenScaleBN = BigNumber.from(10).pow(fromTokenDecimals);
+      const fromTokenScaleBD = new BigDecimal(fromTokenScaleBN.toString());
+      const fromTokenAmountBD = new BigDecimal(orderEntry.rawAmount).multiply(fromTokenScaleBD);
+      const fromTokenAmountBN = BigNumber.from(fromTokenAmountBD.getValue());
+
+      const totalSellQuantityForComponent = allSellQuantitiesByAddress[fromTokenAddress];
+
+      if (!totalSellQuantityForComponent) {
+        allSellQuantitiesByAddress[fromTokenAddress] = fromTokenAmountBN;
+      } else {
+        allSellQuantitiesByAddress[fromTokenAddress] = totalSellQuantityForComponent.add(fromTokenAmountBN);
+        sellTokensPresentInMultipleTrades[fromTokenAddress] = true;
+      }
+    });
+
+    const setOnChainDetails = await setToken.fetchSetDetailsAsync(
+      setTokenAddress, [NULL_ADDRESS]
+    );
+
+    // Check that each component being sold will not have dust position leftover.
+    // We only want to check poential sell tokens that are spread across multiple trades.
+    // We have other logic in place in fetchZeroExTradeQuoteForTradeModule to allow users to
+    // properly max sell out of a position in a single trade.
+    Object.keys(sellTokensPresentInMultipleTrades).forEach(
+      (fromTokenAddress: Address) => {
+        const totalSellQuantity = allSellQuantitiesByAddress[fromTokenAddress];
+        const perTokenSellQuantity = this.convertTotalSetQuantitiesToPerTokenQuantities(
+          totalSellQuantity.toString(),
+          (setOnChainDetails as any).totalSupply,
+        );
+
+        this.validateTradeDoesNotProduceDustPositions(
+          setOnChainDetails,
+          fromTokenAddress,
+          perTokenSellQuantity,
+        );
+      }
+    );
+  }
+
+  /**
+   * Ensures that a sell or buy quantity generated by a trade quote would not result
+   * in the target Set having a very small dust position upon trade execution.
+   *
+   * @param setOnChainDetails  Set Token whose components are being traded
+   * @param fromTokenAddress   Address of token being sold
+   * @param toTokenAddress     Quantity of token being sold
+   * @param fromTokenQuantity  Address of token being bought
+   * @param toTokenQuantity    Quantity of token being bought
+   */
+  private validateTradeDoesNotProduceDustPositions(
     setOnChainDetails: any,
     fromTokenAddress: Address,
-    toTokenAddress: Address,
-    quoteFromRemainingUnits: BigNumber,
-    quoteToUnits: BigNumber
+    fromTokenQuantity: BigNumber,
+    toTokenAddress?: Address,
+    toTokenQuantity?: BigNumber
   ) {
     // fromToken
     const positionForFromToken = setOnChainDetails
@@ -356,12 +497,16 @@ export class TradeQuoter {
       .find((p: any) => p.component.toLowerCase() === fromTokenAddress.toLowerCase());
 
     const currentPositionUnits = BigNumber.from(positionForFromToken.unit);
-    const remainingPositionUnits = currentPositionUnits.sub(quoteFromRemainingUnits);
+    const remainingPositionUnits = currentPositionUnits.sub(fromTokenQuantity);
     const remainingPositionUnitsTooSmall = remainingPositionUnits.gt(0) && remainingPositionUnits.lt(50);
 
     if (remainingPositionUnitsTooSmall) {
-      throw new Error('Remaining units too small, incorrectly attempting max');
+      throw new Error('Remaining units too small, incorrectly attempting sell max');
     }
+
+    // Sometimes we use this method to only check for dust positions
+    // in the sell component.
+    if (!toTokenAddress && !toTokenQuantity) return;
 
     // toToken
     const positionForToToken = setOnChainDetails
@@ -369,13 +514,13 @@ export class TradeQuoter {
       .find((p: any) => p.component.toLowerCase() === toTokenAddress.toLowerCase());
 
     const newToPositionUnits = (positionForToToken !== undefined)
-      ? positionForToToken.unit.add(quoteToUnits)
-      : quoteToUnits;
+      ? positionForToToken.unit.add(toTokenQuantity)
+      : toTokenQuantity;
 
     const newToUnitsTooSmall = newToPositionUnits.gt(0) && newToPositionUnits.lt(50);
 
     if (newToUnitsTooSmall) {
-      throw new Error('Receive units too small');
+      throw new Error('Receive units too small, attempting to purchase dust quantity of tokens');
     }
   }
 

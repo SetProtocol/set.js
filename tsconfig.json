@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationDir": "./dist/types",
+    "skipLibCheck": true,
     "paths": {
       "@src/*": [ "src/*" ],
       "@test/*": [ "test/*" ]

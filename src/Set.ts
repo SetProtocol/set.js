@@ -38,6 +38,8 @@ import {
   IssuanceExtensionAPI,
   TradeExtensionAPI,
   StreamingFeeExtensionAPI,
+  BatchTradeExtensionAPI,
+  DelegatedManagerAPI,
 } from './api/index';
 
 const ethersProviders = require('ethers').providers;
@@ -146,6 +148,12 @@ class Set {
   public perpV2BasisTradingViewer: PerpV2LeverageViewerAPI;
 
   /**
+   * An instance of DelegatedManager class. Contains methods for owner-administering Delegated
+   * Manager contracts
+   */
+  public delegatedManager: DelegatedManagerAPI;
+
+  /**
    * An instance of DelegatedManagerFactory class. Contains methods for deploying and initializing
    * DelegatedManagerSystem deployed SetTokens and Manager contracts
    */
@@ -189,7 +197,7 @@ class Set {
       assertions
     );
     this.system = new SystemAPI(ethersProvider, config.controllerAddress);
-    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey, config.zeroExApiUrls);
+    this.trade = new TradeAPI(ethersProvider, config.tradeModuleAddress);
     this.navIssuance = new NavIssuanceAPI(ethersProvider, config.navIssuanceModuleAddress);
     this.priceOracle = new PriceOracleAPI(ethersProvider, config.masterOracleAddress);
     this.debtIssuance = new DebtIssuanceAPI(ethersProvider, config.debtIssuanceModuleAddress);
@@ -201,7 +209,9 @@ class Set {
     this.perpV2BasisTradingViewer = new PerpV2LeverageViewerAPI(ethersProvider,
                                                                 config.perpV2BasisTradingModuleViewerAddress);
     this.blockchain = new BlockchainAPI(ethersProvider, assertions);
-    this.utils = new UtilsAPI(ethersProvider, config.zeroExApiKey, config.zeroExApiUrls);
+    this.utils = new UtilsAPI(ethersProvider, config.tradeModuleAddress, config.zeroExApiKey, config.zeroExApiUrls);
+
+    this.delegatedManager = new DelegatedManagerAPI(ethersProvider);
 
     this.delegatedManagerFactory = new DelegatedManagerFactoryAPI(
       ethersProvider,
@@ -212,6 +222,7 @@ class Set {
       streamingFeeExtension: new StreamingFeeExtensionAPI(ethersProvider, config.streamingFeeExtensionAddress),
       issuanceExtension: new IssuanceExtensionAPI(ethersProvider, config.issuanceExtensionAddress),
       tradeExtension: new TradeExtensionAPI(ethersProvider, config.tradeExtensionAddress),
+      batchTradeExtension: new BatchTradeExtensionAPI(ethersProvider, config.batchTradeExtensionAddress),
     };
   }
 }

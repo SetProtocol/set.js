@@ -23,17 +23,7 @@ import { TransactionOverrides } from '@setprotocol/set-protocol-v2/dist/typechai
 import { BigNumber } from 'ethers/lib/ethers';
 
 import TradeModuleWrapper from '../wrappers/set-protocol-v2/TradeModuleWrapper';
-import SetTokenAPI from './SetTokenAPI';
 import Assertions from '../assertions';
-
-import {
-  TradeQuoter
-} from './utils';
-
-import {
-  TradeQuote,
-  ZeroExApiUrls
-} from '../types';
 
 /**
  * @title  TradeAPI
@@ -46,19 +36,13 @@ import {
 export default class TradeAPI {
   private tradeModuleWrapper: TradeModuleWrapper;
   private assert: Assertions;
-  private provider: Provider;
-  private tradeQuoter: TradeQuoter;
 
   public constructor(
     provider: Provider,
     tradeModuleAddress: Address,
-    zeroExApiKey?: string,
-    zeroExApiUrls?: ZeroExApiUrls
   ) {
-    this.provider = provider;
     this.tradeModuleWrapper = new TradeModuleWrapper(provider, tradeModuleAddress);
     this.assert = new Assertions();
-    this.tradeQuoter = new TradeQuoter(zeroExApiKey, zeroExApiUrls);
   }
 
   /**
@@ -127,73 +111,5 @@ export default class TradeAPI {
       callerAddress,
       txOpts
     );
-  }
-
-  /**
-   * Call 0x API to generate a trade quote for two SetToken components.
-   *
-   * @param  fromToken            Address of token being sold
-   * @param  toToken              Address of token being bought
-   * @param  fromTokenDecimals    Token decimals of token being sold (ex: 18)
-   * @param  toTokenDecimals      Token decimals of token being bought (ex: 18)
-   * @param  rawAmount            String quantity of token to sell (ex: "0.5")
-   * @param  fromAddress          SetToken address which holds the buy / sell components
-   * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with (Default: fetched from EthGasStation)
-   * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
-   * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
-   * @param  feePercentage        (Optional) Default: 0
-   * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
-   * @param  excludedSources      (Optional) Exchanges to exclude (Default: ['Kyber', 'Eth2Dai', 'Mesh'])
-   * @param  simulatedChainId     (Optional) ChainId of target network (useful when using a forked development client)
-   *
-   * @return {Promise<TradeQuote>}
-   */
-  public async fetchTradeQuoteAsync(
-    fromToken: Address,
-    toToken: Address,
-    fromTokenDecimals: number,
-    toTokenDecimals: number,
-    rawAmount: string,
-    fromAddress: Address,
-    setToken: SetTokenAPI,
-    gasPrice?: number,
-    slippagePercentage?: number,
-    isFirmQuote?: boolean,
-    feePercentage?: number,
-    feeRecipient?: Address,
-    excludedSources?: string[],
-    simulatedChainId?: number,
-  ): Promise<TradeQuote> {
-    this.assert.schema.isValidAddress('fromToken', fromToken);
-    this.assert.schema.isValidAddress('toToken', toToken);
-    this.assert.schema.isValidAddress('fromAddress', fromAddress);
-    this.assert.schema.isValidJsNumber('fromTokenDecimals', fromTokenDecimals);
-    this.assert.schema.isValidJsNumber('toTokenDecimals', toTokenDecimals);
-    this.assert.schema.isValidString('rawAmount', rawAmount);
-
-    // The forked Hardhat network has a chainId of 31337 so we can't rely on autofetching this value
-    const chainId = (simulatedChainId !== undefined)
-      ? simulatedChainId
-      : (await this.provider.getNetwork()).chainId;
-
-    return this.tradeQuoter.generateQuoteForTrade({
-      fromToken,
-      toToken,
-      fromTokenDecimals,
-      toTokenDecimals,
-      rawAmount,
-      fromAddress,
-      chainId,
-      tradeModule: this.tradeModuleWrapper,
-      provider: this.provider,
-      setToken,
-      gasPrice,
-      slippagePercentage,
-      isFirmQuote,
-      feePercentage,
-      feeRecipient,
-      excludedSources,
-    });
   }
 }
