@@ -82,7 +82,7 @@ export default class UtilsAPI {
    *                              When false, amount is `sellAmount` of `fromToken`
    * @param  fromAddress          SetToken address which holds the buy / sell components
    * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             gasPrice to calculate gas costs with
+   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with
    * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0
@@ -157,7 +157,7 @@ export default class UtilsAPI {
    *                              When false, amount is `sellAmount` of `fromToken`
    * @param  fromAddress          SetToken address which holds the buy / sell components
    * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             gasPrice to calculate gas costs with
+   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with
    * @param  slippagePercentage   (Optional) maximum slippage, determines min receive quantity. (Default: 2%)
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0
@@ -344,7 +344,7 @@ export default class UtilsAPI {
    * @param  orderPairs           TradeOrderPairs array (see `fetchTradeQuoteAsync` for property descriptions)
    * @param  fromAddress          SetToken address which holds the buy / sell components
    * @param  setToken             SetTokenAPI instance
-   * @param  gasPrice             gasPrice to calculate gas costs with
+   * @param  gasPrice             (Optional) gasPrice to calculate gas costs with
    * @param  isFirmQuote          (Optional) Whether quote request is indicative or firm
    * @param  feePercentage        (Optional) Default: 0
    * @param  feeRecipient         (Optional) Default: 0xD3D555Bb655AcBA9452bfC6D7cEa8cC7b3628C55
